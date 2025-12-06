@@ -8,11 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
-    "prisma:seed": "tsx prisma/seed.ts"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "prisma:push": "prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^7.1.0",
@@ -39,4 +35,3 @@
     "typescript": "^5"
   }
 }
-
