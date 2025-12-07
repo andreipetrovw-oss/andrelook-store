@@ -178,7 +178,11 @@ const AndreLookStore = () => {
     }
   };
 
-  const t = translations[language];
+   const base = translations.ru;
+  const t = {
+    ...base,
+    ...translations[language],
+  };
 
   const brands = [
     { id: 'moncler', name: 'Moncler', image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400' },
