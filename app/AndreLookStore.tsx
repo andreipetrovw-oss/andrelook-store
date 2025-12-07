@@ -7,68 +7,68 @@ import {
   ShoppingBag, LogOut, TrendingUp
 } from "lucide-react";
 
-// === ВАЖНО: translations должны быть ОБЪЯВЛЕНЫ ПЕРЕД использованием ===
-const translations = {
-  ru: {
-    home: "Главная",
-    brands: "Бренды",
-    about: "О нас",
-    contact: "Контакты",
-    cart: "Корзина",
-    account: "Аккаунт",
-    admin: "Админ",
-    heroTitle: "Премиум одежда европейских брендов",
-    heroSubtitle:
-      "Оригинальные коллекции Moncler, Parajumpers и CP Company с доставкой по Европе",
-    selectBrand: "Выберите бренд",
-    catalog: "Смотреть каталог",
-    addToCart: "Добавить в корзину",
-    checkout: "Оформить заказ",
-    backToBrands: "Назад к брендам",
-    backToCatalog: "Назад к каталогу",
-    emptyCart: "Корзина пуста",
-    total: "Итого",
-    shipping: "Доставка",
-    free: "Бесплатно",
-    orderSuccess: "Заказ оформлен!",
-    thankYou: "Спасибо за покупку в AndreLook",
-    orderDetails: "Детали заказа отправлены на ваш email",
-    guarantee: "Гарантия подлинности",
-    guaranteeText: "100% оригинальные товары от официальных поставщиков",
-    fastShipping: "Быстрая доставка",
-    shippingText: "Европа 3-7 дней, Эстония 1-3 дня",
-    premium: "Премиум качество",
-    premiumText: "Тщательный контроль качества каждого изделия",
-    aboutTitle: "О нас",
-    aboutText:
-      "AndreLook - эксклюзивный бутик премиальной одежды. Оригинальные коллекции ведущих брендов Европы.",
-    name: "Имя и фамилия",
-    email: "Email",
-    phone: "Телефон",
-    address: "Адрес доставки",
-    paymentMethod: "Способ оплаты",
-    confirmOrder: "Подтвердить заказ",
-  },
-  en: {},
-  et: {},
-} as const;
-
-type Lang = keyof typeof translations;
-
-// ===================================================================
-
 const AndreLookStore = () => {
+  // ---------- STATE ----------
   const [currentView, setCurrentView] = useState("home");
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [cart, setCart] = useState<any[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState(1);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [language, setLanguage] = useState<Lang>("ru");
+  const [language, setLanguage] = useState<"ru" | "en" | "et">("ru");
 
-  const t = translations[language];
+  // ---------- FIXED TRANSLATIONS ----------
+  const translations = {
+    ru: {
+      home: "Главная",
+      brands: "Бренды",
+      about: "О нас",
+      contact: "Контакты",
+      cart: "Корзина",
+      account: "Аккаунт",
+      admin: "Админ",
+      heroTitle: "Премиум одежда европейских брендов",
+      heroSubtitle:
+        "Оригинальные коллекции Moncler, Parajumpers и CP Company с доставкой по Европе",
+      selectBrand: "Выберите бренд",
+      catalog: "Смотреть каталог",
+      addToCart: "Добавить в корзину",
+      checkout: "Оформить заказ",
+      backToBrands: "Назад к брендам",
+      backToCatalog: "Назад к каталогу",
+      emptyCart: "Корзина пуста",
+      total: "Итого",
+      shipping: "Доставка",
+      free: "Бесплатно",
+      orderSuccess: "Заказ оформлен!",
+      thankYou: "Спасибо за покупку в AndreLook",
+      orderDetails: "Детали заказа отправлены на ваш email",
+      guarantee: "Гарантия подлинности",
+      guaranteeText: "100% оригинальные товары от официальных поставщиков",
+      fastShipping: "Быстрая доставка",
+      shippingText: "Европа 3–7 дней, Эстония 1–3 дня",
+      premium: "Премиум качество",
+      premiumText: "Контроль качества каждого изделия",
+      name: "Имя и фамилия",
+      email: "Email",
+      phone: "Телефон",
+      address: "Адрес доставки",
+      paymentMethod: "Способ оплаты",
+      confirmOrder: "Подтвердить заказ",
+    },
+    en: {}, // будут заменены на RU ниже
+    et: {}, // будут заменены на RU ниже
+  };
 
+  // ---------- 🧩 FIX: EN и ET получают те же поля, что и RU ----------
+  const base = translations.ru;
+  const t = {
+    ...base,
+    ...translations[language],
+  };
+
+  // ---------- BRANDS ----------
   const brands = [
     {
       id: "moncler",
@@ -90,7 +90,8 @@ const AndreLookStore = () => {
     },
   ];
 
-  const products: Record<string, any[]> = {
+  // ---------- PRODUCTS ----------
+  const products: any = {
     moncler: [
       {
         id: 1,
@@ -100,16 +101,20 @@ const AndreLookStore = () => {
         image:
           "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600",
         rating: 5,
-        description: { ru: "Легендарная пуховая куртка Moncler Maya." },
+        description: {
+          ru: "Легендарная пуховая куртка Moncler Maya.",
+          en: "Legendary Moncler Maya down jacket.",
+          et: "Legendaarne Moncler Maya sulejope.",
+        },
       },
     ],
     parajumpers: [],
     cpcompany: [],
   };
 
+  // ---------- CART LOGIC ----------
   const addToCart = (product: any) => {
     const existing = cart.find((i) => i.id === product.id);
-
     if (existing) {
       setCart(
         cart.map((i) =>
@@ -151,11 +156,16 @@ const AndreLookStore = () => {
     }, 2500);
   };
 
+  // ------------------------------------------------------------
+  // -----------------------   UI   ------------------------------
+  // ------------------------------------------------------------
+
   return (
     <div className="min-h-screen bg-stone-50">
       {/* HEADER */}
       <header className="bg-white border-b border-stone-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+
           {/* LOGO */}
           <div
             onClick={() => {
@@ -165,14 +175,14 @@ const AndreLookStore = () => {
             }}
             className="flex items-center gap-3 cursor-pointer"
           >
-            <span className="text-4xl font-serif text-stone-800">AL</span>
-            <span className="text-xl text-stone-700 tracking-widest">
-              ANDRELOOK
-            </span>
+            <span className="text-4xl font-serif">AL</span>
+            <span className="text-xl tracking-widest">ANDRELOOK</span>
           </div>
 
           {/* ACTIONS */}
           <div className="flex items-center gap-4">
+
+            {/* Language */}
             <button
               onClick={() => setLanguage("ru")}
               className={`px-2 py-1 rounded text-xs ${
@@ -182,6 +192,7 @@ const AndreLookStore = () => {
               RU
             </button>
 
+            {/* CART */}
             <button
               onClick={() => setShowCart(true)}
               className="relative p-2 hover:bg-stone-100 rounded-full"
@@ -197,7 +208,7 @@ const AndreLookStore = () => {
         </div>
       </header>
 
-      {/* HOME PAGE */}
+      {/* ---------------- HOME PAGE ---------------- */}
       {currentView === "home" && !selectedBrand && (
         <main className="max-w-7xl mx-auto p-8">
           <h2 className="text-5xl text-stone-800 mb-6">{t.heroTitle}</h2>
@@ -229,7 +240,7 @@ const AndreLookStore = () => {
         </main>
       )}
 
-      {/* PRODUCT CATALOG */}
+      {/* ---------------- CATALOG ---------------- */}
       {currentView === "catalog" && selectedBrand && (
         <main className="max-w-7xl mx-auto p-8">
           <button
@@ -248,7 +259,7 @@ const AndreLookStore = () => {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {products[selectedBrand]?.map((product) => (
+            {products[selectedBrand]?.map((product: any) => (
               <div
                 key={product.id}
                 className="border rounded-xl overflow-hidden hover:shadow-xl cursor-pointer"
@@ -257,12 +268,9 @@ const AndreLookStore = () => {
                   setCurrentView("product");
                 }}
               >
-                <img
-                  src={product.image}
-                  className="h-96 w-full object-cover"
-                />
+                <img src={product.image} className="h-96 w-full object-cover" />
                 <div className="p-6">
-                  <h3 className="text-xl text-stone-800">{product.name}</h3>
+                  <h3 className="text-xl">{product.name}</h3>
                   <p className="text-2xl mt-2">€{product.price}</p>
                 </div>
               </div>
@@ -271,7 +279,7 @@ const AndreLookStore = () => {
         </main>
       )}
 
-      {/* PRODUCT PAGE */}
+      {/* ---------------- PRODUCT PAGE ---------------- */}
       {currentView === "product" && selectedProduct && (
         <main className="max-w-7xl mx-auto p-8">
           <button
@@ -289,9 +297,7 @@ const AndreLookStore = () => {
             <img src={selectedProduct.image} className="w-full rounded-xl" />
 
             <div>
-              <h2 className="text-4xl text-stone-800">
-                {selectedProduct.name}
-              </h2>
+              <h2 className="text-4xl">{selectedProduct.name}</h2>
 
               <p className="mt-6 text-xl">€{selectedProduct.price}</p>
 
@@ -306,7 +312,7 @@ const AndreLookStore = () => {
         </main>
       )}
 
-      {/* CART */}
+      {/* ---------------- CART ---------------- */}
       {showCart && (
         <div className="fixed inset-0 flex justify-end z-50">
           <div
