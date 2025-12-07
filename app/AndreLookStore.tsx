@@ -1,3 +1,5 @@
+type TranslationKeys = keyof typeof translations;
+
 "use client";
 
 import React, { useState } from "react";
@@ -65,7 +67,9 @@ const AndreLookStore = () => {
     et: {},
   };
 
-  const t = translations[language];
+  const t = translations[language as keyof typeof translations];
+;
+;
 
   const brands = [
     {
