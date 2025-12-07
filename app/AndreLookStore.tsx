@@ -179,10 +179,11 @@ const AndreLookStore = () => {
   };
 
    const base = translations.ru;
-  const t = {
-    ...base,
-    ...translations[language],
-  };
+const t = {
+  ...base,
+  ...(translations[language as keyof typeof translations] || base),
+};
+
 
   const brands = [
     { id: 'moncler', name: 'Moncler', image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400' },
@@ -327,7 +328,8 @@ const AndreLookStore = () => {
     { id: 3, name: 'John Smith', email: 'john@example.com', orders: 5, totalSpent: 7500 }
   ];
 
-  const addToCart = (product) => {
+  const addToCart = (product: any) => {
+
     const existingItem = cart.find(item => item.id === product.id);
     if (existingItem) {
       setCart(cart.map(item => 
