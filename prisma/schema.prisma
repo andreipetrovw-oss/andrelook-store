@@ -1,8 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["deno"]
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -10,44 +8,44 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  password      String
-  role          String    @default("user")
-  orders        Order[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("user")
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Brand {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  nameEn      String
-  nameEt      String
-  image       String
-  products    Product[]
-  createdAt   DateTime  @default(now())
+  id        String    @id @default(cuid())
+  name      String    @unique
+  nameEn    String
+  nameEt    String
+  image     String
+  products  Product[]
+  createdAt DateTime  @default(now())
 }
 
 model Product {
-  id              String      @id @default(cuid())
-  name            String
-  nameEn          String
-  nameEt          String
-  descriptionRu   String      @db.Text
-  descriptionEn   String      @db.Text
-  descriptionEt   String      @db.Text
-  price           Float
-  brand           Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  brandId         String
-  image           String
-  images          String[]
-  rating          Int         @default(5)
-  inStock         Boolean     @default(true)
-  orderItems      OrderItem[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id            String      @id @default(cuid())
+  name          String
+  nameEn        String
+  nameEt        String
+  descriptionRu String      @db.Text
+  descriptionEn String      @db.Text
+  descriptionEt String      @db.Text
+  price         Float
+  brand         Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId       String
+  image         String
+  images        String[]
+  rating        Int         @default(5)
+  inStock       Boolean     @default(true)
+  orderItems    OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Order {
@@ -69,11 +67,11 @@ model Order {
 }
 
 model OrderItem {
-  id          String   @id @default(cuid())
-  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId     String
-  product     Product  @relation(fields: [productId], references: [id])
-  productId   String
-  quantity    Int
-  price       Float
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Float
 }
