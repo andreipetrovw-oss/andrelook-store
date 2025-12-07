@@ -1,6 +1,7 @@
+"use client";
+
 type TranslationKeys = keyof typeof translations;
 
-"use client";
 
 import React, { useState } from "react";
 import {
