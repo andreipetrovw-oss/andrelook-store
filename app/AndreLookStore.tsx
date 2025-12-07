@@ -1,8 +1,5 @@
 "use client";
 
-type TranslationKeys = keyof typeof translations;
-
-
 import React, { useState } from "react";
 import {
   ShoppingCart, User, Search, Heart, ChevronRight, Star, Truck,
@@ -10,67 +7,67 @@ import {
   ShoppingBag, LogOut, TrendingUp
 } from "lucide-react";
 
+// === ВАЖНО: translations должны быть ОБЪЯВЛЕНЫ ПЕРЕД использованием ===
+const translations = {
+  ru: {
+    home: "Главная",
+    brands: "Бренды",
+    about: "О нас",
+    contact: "Контакты",
+    cart: "Корзина",
+    account: "Аккаунт",
+    admin: "Админ",
+    heroTitle: "Премиум одежда европейских брендов",
+    heroSubtitle:
+      "Оригинальные коллекции Moncler, Parajumpers и CP Company с доставкой по Европе",
+    selectBrand: "Выберите бренд",
+    catalog: "Смотреть каталог",
+    addToCart: "Добавить в корзину",
+    checkout: "Оформить заказ",
+    backToBrands: "Назад к брендам",
+    backToCatalog: "Назад к каталогу",
+    emptyCart: "Корзина пуста",
+    total: "Итого",
+    shipping: "Доставка",
+    free: "Бесплатно",
+    orderSuccess: "Заказ оформлен!",
+    thankYou: "Спасибо за покупку в AndreLook",
+    orderDetails: "Детали заказа отправлены на ваш email",
+    guarantee: "Гарантия подлинности",
+    guaranteeText: "100% оригинальные товары от официальных поставщиков",
+    fastShipping: "Быстрая доставка",
+    shippingText: "Европа 3-7 дней, Эстония 1-3 дня",
+    premium: "Премиум качество",
+    premiumText: "Тщательный контроль качества каждого изделия",
+    aboutTitle: "О нас",
+    aboutText:
+      "AndreLook - эксклюзивный бутик премиальной одежды. Оригинальные коллекции ведущих брендов Европы.",
+    name: "Имя и фамилия",
+    email: "Email",
+    phone: "Телефон",
+    address: "Адрес доставки",
+    paymentMethod: "Способ оплаты",
+    confirmOrder: "Подтвердить заказ",
+  },
+  en: {},
+  et: {},
+} as const;
+
+type Lang = keyof typeof translations;
+
+// ===================================================================
+
 const AndreLookStore = () => {
   const [currentView, setCurrentView] = useState("home");
-  const [selectedBrand, setSelectedBrand] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [cart, setCart] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [cart, setCart] = useState<any[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState(1);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [language, setLanguage] = useState("ru");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
+  const [language, setLanguage] = useState<Lang>("ru");
 
-  const translations = {
-    ru: {
-      home: "Главная",
-      brands: "Бренды",
-      about: "О нас",
-      contact: "Контакты",
-      cart: "Корзина",
-      account: "Аккаунт",
-      admin: "Админ",
-      heroTitle: "Премиум одежда европейских брендов",
-      heroSubtitle:
-        "Оригинальные коллекции Moncler, Parajumpers и CP Company с доставкой по Европе",
-      selectBrand: "Выберите бренд",
-      catalog: "Смотреть каталог",
-      addToCart: "Добавить в корзину",
-      checkout: "Оформить заказ",
-      backToBrands: "Назад к брендам",
-      backToCatalog: "Назад к каталогу",
-      emptyCart: "Корзина пуста",
-      total: "Итого",
-      shipping: "Доставка",
-      free: "Бесплатно",
-      orderSuccess: "Заказ оформлен!",
-      thankYou: "Спасибо за покупку в AndreLook",
-      orderDetails: "Детали заказа отправлены на ваш email",
-      guarantee: "Гарантия подлинности",
-      guaranteeText: "100% оригинальные товары от официальных поставщиков",
-      fastShipping: "Быстрая доставка",
-      shippingText: "Европа 3-7 дней, Эстония 1-3 дня",
-      premium: "Премиум качество",
-      premiumText: "Тщательный контроль качества каждого изделия",
-      aboutTitle: "О нас",
-      aboutText:
-        "AndreLook - эксклюзивный бутик премиальной одежды. Оригинальные коллекции ведущих брендов Европы.",
-      name: "Имя и фамилия",
-      email: "Email",
-      phone: "Телефон",
-      address: "Адрес доставки",
-      paymentMethod: "Способ оплаты",
-      confirmOrder: "Подтвердить заказ",
-    },
-    en: {},
-    et: {},
-  };
-
-  const t = translations[language as keyof typeof translations];
-;
-;
+  const t = translations[language];
 
   const brands = [
     {
@@ -93,7 +90,7 @@ const AndreLookStore = () => {
     },
   ];
 
-  const products = {
+  const products: Record<string, any[]> = {
     moncler: [
       {
         id: 1,
@@ -103,18 +100,14 @@ const AndreLookStore = () => {
         image:
           "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600",
         rating: 5,
-        description: {
-          ru: "Легендарная пуховая куртка Moncler Maya.",
-          en: "",
-          et: "",
-        },
+        description: { ru: "Легендарная пуховая куртка Moncler Maya." },
       },
     ],
     parajumpers: [],
     cpcompany: [],
   };
 
-  const addToCart = (product) => {
+  const addToCart = (product: any) => {
     const existing = cart.find((i) => i.id === product.id);
 
     if (existing) {
@@ -128,10 +121,10 @@ const AndreLookStore = () => {
     }
   };
 
-  const removeFromCart = (id) =>
+  const removeFromCart = (id: number) =>
     setCart(cart.filter((item) => item.id !== id));
 
-  const updateQuantity = (id, delta) => {
+  const updateQuantity = (id: number, delta: number) => {
     setCart(
       cart
         .map((item) =>
@@ -293,10 +286,7 @@ const AndreLookStore = () => {
           </button>
 
           <div className="grid md:grid-cols-2 gap-12">
-            <img
-              src={selectedProduct.image}
-              className="w-full rounded-xl"
-            />
+            <img src={selectedProduct.image} className="w-full rounded-xl" />
 
             <div>
               <h2 className="text-4xl text-stone-800">
@@ -316,7 +306,7 @@ const AndreLookStore = () => {
         </main>
       )}
 
-      {/* CART DRAWER */}
+      {/* CART */}
       {showCart && (
         <div className="fixed inset-0 flex justify-end z-50">
           <div
