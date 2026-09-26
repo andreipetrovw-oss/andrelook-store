@@ -24,6 +24,7 @@ The malformed legacy application was replaced in the explicit scaffold commit `d
 - Prisma 6.12.0 is deliberately pinned because the newer lines evaluated during the build reported high-severity dependency findings; the selected lockfile reports zero vulnerabilities.
 - ESLint 9.39.5 is the latest peer-compatible line for the current Next.js ESLint dependency graph. ESLint 10 was evaluated and rejected because three current upstream plugins declare it outside their peer ranges. This compatibility constraint should be revisited when the Next.js lint stack supports ESLint 10.
 - `npm audit --audit-level=high`: zero vulnerabilities.
+- The lockfile was normalized with npm 12 after the first Linux CI run exposed two optional WebAssembly dependency records that npm 11 on macOS had omitted. The corrected lockfile passes clean installs with both npm 11 and npm 12.
 - Security headers disable framing and MIME sniffing, restrict referrers and browser permissions, and remove the framework-powered header.
 - A repository secret-pattern scan found no credentials/private keys. The private Phase 5C1 source artifact is not committed.
 
@@ -73,6 +74,7 @@ Server-protected structural routes exist at `/admin`, `/admin/orders`, and `/adm
 - Prisma schema and migration-script generation: pass; real isolated migration application: pass.
 - Import checksum/dry run: pass; isolated write/repeat/count verification: pass.
 - Production build: pass; all expected App Router routes emitted.
+- GitHub Actions: the initial run identified the cross-platform lockfile omission before executing the remaining gates; the lockfile was corrected and the final remote run/result is recorded in the final handoff.
 - Runtime smoke test: RU/ET/EN home/catalog 200; unsupported/missing records 404; root 307 to `/ru`; disabled admin routes 307 to sign-in; robots/sitemap 200; staging robots disallow all; security headers present.
 - Dependency audit and secret scan: pass.
 
@@ -93,6 +95,7 @@ The repository has an environment contract, migration/import commands, indexing-
 - Development branch: `v1-foundation`.
 - Scaffold commit: `db224d5736bbdd9723b1e5507105daaddd1c2906`.
 - Foundation implementation commit: `b3aeae3d69a0b9df791cc77022ff01f77439cb8b`.
+- Cross-platform dependency-lock correction: `4c93653abd68d64b55a0201480c4624249a909b2`.
 - This report is committed separately after the implementation so the implementation SHA can be recorded without ambiguity; its exact commit is included in the final Phase 6B handoff.
 - Preservation branch, tag, mirror, bundle, and checksums are listed in section A.
 - Technical artifacts include the schema/migration, importer/tests, auth/data boundaries, locale routes, visual tokens/components, studio standard, CI, setup and staging documentation.
