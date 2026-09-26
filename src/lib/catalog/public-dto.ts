@@ -1,3 +1,5 @@
+import type { ImageRole } from "@prisma/client";
+
 import type { Locale } from "@/config/locales";
 
 export type PublicProductDto = {
@@ -11,7 +13,7 @@ export type PublicProductDto = {
   images: Array<{
     alt: string;
     height: number;
-    role: "PRIMARY" | "GALLERY" | "SIZE_CHART" | "DETAIL";
+    role: ImageRole;
     url: string;
     width: number;
   }>;
@@ -42,7 +44,7 @@ export type PublicProductRecord = {
   id: string;
   images: Array<{
     height: number;
-    role: "PRIMARY" | "GALLERY" | "SIZE_CHART" | "DETAIL";
+    role: ImageRole;
     sortOrder: number;
     translations: Array<{
       altText: string;

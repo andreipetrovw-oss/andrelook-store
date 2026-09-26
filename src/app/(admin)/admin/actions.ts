@@ -4,7 +4,7 @@ import { OrderStatus, PaymentKind } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireOwner } from "@/lib/auth/server";
+import { requireActiveAdmin } from "@/lib/admin/identity";
 import { getPrisma } from "@/lib/db";
 
 const statusSchema = z.object({
@@ -25,29 +25,10 @@ const paymentSchema = z.object({
   reference: z.string().trim().max(200).optional(),
 });
 
-async function adminId() {
-  const identity = await requireOwner();
-  const admin = await getPrisma().adminUser.upsert({
-    create: {
-      email: identity.email,
-      provider: identity.provider,
-      providerSubject: identity.providerSubject,
-    },
-    update: { email: identity.email, isActive: true },
-    where: {
-      provider_providerSubject: {
-        provider: identity.provider,
-        providerSubject: identity.providerSubject,
-      },
-    },
-  });
-  return admin.id;
-}
-
 export async function updateOrderStatus(formData: FormData) {
   const parsed = statusSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid status update.");
-  const changedByAdminId = await adminId();
+  const changedByAdminId = (await requireActiveAdmin()).id;
   const prisma = getPrisma();
   await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUniqueOrThrow({
@@ -78,7 +59,7 @@ export async function updateOrderStatus(formData: FormData) {
 export async function recordPayment(formData: FormData) {
   const parsed = paymentSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid payment.");
-  const recordedByAdminId = await adminId();
+  const recordedByAdminId = (await requireActiveAdmin()).id;
   await getPrisma().payment.create({
     data: {
       amountMinor: Math.round(parsed.data.amount * 100),

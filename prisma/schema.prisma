@@ -33,6 +33,13 @@ enum SourceReviewStatus {
   REJECTED
 }
 
+enum ReviewDecision {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVISION
+}
+
 enum OrderStatus {
   NEW
   CONTACTED
@@ -73,9 +80,16 @@ enum PaymentKind {
 
 enum ImageRole {
   PRIMARY
+  FRONT
+  BACK
+  SIDE
+  ALTERNATIVE
+  INTERIOR
   GALLERY
-  SIZE_CHART
   DETAIL
+  BRANDING
+  ADDITIONAL
+  SIZE_CHART
 }
 
 model Category {
@@ -142,6 +156,8 @@ model Product {
   sizeChart            SizeChart?
   variants             ProductVariant[]
   orderItems           OrderItem[]
+  review               ProductReview?
+  reviewEvents         ProductReviewEvent[]
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
@@ -210,25 +226,68 @@ model ProductSourceImage {
 }
 
 model ProductImage {
-  id           String                    @id @default(cuid())
-  productId    String
-  product      Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sourceImageId String?
-  sourceImage   ProductSourceImage?       @relation(fields: [sourceImageId], references: [id], onDelete: SetNull)
-  storageKey   String                    @unique
-  url          String
-  role         ImageRole
-  sortOrder    Int                       @default(0)
-  width        Int
-  height       Int
-  reviewStatus SourceReviewStatus        @default(NEEDS_REVIEW)
-  approvedAt   DateTime?
-  translations ProductImageTranslation[]
-  createdAt    DateTime                  @default(now())
-  updatedAt    DateTime                  @updatedAt
+  id                String                    @id @default(cuid())
+  productId         String
+  product           Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sourceImageId     String?
+  sourceImage       ProductSourceImage?       @relation(fields: [sourceImageId], references: [id], onDelete: SetNull)
+  storageKey        String                    @unique
+  url               String
+  role              ImageRole
+  sortOrder         Int                       @default(0)
+  width             Int
+  height            Int
+  reviewStatus      SourceReviewStatus        @default(NEEDS_REVIEW)
+  approvedAt        DateTime?
+  approvedByAdminId String?
+  approvedByAdmin   AdminUser?                @relation("ProductImageApprover", fields: [approvedByAdminId], references: [id], onDelete: SetNull)
+  translations      ProductImageTranslation[]
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
 
   @@index([productId, role, sortOrder])
   @@index([sourceImageId])
+  @@index([approvedByAdminId])
+}
+
+model ProductReview {
+  id                       String         @id @default(cuid())
+  productId                String         @unique
+  product                  Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  identityDecision         ReviewDecision @default(PENDING)
+  categoryDecision         ReviewDecision @default(PENDING)
+  visualDecision           ReviewDecision @default(PENDING)
+  sizeDecision             ReviewDecision @default(PENDING)
+  contentDecision          ReviewDecision @default(PENDING)
+  commercialDecision       ReviewDecision @default(PENDING)
+  optionsDecision          ReviewDecision @default(PENDING)
+  imageDecision            ReviewDecision @default(PENDING)
+  blockingIssues           Json?
+  ownerPublicationApproved Boolean        @default(false)
+  ownerApprovedAt          DateTime?
+  reviewedByAdminId        String?
+  reviewedByAdmin          AdminUser?     @relation("ProductReviewOwner", fields: [reviewedByAdminId], references: [id], onDelete: SetNull)
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+
+  @@index([ownerPublicationApproved])
+  @@index([reviewedByAdminId])
+}
+
+model ProductReviewEvent {
+  id               String    @id @default(cuid())
+  productId        String
+  product          Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  changedByAdminId String
+  changedByAdmin   AdminUser @relation("ProductReviewEventOwner", fields: [changedByAdminId], references: [id], onDelete: Restrict)
+  action           String
+  beforeState      Json?
+  afterState       Json?
+  note             String?
+  createdAt        DateTime  @default(now())
+
+  @@index([productId, createdAt])
+  @@index([changedByAdminId, createdAt])
 }
 
 model ProductImageTranslation {
@@ -424,15 +483,18 @@ model OrderStatusHistory {
 }
 
 model AdminUser {
-  id              String               @id @default(cuid())
-  provider        String
-  providerSubject String
-  email           String               @unique
-  isActive        Boolean              @default(true)
-  payments        Payment[]            @relation("PaymentRecorder")
-  statusChanges   OrderStatusHistory[] @relation("StatusChanger")
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  id                  String               @id @default(cuid())
+  provider            String
+  providerSubject     String
+  email               String               @unique
+  isActive            Boolean              @default(true)
+  payments            Payment[]            @relation("PaymentRecorder")
+  statusChanges       OrderStatusHistory[] @relation("StatusChanger")
+  productImages       ProductImage[]       @relation("ProductImageApprover")
+  productReviews      ProductReview[]      @relation("ProductReviewOwner")
+  productReviewEvents ProductReviewEvent[] @relation("ProductReviewEventOwner")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   @@unique([provider, providerSubject])
 }
