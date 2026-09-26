@@ -746,6 +746,7 @@ button:disabled {
 }
 
 .admin-sidebar {
+  min-width: 0;
   background: var(--color-ink);
   color: white;
   display: grid;
@@ -760,6 +761,7 @@ button:disabled {
 }
 
 .admin-main {
+  min-width: 0;
   padding: clamp(2rem, 5vw, 5rem);
 }
 
@@ -1043,7 +1045,7 @@ button:disabled {
 
   .admin-sidebar nav {
     grid-column: 1 / -1;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     order: 3;
   }
 
