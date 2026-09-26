@@ -15,11 +15,11 @@ were preserved.
 
 - No rebase, force-push, main merge, or production-repository write occurred.
 - Deployed implementation commit:
-  `3a269f4440e46528ad88112a19d55397ca0af08f`.
+  `b366af8e62288359c772191b86580c33279f7670`.
 - At final implementation verification, local HEAD and
-  `origin/phase6d-owner-golden-products` matched that commit and the worktree
-  was clean. The final user-facing completion report records the later
-  documentation-only commit, if any.
+  `origin/phase6d-owner-golden-products` matched that commit before this final
+  report update. The final user-facing completion report records the later
+  documentation-only commit and its CI run.
 - Preserved refs at final safety verification:
   - `origin/main`: `1709a6a89372e9c07f1f2137acc65afc2626fc59`
   - `origin/v1-foundation`: `8166ced8f3f718c57c35ff1c14f07c926f57597a`
@@ -33,38 +33,41 @@ were preserved.
 
 ## C. Owner authentication
 
-The existing Clerk-ready authorization architecture remains fail-closed.
-Every `/admin` layout, private catalog query, and CRM/catalog mutation performs
-server-side owner authorization. When staging auth is disabled, `/admin`,
-`/admin/orders`, and `/admin/catalog` redirect to
-`/sign-in?reason=not-configured`; no fallback password, seed owner, client-only
-role check, or bypass was introduced.
+Clerk authentication is active for staging only. Marketplace resource
+`clerk-aquamarine-cave` (`ir_wVzvWzHNQR0CNV4n`, installation
+`icfg_PisxUIr8oKLyrCu9p7ZLv2yL`) is connected only to
+`andrelook-v1-staging`. Clerk keys, `AUTH_PROVIDER=clerk`, and the exact
+`OWNER_EMAILS` value are scoped to the isolated project's Production, Preview,
+and Development environments.
 
-Clerk activation is intentionally incomplete for two external owner inputs:
+The Clerk instance and the application server each allow exactly
+`info.andrelook@gmail.com`. Clerk has one allowlist identifier and one user,
+both for that address; no other user exists. Clerk's allowlist is enabled, so
+other visitors cannot create customer accounts. Every `/admin` route is
+rejected in middleware when signed out, and every layout, private query, and
+CRM/catalog mutation independently performs exact, case-normalized server-side
+owner authorization. No fallback password, seed owner, client-only role check,
+or bypass exists.
 
-1. Vercel still returns `integration_terms_acceptance_required`. The owner must
-   review and accept the Clerk Marketplace terms at
-   <https://vercel.com/andreys-projects-a106cf89/~/integrations/accept-terms/clerk?source=cli>.
-2. The exact owner-controlled email for `OWNER_EMAILS` has not been explicitly
-   provided. It must not be inferred from repository, Git, or public contact
-   data.
-
-Until both are supplied, no authenticated owner session can or should be
-created.
+An anonymous request to `/admin` returns `307` to
+`/sign-in?reason=unauthenticated`. The owner completed Clerk enrollment in the
+browser, the app created one active `AdminUser` only after a successful
+authenticated mutation, and the final browser session displayed the exact
+allowlisted email.
 
 ## D. CRM owner review
 
-The CRM retains the Phase 6C overview, order list, order detail, status history,
-payment/balance visibility, source/acquisition visibility, next-action display,
-catalog readiness list, and protected private supplier evidence. Status and
-payment mutations now share the active owner identity helper and remain
-audited.
+The authenticated owner review passed for `/admin`, `/admin/orders`, an order
+detail, `/admin/catalog`, and a golden-product catalog detail. The CRM showed
+the two NEW requests, customer contact method/value, requested product and
+size, pending colour/price state, acquisition channel, payment/balance state,
+next action, timeline, readiness gates, and private supplier/source evidence.
 
-The two existing isolated requests remain NEW and intact. A real authenticated
-owner review of `/admin`, `/admin/orders`, `/admin/orders/{id}`,
-`/admin/catalog`, and `/admin/catalog/{id}` could not be completed without the
-Clerk terms acceptance and exact allowlisted email. No authentication was
-weakened to simulate that review.
+On `AL-20260926-0B017F`, the owner-only mutation path completed a real audited
+`NEW -> CONTACTED -> NEW` cycle. Both notes and both new timeline records were
+visible after reload. The request was returned to its original NEW operational
+state; neither request was deleted or replaced. Payment recording was inspected
+but not exercised because no payment fact exists.
 
 ## E. Golden product fact review
 
@@ -188,15 +191,16 @@ four products remain `READY` for staging review only and explicitly blocked.
 
 ## N. End-to-end request/CRM test
 
-The original two isolated Phase 6C requests remain intact, each with one NEW
-status-history entry and exact product/size snapshots. Database totals are two
-orders, two customers, zero payments and zero admin identities. No extra test
-customer or order was created during Phase 6D.
+The original two isolated Phase 6C requests remain intact with exact
+product/size snapshots. Database totals are two orders, two customers, zero
+payments and one expected active owner `AdminUser`. No extra customer, order or
+payment was created.
 
-The final authenticated request-to-owner-status-change replay is pending Clerk
-activation. Existing unit/integration coverage verifies request snapshot
-integrity and transactional status-history creation; the owner mutation was not
-bypassed to manufacture a browser result.
+`AL-20260926-0B017F` now has three status-history entries: its original NEW
+entry, the authenticated CONTACTED verification, and the authenticated reset to
+NEW. `AL-20260926-A122AA` retains its original single NEW entry. This verifies
+the real owner mutation and history path without inventing a commercial or
+payment event.
 
 ## O. Responsive/accessibility
 
@@ -208,12 +212,19 @@ the auditor could not calculate a gradient background colour.
 
 The protected CRM layout and controls include responsive one-column states,
 scrollable tables, native labels, keyboard focus, fieldsets and lazy-loaded
-source evidence. Authenticated CRM browser verification at 390/768/1440 remains
-pending owner authentication rather than being bypassed.
+source evidence. Authenticated browser verification passed at 390, 768 and
+1440 pixels for overview, order list and golden catalog detail, with the exact
+owner identity visible and no console warnings/errors. A real 390-pixel order
+list check exposed grid min-content overflow; commit `2c3d30f` added explicit
+grid-item containment and equal-width mobile navigation. The deployed retest
+reported viewport and document widths both at 390 pixels, while the order table
+remained intentionally scrollable inside its wrapper.
 
 ## P. Security/privacy
 
 - Auth, private reads and all owner mutations fail closed.
+- Clerk and the application each allow exactly one owner email; the Clerk
+  instance contains one user and no public customer identity.
 - Supplier/source/customer data remains absent from public DTOs.
 - Public assets require owner identity, approved source linkage and explicit
   fidelity confirmation.
@@ -228,7 +239,8 @@ pending owner authentication rather than being bypassed.
 
 ## Q. Tests/build/CI
 
-The complete local gate passed from a fresh install:
+The complete local gate passed from a fresh install, followed by the relevant
+full gate after the final auth/viewport hardening:
 
 - `npm ci`;
 - `npm audit --audit-level=high`: zero vulnerabilities;
@@ -248,43 +260,42 @@ The first remote run identified a macOS/Linux optional-dependency lockfile
 omission. The lock was corrected with explicit portable WASM runtime entries,
 the clean gate was repeated, and GitHub Actions run `36271375194` completed
 green at `3a269f4440e46528ad88112a19d55397ca0af08f`. The final completion message
-records the CI run for the documentation-only final HEAD.
+records the fully green CI run for the documentation-only final HEAD.
 
 ## R. Staging deployment
 
 - Project: `andrelook-v1-staging`
 - Project ID: `prj_M6hDxQzBiShNOpWkWwSj3FOZmf1m`
 - Owner URL: <https://andrelook-v1-staging.vercel.app>
-- Deployment ID: `dpl_Hpf3RSbFDVDeV3SnYjgwYqCBJDo6`
+- Deployment ID: `dpl_2XvzbqBKKLU3zC4SgHqygKrK57TD`
 - Deployment state: `READY`
 - Deployment commit metadata:
-  `3a269f4440e46528ad88112a19d55397ca0af08f`
+  `b366af8e62288359c772191b86580c33279f7670`
 - Runtime: Node.js 24 / Next.js
 - Aliases: Vercel-owned staging aliases only; custom project alias list is
   empty.
 
-Authenticated-protection-bypass smoke tests returned 200 for RU, ET and EN
-home/catalog, category and all four golden product routes; `/not-a-route`
-returned 404. Admin routes remain fail-closed with the expected
-`not-configured` redirect. `robots.txt` and `sitemap.xml` return 200 while
-indexing stays disabled.
+Public smoke tests returned 200 for RU, ET and EN home, catalog, category and
+golden product routes; `/not-a-route` returned 404. The public golden-product
+HTML contained no supplier hostname, source-system token or test-customer
+value. Authenticated owner checks passed for CRM overview, orders, order detail,
+catalog readiness and private golden-product evidence. Anonymous admin access
+returns the expected `unauthenticated` redirect without a runtime error.
+`robots.txt` and `sitemap.xml` return 200 while indexing stays disabled.
 
 ## S. Remaining owner decisions
 
-Required before Phase 6D can perform its human-only checks:
+Authentication setup and the real owner CRM review are complete. Remaining
+human product decisions are:
 
-1. Accept the Clerk Marketplace terms at the exact URL in section C.
-2. Provide the exact owner-controlled email to allowlist; public contact and Git
-   emails will not be inferred.
-3. Sign in and review the two existing requests in the CRM.
-4. Decide identity/category/size/content/commercial/options/visual/image status
+1. Decide identity/category/size/content/commercial/options/visual/image status
    for each golden product.
-5. Provide/approve price, currency, availability, preorder text, selectable
+2. Provide/approve price, currency, availability, preorder text, selectable
    sizes and localized colours.
-6. Approve source-supported RU/ET/EN customer copy.
-7. Compare each selected source against any Studio candidate and explicitly
+3. Approve source-supported RU/ET/EN customer copy.
+4. Compare each selected source against any Studio candidate and explicitly
    choose APPROVED, REJECTED or NEEDS REVISION.
-8. Give explicit publication-readiness approval only after every server gate
+5. Give explicit publication-readiness approval only after every server gate
    passes.
 
 ## T. Commits/artifacts
@@ -296,6 +307,8 @@ Implementation commits:
 - `992e449` — owner review workspace, source-evidence mapping and responsive
   administration UI;
 - `3a269f4` — cross-platform clean-install lockfile correction.
+- `2c3d30f` — contain the authenticated CRM layout at mobile widths;
+- `b366af8` — reject signed-out CRM requests before private page rendering.
 
 Key tracked artifacts:
 
@@ -326,10 +339,10 @@ staging project's custom alias list remains empty.
 
 ## V. Recommended Phase 6E
 
-Do not begin Phase 6E yet. First complete the owner-only actions in section S
-inside Phase 6D: activate exact-email Clerk access, perform the authenticated
-CRM review, make explicit commercial/content/option decisions, complete human
-fidelity review, upload only approved public assets, and rerun the golden
-product request/status flow. Only then should a separately authorized Phase 6E
-consider scaling the proven workflow beyond the four golden products. It should
-still avoid automatic approval, unsupported claims and production cutover.
+Do not begin Phase 6E yet. Authentication and the authenticated CRM review are
+complete, but the human product decisions in section S remain intentionally
+open. The owner should next make explicit commercial/content/option decisions,
+complete human fidelity review, and upload only approved public assets. Only
+after those gates pass should a separately authorized Phase 6E consider scaling
+the proven workflow beyond the four golden products. It should still avoid
+automatic approval, unsupported claims and production cutover.
