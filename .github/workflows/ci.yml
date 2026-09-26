@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - v1-foundation
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AUTH_PROVIDER: disabled
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/andrelook_ci?schema=public
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      OWNER_EMAILS: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:run
+      - run: npm run db:validate
+      - run: npm run db:migration:script
+      - run: npm run build

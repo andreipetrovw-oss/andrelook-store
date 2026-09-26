@@ -1,0 +1,21 @@
+:root {
+  --color-background: #f5f2ed;
+  --color-background-warm: #ede9e2;
+  --color-card: #ffffff;
+  --color-ink: #1c1c1a;
+  --color-ink-mid: #4a4844;
+  --color-ink-muted: #625e58;
+  --color-ink-light: #706b64;
+  --color-border: #ddd8d0;
+  --color-border-strong: #c8c2b8;
+  --color-accent: #3d3028;
+  --color-accent-soft: #f0ebe6;
+  --color-gold: #806945;
+  --font-editorial: "Cormorant Garamond", Georgia, serif;
+  --font-interface: "Outfit", system-ui, sans-serif;
+  --content-max: 1360px;
+  --header-height: 80px;
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --space-page: clamp(1rem, 4vw, 5rem);
+  --space-section: clamp(5rem, 9vw, 9rem);
+}

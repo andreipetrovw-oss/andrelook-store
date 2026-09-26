@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Andrelook v1 foundation
 
-## Getting Started
+This repository contains the clean Next.js foundation for the future Andrelook storefront and owner-only CRM. It is being developed separately from the live static production website. Phase 6B does not replace or deploy production.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 App Router and strict TypeScript
+- React 19
+- PostgreSQL and Prisma
+- Clerk-ready, email-allowlisted owner authentication (disabled and fail-closed until configured)
+- Vitest, ESLint, Prettier, and GitHub Actions
+
+The application uses one `src/` tree. Server Components read directly through server-only data-access modules. UI mutations will use Server Actions. Route Handlers are reserved for genuine external HTTP boundaries.
+
+## Requirements
+
+- Node.js 24 or newer
+- npm
+- PostgreSQL for schema migration/import work
+- A Clerk project and explicit owner email allowlist before `/admin` can be accessed
+
+## Local setup
+
+1. Copy `.env.example` to `.env.local` and replace placeholders with development values.
+2. Install exactly the locked dependencies with `npm ci`.
+3. Generate the Prisma client with `npm run db:generate`.
+4. Apply migrations to a development database with `npm run db:migrate:deploy`.
+5. Start the app with `npm run dev`.
+
+`AUTH_PROVIDER=disabled` is intentional by default. It keeps `/admin` inaccessible until Clerk keys and at least one `OWNER_EMAILS` entry are configured. Public registration must remain disabled in the provider dashboard.
+
+## Verification
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+npm audit --audit-level=high
+npm run format:check
+npm run lint
+npm run typecheck
+npm run test:run
+DATABASE_URL='postgresql://schema:validation@127.0.0.1:5432/schema' npm run db:validate
+DATABASE_URL='postgresql://schema:validation@127.0.0.1:5432/schema' npm run db:migration:script
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The CI workflow runs the same static gates. Applying the migration itself requires an isolated PostgreSQL instance.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Phase 5C1 import
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The master catalog is intentionally not committed because it contains private supplier/source information. Dry-run validation is the default:
 
-## Learn More
+```bash
+npm run import:phase5 -- --file /absolute/path/to/final-master-catalog.json
+```
 
-To learn more about Next.js, take a look at the following resources:
+A write is accepted only with a development or staging target:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run import:phase5 -- \
+  --file /absolute/path/to/final-master-catalog.json \
+  --write \
+  --target development
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All imported products remain `DRAFT`; public slugs, translations, public images, availability, stock, retail prices, and claims are not inferred.
 
-## Deploy on Vercel
+## Routes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/ru/`, `/et/`, `/en/`
+- `/{locale}/catalog/`
+- `/{locale}/catalog/{categorySlug}/`
+- `/{locale}/catalog/{categorySlug}/{productSlug}/`
+- `/admin`, `/admin/orders`, `/admin/catalog` (owner only)
+- `/sign-in` (provider configuration/sign-in boundary)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+RU is the provisional root and `x-default` locale in `src/config/locales.ts`. Legacy production redirects are deliberately not implemented.
+
+## Documentation
+
+- `docs/architecture.md`
+- `docs/authentication.md`
+- `docs/import-phase5c1.md`
+- `docs/visual-system.md`
+- `docs/andrelook-studio-standard.md`
+- `docs/staging.md`
+- `docs/phase6b-report.md`
+
+## Safety
+
+Do not connect this branch to the current production Vercel project or production domains. Do not place supplier URLs, costs, private source images, customer data, or secrets in public components, props, metadata, logs, or analytics.

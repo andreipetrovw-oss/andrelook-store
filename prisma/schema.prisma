@@ -1,0 +1,429 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Locale {
+  RU
+  ET
+  EN
+}
+
+enum PublicationStatus {
+  DRAFT
+  READY
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AvailabilityType {
+  IN_STOCK
+  PRE_ORDER
+  UNAVAILABLE
+}
+
+enum SourceReviewStatus {
+  CANDIDATE
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum OrderStatus {
+  NEW
+  CONTACTED
+  CONFIRMED
+  AWAITING_PAYMENT
+  PAID
+  ORDERED
+  IN_TRANSIT
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+enum ContactMethod {
+  TELEGRAM
+  INSTAGRAM
+  PHONE
+  EMAIL
+  OTHER
+}
+
+enum AcquisitionChannel {
+  DIRECT
+  INSTAGRAM
+  MARKETPLACE
+  ADVERTISING
+  REFERRAL
+  OTHER
+}
+
+enum PaymentKind {
+  DEPOSIT
+  BALANCE
+  FULL
+  REFUND
+  ADJUSTMENT
+}
+
+enum ImageRole {
+  PRIMARY
+  GALLERY
+  SIZE_CHART
+  DETAIL
+}
+
+model Category {
+  id           String                @id @default(cuid())
+  slug         String                @unique
+  parentId     String?
+  parent       Category?             @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children     Category[]            @relation("CategoryTree")
+  sortOrder    Int                   @default(0)
+  isActive     Boolean               @default(true)
+  translations CategoryTranslation[]
+  products     Product[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@index([parentId, sortOrder])
+}
+
+model CategoryTranslation {
+  id             String   @id @default(cuid())
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  locale         Locale
+  name           String
+  description    String?
+  seoTitle       String?
+  seoDescription String?
+
+  @@unique([categoryId, locale])
+}
+
+model Brand {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  displayName String
+  description String?
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id                   String               @id @default(cuid())
+  internalCode         String               @unique
+  slug                 String?              @unique
+  categoryId           String?
+  category             Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brandId              String?
+  brand                Brand?               @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  publicationStatus    PublicationStatus    @default(DRAFT)
+  availabilityType     AvailabilityType?
+  retailPriceMinor     Int?
+  currency             String?              @db.Char(3)
+  preorderEstimateText String?
+  isFeatured           Boolean              @default(false)
+  sortOrder            Int                  @default(0)
+  publishedAt          DateTime?
+  translations         ProductTranslation[]
+  privateData          ProductPrivate?
+  sourceImages         ProductSourceImage[]
+  images               ProductImage[]
+  colors               ProductColor[]
+  sizeChart            SizeChart?
+  variants             ProductVariant[]
+  orderItems           OrderItem[]
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  @@index([publicationStatus, categoryId, sortOrder])
+  @@index([availabilityType])
+}
+
+model ProductTranslation {
+  id               String  @id @default(cuid())
+  productId        String
+  product          Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  locale           Locale
+  name             String
+  shortDescription String?
+  description      String?
+  seoTitle         String?
+  seoDescription   String?
+
+  @@unique([productId, locale])
+}
+
+model ProductPrivate {
+  id                            String             @id @default(cuid())
+  productId                     String             @unique
+  product                       Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplierName                  String?
+  supplierSourceId              String?
+  supplierUrl                   String?
+  supplierAlbumUrl              String?
+  supplierProductCode           String?
+  supplierCostMinor             Int?
+  supplierCurrency              String?            @db.Char(3)
+  landedCostMinor               Int?
+  supplierAvailabilityText      String?
+  supplierAvailabilityCheckedAt DateTime?
+  internalNotes                 String?
+  sourceReviewStatus            SourceReviewStatus @default(CANDIDATE)
+  sourcePayload                 Json?
+  createdAt                     DateTime           @default(now())
+  updatedAt                     DateTime           @updatedAt
+}
+
+model ProductSourceImage {
+  id                 String             @id @default(cuid())
+  productId          String
+  product            Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sourcePosition     Int
+  sourceName         String?
+  sourceUrl          String
+  previewUrl         String?
+  width              Int?
+  height             Int?
+  isSizeChart        Boolean            @default(false)
+  inferredView       String?
+  assignedSourceRole String?
+  sourceSha256       String?
+  localOriginalPath  String?
+  httpValidation     Json?
+  reviewStatus       SourceReviewStatus @default(CANDIDATE)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@unique([productId, sourcePosition])
+  @@index([productId, isSizeChart])
+}
+
+model ProductImage {
+  id           String                    @id @default(cuid())
+  productId    String
+  product      Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storageKey   String                    @unique
+  url          String
+  role         ImageRole
+  sortOrder    Int                       @default(0)
+  width        Int
+  height       Int
+  approvedAt   DateTime?
+  translations ProductImageTranslation[]
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@index([productId, role, sortOrder])
+}
+
+model ProductImageTranslation {
+  id      String       @id @default(cuid())
+  imageId String
+  image   ProductImage @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  locale  Locale
+  altText String
+
+  @@unique([imageId, locale])
+}
+
+model ProductColor {
+  id           String                    @id @default(cuid())
+  productId    String
+  product      Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  code         String
+  swatchHex    String?
+  sortOrder    Int                       @default(0)
+  reviewStatus SourceReviewStatus        @default(NEEDS_REVIEW)
+  translations ProductColorTranslation[]
+  variants     ProductVariant[]
+
+  @@unique([productId, code])
+}
+
+model ProductColorTranslation {
+  id      String       @id @default(cuid())
+  colorId String
+  color   ProductColor @relation(fields: [colorId], references: [id], onDelete: Cascade)
+  locale  Locale
+  name    String
+
+  @@unique([colorId, locale])
+}
+
+model SizeChart {
+  id           String             @id @default(cuid())
+  productId    String             @unique
+  product      Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  units        String?
+  chartData    Json
+  reviewStatus SourceReviewStatus @default(NEEDS_REVIEW)
+  isPublished  Boolean            @default(false)
+  reviewedAt   DateTime?
+  evidence     SizeChartEvidence?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model SizeChartEvidence {
+  id                  String    @id @default(cuid())
+  sizeChartId         String    @unique
+  sizeChart           SizeChart @relation(fields: [sizeChartId], references: [id], onDelete: Cascade)
+  sourceAlbumId       String?
+  sourceImagePosition Int?
+  sourceImageUrl      String?
+  sourceImageSha256   String?
+  verification        String?
+  verificationDate    DateTime?
+  chartScope          String?
+  notes               Json?
+}
+
+model ProductVariant {
+  id            String        @id @default(cuid())
+  productId     String
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  colorId       String?
+  color         ProductColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  variantKey    String
+  sizeLabel     String?
+  stockQuantity Int           @default(0)
+  isEnabled     Boolean       @default(false)
+  ownerSku      String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([productId, variantKey])
+  @@index([productId, isEnabled])
+}
+
+model Customer {
+  id                     String        @id @default(cuid())
+  name                   String
+  preferredContactMethod ContactMethod
+  preferredContactValue  String
+  phone                  String?
+  email                  String?
+  telegramHandle         String?
+  instagramHandle        String?
+  preferredLocale        Locale
+  internalNotes          String?
+  orders                 Order[]
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@index([preferredContactMethod, preferredContactValue])
+}
+
+model Order {
+  id                  String               @id @default(cuid())
+  displayNumber       String               @unique
+  customerId          String
+  customer            Customer             @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  status              OrderStatus          @default(NEW)
+  currency            String?              @db.Char(3)
+  confirmedTotalMinor Int?
+  acquisitionChannel  AcquisitionChannel   @default(DIRECT)
+  utmSource           String?
+  utmMedium           String?
+  utmCampaign         String?
+  utmContent          String?
+  utmTerm             String?
+  initialReferrer     String?
+  landingPath         String?
+  orderDate           DateTime             @default(now())
+  confirmedAt         DateTime?
+  supplierOrderedAt   DateTime?
+  etaText             String?
+  etaDate             DateTime?
+  trackingReference   String?
+  nextActionAt        DateTime?
+  internalNotes       String?
+  cancelledReason     String?
+  items               OrderItem[]
+  payments            Payment[]
+  statusHistory       OrderStatusHistory[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([status, nextActionAt])
+  @@index([acquisitionChannel, orderDate])
+  @@index([customerId, orderDate])
+}
+
+model OrderItem {
+  id                          String            @id @default(cuid())
+  orderId                     String
+  order                       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId                   String?
+  product                     Product?          @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productInternalCodeSnapshot String
+  productNameSnapshot         String
+  productSlugSnapshot         String?
+  colorSnapshot               String?
+  sizeSnapshot                String?
+  availabilityTypeSnapshot    AvailabilityType?
+  quantity                    Int
+  unitPriceMinor              Int?
+  unitLandedCostMinorSnapshot Int?
+  internalNotes               String?
+  createdAt                   DateTime          @default(now())
+  updatedAt                   DateTime          @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id                String      @id @default(cuid())
+  orderId           String
+  order             Order       @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  kind              PaymentKind
+  amountMinor       Int
+  currency          String      @db.Char(3)
+  receivedAt        DateTime
+  reference         String?
+  internalNotes     String?
+  recordedByAdminId String?
+  recordedByAdmin   AdminUser?  @relation("PaymentRecorder", fields: [recordedByAdminId], references: [id], onDelete: SetNull)
+  createdAt         DateTime    @default(now())
+
+  @@index([orderId, receivedAt])
+}
+
+model OrderStatusHistory {
+  id               String       @id @default(cuid())
+  orderId          String
+  order            Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus       OrderStatus?
+  toStatus         OrderStatus
+  changedByAdminId String?
+  changedByAdmin   AdminUser?   @relation("StatusChanger", fields: [changedByAdminId], references: [id], onDelete: SetNull)
+  note             String?
+  createdAt        DateTime     @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+model AdminUser {
+  id              String               @id @default(cuid())
+  provider        String
+  providerSubject String
+  email           String               @unique
+  isActive        Boolean              @default(true)
+  payments        Payment[]            @relation("PaymentRecorder")
+  statusChanges   OrderStatusHistory[] @relation("StatusChanger")
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@unique([provider, providerSubject])
+}
