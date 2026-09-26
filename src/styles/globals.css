@@ -841,6 +841,137 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.admin-section-label {
+  color: var(--color-gold);
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.readiness-summary {
+  border: 1px solid var(--color-border-strong);
+  margin-block: 1.5rem 2rem;
+  padding: 1rem 1.25rem;
+}
+
+.readiness-summary.ready {
+  border-color: #497a52;
+}
+
+.readiness-summary.blocked {
+  border-color: var(--color-gold);
+}
+
+.admin-form-grid,
+.locale-editor-grid,
+.review-checklist {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1.5rem;
+}
+
+.admin-form-grid label,
+.locale-editor-grid label,
+.review-checklist label,
+.admin-stack-form label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-form-grid label > span,
+.locale-editor-grid label > span,
+.review-checklist label > span,
+.admin-stack-form label > span {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-form-grid input,
+.admin-form-grid select,
+.admin-form-grid textarea,
+.locale-editor-grid input,
+.locale-editor-grid textarea,
+.review-checklist input,
+.review-checklist select,
+.review-checklist textarea,
+.admin-stack-form textarea {
+  background: var(--color-background);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  min-height: 3rem;
+  padding: 0.7rem;
+  width: 100%;
+}
+
+.admin-form-grid button,
+.locale-editor-grid button,
+.review-checklist button {
+  align-self: end;
+  background: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  color: white;
+  min-height: 3rem;
+  padding: 0.7rem 1rem;
+}
+
+.admin-form-grid .wide,
+.review-checklist .wide {
+  grid-column: 1 / -1;
+}
+
+.locale-editor-grid fieldset {
+  border: 1px solid var(--color-border);
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.checkbox-row {
+  align-items: start;
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+}
+
+.checkbox-row input {
+  min-height: auto;
+  width: 1.1rem;
+}
+
+.source-review-grid,
+.approved-image-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+
+.source-review-card {
+  border: 1px solid var(--color-border);
+  min-width: 0;
+  padding: 0.75rem;
+}
+
+.source-review-card > img,
+.approved-image-grid img {
+  aspect-ratio: 4 / 5;
+  background: var(--color-background-warm);
+  object-fit: contain;
+  width: 100%;
+}
+
+.approved-image-grid figure {
+  margin: 0;
+}
+
+.approved-image-grid figcaption {
+  font-size: 0.75rem;
+  padding-block: 0.5rem;
+}
+
 .timeline {
   display: grid;
   gap: 0.75rem;
@@ -917,8 +1048,16 @@ button:disabled {
   }
 
   .admin-filters,
-  .order-detail-grid {
+  .order-detail-grid,
+  .admin-form-grid,
+  .locale-editor-grid,
+  .review-checklist {
     grid-template-columns: 1fr;
+  }
+
+  .admin-form-grid .wide,
+  .review-checklist .wide {
+    grid-column: auto;
   }
 }
 

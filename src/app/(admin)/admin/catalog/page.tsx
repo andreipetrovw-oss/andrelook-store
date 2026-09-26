@@ -18,6 +18,7 @@ export default async function AdminCatalogPage() {
               <th>Size chart</th>
               <th>Availability</th>
               <th>Retail</th>
+              <th>Owner gate</th>
               <th>Private source</th>
             </tr>
           </thead>
@@ -47,6 +48,7 @@ export default async function AdminCatalogPage() {
                     ? `${(product.retailPriceMinor / 100).toFixed(2)} ${product.currency}`
                     : "Pending"}
                 </td>
+                <td>{product.ownerApproved ? "Approved" : "Blocked"}</td>
                 <td>
                   <span>{product.privateData?.supplierName ?? "—"}</span>
                   {product.privateData?.supplierAlbumUrl ? (

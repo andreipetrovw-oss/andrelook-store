@@ -123,6 +123,12 @@ export async function getAdminCatalog() {
         },
       },
       publicationStatus: true,
+      review: {
+        select: {
+          blockingIssues: true,
+          ownerPublicationApproved: true,
+        },
+      },
       retailPriceMinor: true,
       sizeChart: { select: { isPublished: true, reviewStatus: true } },
       slug: true,
@@ -134,6 +140,8 @@ export async function getAdminCatalog() {
     ...product,
     contentComplete: product._count.translations === 3,
     imageReady: product._count.images > 0,
+    ownerApproved: product.review?.ownerPublicationApproved === true,
+    blockingIssues: product.review?.blockingIssues,
     sizeReady: Boolean(
       product.sizeChart?.reviewStatus === "APPROVED" &&
       product.sizeChart.isPublished,
