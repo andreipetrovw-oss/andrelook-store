@@ -50,6 +50,7 @@ const record: PublicProductRecord & Record<string, unknown> = {
       shortDescription: null,
     },
   ],
+  updatedAt: new Date("2026-09-26T12:00:00.000Z"),
 };
 
 describe("public product serialization", () => {
@@ -58,6 +59,7 @@ describe("public product serialization", () => {
     expect(dto).not.toBeNull();
     expect(dto?.name).toBe("Approved product");
     expect(dto?.retailPriceMinor).toBe(25000);
+    expect(dto?.version).toBe("2026-09-26T12:00:00.000Z");
   });
 
   it("cannot serialize private catalog or customer information", () => {
@@ -82,5 +84,23 @@ describe("public product serialization", () => {
       toPublicProductDto({ ...record, retailPriceMinor: null }, "en"),
     ).toBeNull();
     expect(toPublicProductDto({ ...record, slug: null }, "en")).toBeNull();
+  });
+
+  it("allows explicit owner-review serialization without inventing commercial fields", () => {
+    const dto = toPublicProductDto(
+      {
+        ...record,
+        availabilityType: null,
+        currency: null,
+        retailPriceMinor: null,
+      },
+      "en",
+      true,
+    );
+    expect(dto).toMatchObject({
+      availability: null,
+      currency: null,
+      retailPriceMinor: null,
+    });
   });
 });

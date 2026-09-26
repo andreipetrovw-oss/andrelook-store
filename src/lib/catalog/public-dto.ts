@@ -1,11 +1,11 @@
 import type { Locale } from "@/config/locales";
 
 export type PublicProductDto = {
-  availability: "IN_STOCK" | "PRE_ORDER" | "UNAVAILABLE";
+  availability: "IN_STOCK" | "PRE_ORDER" | "UNAVAILABLE" | null;
   brand: { name: string; slug: string } | null;
   category: { name: string; slug: string };
   colors: Array<{ code: string; name: string; swatchHex: string | null }>;
-  currency: string;
+  currency: string | null;
   description: string | null;
   id: string;
   images: Array<{
@@ -17,10 +17,11 @@ export type PublicProductDto = {
   }>;
   name: string;
   preorderEstimate: string | null;
-  retailPriceMinor: number;
+  retailPriceMinor: number | null;
   shortDescription: string | null;
   sizeChart: { data: unknown; units: string | null } | null;
   slug: string;
+  version: string;
 };
 
 type LocalizedText = { locale: "RU" | "ET" | "EN"; name: string };
@@ -52,7 +53,11 @@ export type PublicProductRecord = {
   }>;
   preorderEstimateText: string | null;
   retailPriceMinor: number | null;
-  sizeChart: { chartData: unknown; units: string | null } | null;
+  sizeChart: {
+    chartData: unknown;
+    isPublished: boolean;
+    units: string | null;
+  } | null;
   slug: string | null;
   translations: Array<{
     description: string | null;
@@ -60,6 +65,7 @@ export type PublicProductRecord = {
     name: string;
     shortDescription: string | null;
   }>;
+  updatedAt: Date;
 };
 
 const databaseLocale = { ru: "RU", et: "ET", en: "EN" } as const;
@@ -67,6 +73,7 @@ const databaseLocale = { ru: "RU", et: "ET", en: "EN" } as const;
 export function toPublicProductDto(
   record: PublicProductRecord,
   locale: Locale,
+  allowReviewedDrafts = false,
 ): PublicProductDto | null {
   const selectedLocale = databaseLocale[locale];
   const translation = record.translations.find(
@@ -78,12 +85,13 @@ export function toPublicProductDto(
 
   if (
     !record.slug ||
-    !record.availabilityType ||
-    record.retailPriceMinor === null ||
-    !record.currency ||
     !translation ||
     !record.category ||
-    !categoryTranslation
+    !categoryTranslation ||
+    (!allowReviewedDrafts &&
+      (!record.availabilityType ||
+        record.retailPriceMinor === null ||
+        !record.currency))
   ) {
     return null;
   }
@@ -136,9 +144,11 @@ export function toPublicProductDto(
     preorderEstimate: record.preorderEstimateText,
     retailPriceMinor: record.retailPriceMinor,
     shortDescription: translation.shortDescription,
-    sizeChart: record.sizeChart
-      ? { data: record.sizeChart.chartData, units: record.sizeChart.units }
-      : null,
+    sizeChart:
+      record.sizeChart && (record.sizeChart.isPublished || allowReviewedDrafts)
+        ? { data: record.sizeChart.chartData, units: record.sizeChart.units }
+        : null,
     slug: record.slug,
+    version: record.updatedAt.toISOString(),
   };
 }

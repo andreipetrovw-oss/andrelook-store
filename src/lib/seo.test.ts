@@ -2,9 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { localizedAlternates } from "./seo";
+import { indexingRobots, localizedAlternates } from "./seo";
 
 const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const originalIndexing = process.env.INDEXING_ENABLED;
 
 afterEach(() => {
   if (originalSiteUrl === undefined) {
@@ -12,6 +13,8 @@ afterEach(() => {
   } else {
     process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
   }
+  if (originalIndexing === undefined) delete process.env.INDEXING_ENABLED;
+  else process.env.INDEXING_ENABLED = originalIndexing;
 });
 
 describe("localized metadata", () => {
@@ -26,6 +29,15 @@ describe("localized metadata", () => {
         ru: "https://staging.example.test/ru/catalog/outerwear",
         "x-default": "https://staging.example.test/ru/catalog/outerwear",
       },
+    });
+  });
+
+  it("keeps staging noindex unless indexing is explicitly enabled", () => {
+    process.env.INDEXING_ENABLED = "false";
+    expect(indexingRobots()).toEqual({
+      follow: false,
+      index: false,
+      nocache: true,
     });
   });
 });

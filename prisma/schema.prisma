@@ -201,6 +201,7 @@ model ProductSourceImage {
   localOriginalPath  String?
   httpValidation     Json?
   reviewStatus       SourceReviewStatus @default(CANDIDATE)
+  publicAssets       ProductImage[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -212,18 +213,22 @@ model ProductImage {
   id           String                    @id @default(cuid())
   productId    String
   product      Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sourceImageId String?
+  sourceImage   ProductSourceImage?       @relation(fields: [sourceImageId], references: [id], onDelete: SetNull)
   storageKey   String                    @unique
   url          String
   role         ImageRole
   sortOrder    Int                       @default(0)
   width        Int
   height       Int
+  reviewStatus SourceReviewStatus        @default(NEEDS_REVIEW)
   approvedAt   DateTime?
   translations ProductImageTranslation[]
   createdAt    DateTime                  @default(now())
   updatedAt    DateTime                  @updatedAt
 
   @@index([productId, role, sortOrder])
+  @@index([sourceImageId])
 }
 
 model ProductImageTranslation {
@@ -327,6 +332,7 @@ model Customer {
 model Order {
   id                  String               @id @default(cuid())
   displayNumber       String               @unique
+  requestKey          String               @unique
   customerId          String
   customer            Customer             @relation(fields: [customerId], references: [id], onDelete: Restrict)
   status              OrderStatus          @default(NEW)
@@ -340,6 +346,9 @@ model Order {
   utmTerm             String?
   initialReferrer     String?
   landingPath         String?
+  requestedLocale     Locale
+  consentVersion      String
+  consentAt           DateTime
   orderDate           DateTime             @default(now())
   confirmedAt         DateTime?
   supplierOrderedAt   DateTime?

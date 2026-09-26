@@ -21,7 +21,7 @@ export function SiteHeader({
             alt="Andrelook"
             className="brand-logo"
             height={302}
-            priority
+            loading="eager"
             src="/brand/logo.png"
             width={476}
           />
@@ -35,10 +35,16 @@ export function SiteHeader({
         <LanguageSwitcher currentLocale={locale} label={dictionary.language} />
 
         <details className="mobile-navigation">
-          <summary aria-label={dictionary.navigation}>Menu</summary>
+          <summary aria-label={dictionary.navigation}>
+            {dictionary.mobileMenu}
+          </summary>
           <nav aria-label={dictionary.navigation}>
             <Link href={`/${locale}`}>{dictionary.home}</Link>
             <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
+            <LanguageSwitcher
+              currentLocale={locale}
+              label={dictionary.language}
+            />
           </nav>
         </details>
       </div>

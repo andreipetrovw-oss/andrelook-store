@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        hostname: "*.public.blob.vercel-storage.com",
+        pathname: "/andrelook-v1/**",
+        protocol: "https",
+      },
+    ],
+  },
   poweredByHeader: false,
   reactStrictMode: true,
   async headers() {

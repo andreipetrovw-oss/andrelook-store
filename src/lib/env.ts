@@ -12,6 +12,7 @@ export type ServerConfig = {
   clerkSecretKey: string | null;
   databaseUrl: string | null;
   indexingEnabled: boolean;
+  storefrontReviewMode: boolean;
   ownerEmails: string[];
   siteUrl: URL;
 };
@@ -44,6 +45,18 @@ export function getServerConfig(): ServerConfig {
     throw new Error("NEXT_PUBLIC_SITE_URL must be an absolute URL.");
   }
 
+  const requestedReviewMode = process.env.STOREFRONT_REVIEW_MODE === "true";
+  const stagingReviewProjectId = optionalValue(
+    process.env.STAGING_REVIEW_PROJECT_ID,
+  );
+  const currentVercelProjectId = optionalValue(process.env.VERCEL_PROJECT_ID);
+  const isLocalReview =
+    rawSiteUrl.startsWith("http://localhost:") ||
+    rawSiteUrl.startsWith("http://127.0.0.1:");
+  const isBoundStagingProject = Boolean(
+    stagingReviewProjectId && currentVercelProjectId === stagingReviewProjectId,
+  );
+
   const config: ServerConfig = {
     authProvider: authProviderValue,
     clerkPublishableKey: optionalValue(
@@ -52,6 +65,8 @@ export function getServerConfig(): ServerConfig {
     clerkSecretKey: optionalValue(process.env.CLERK_SECRET_KEY),
     databaseUrl: optionalValue(process.env.DATABASE_URL),
     indexingEnabled: process.env.INDEXING_ENABLED === "true",
+    storefrontReviewMode:
+      requestedReviewMode && (isLocalReview || isBoundStagingProject),
     ownerEmails: parseOwnerEmails(process.env.OWNER_EMAILS),
     siteUrl: new URL(rawSiteUrl),
   };

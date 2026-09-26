@@ -1,31 +1,36 @@
-const statuses = [
-  "NEW",
-  "CONTACTED",
-  "CONFIRMED",
-  "AWAITING_PAYMENT",
-  "PAID",
-  "ORDERED",
-  "IN_TRANSIT",
-  "READY",
-  "DELIVERED",
-  "CANCELLED",
+import Link from "next/link";
+
+import { getAdminOverview } from "@/lib/admin/query";
+
+const cards = [
+  ["NEW", "New leads"],
+  ["CONFIRMED", "Active orders"],
+  ["AWAITING_PAYMENT", "Awaiting payment"],
+  ["IN_TRANSIT", "In transit"],
+  ["READY", "Ready"],
 ] as const;
 
-export default function AdminOverviewPage() {
+export default async function AdminOverviewPage() {
+  const overview = await getAdminOverview();
   return (
     <>
       <span className="eyebrow">Owner only</span>
       <h1>Overview</h1>
-      <p>
-        The CRM boundary is ready. Operational data will follow in Phase 6C.
-      </p>
       <div className="admin-cards">
-        {statuses.map((status) => (
-          <article className="admin-card" key={status}>
-            <strong>{status.replaceAll("_", " ")}</strong>
-            <p>0</p>
-          </article>
+        {cards.map(([status, label]) => (
+          <Link
+            className="admin-card"
+            href={`/admin/orders?status=${status}`}
+            key={status}
+          >
+            <strong>{label}</strong>
+            <p>{overview.counts[status] ?? 0}</p>
+          </Link>
         ))}
+        <Link className="admin-card warning" href="/admin/orders">
+          <strong>Overdue next actions</strong>
+          <p>{overview.overdue}</p>
+        </Link>
       </div>
     </>
   );

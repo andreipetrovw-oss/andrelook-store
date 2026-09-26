@@ -5,17 +5,29 @@ import type { Locale } from "@/config/locales";
 import type { PublicProductDto } from "@/lib/catalog/public-dto";
 
 export function ProductCard({
+  dictionary,
   locale,
   product,
 }: {
+  dictionary: import("@/i18n/dictionaries").Dictionary;
   locale: Locale;
   product: PublicProductDto;
 }) {
   const primaryImage = product.images.find((image) => image.role === "PRIMARY");
-  const formattedPrice = new Intl.NumberFormat(locale, {
-    currency: product.currency,
-    style: "currency",
-  }).format(product.retailPriceMinor / 100);
+  const formattedPrice =
+    product.currency && product.retailPriceMinor !== null
+      ? new Intl.NumberFormat(locale, {
+          currency: product.currency,
+          style: "currency",
+        }).format(product.retailPriceMinor / 100)
+      : dictionary.pricePending;
+  const availability = product.availability
+    ? {
+        IN_STOCK: dictionary.availabilityInStock,
+        PRE_ORDER: dictionary.availabilityPreOrder,
+        UNAVAILABLE: dictionary.availabilityUnavailable,
+      }[product.availability]
+    : dictionary.availabilityPending;
 
   return (
     <article className="product-card">
@@ -24,7 +36,7 @@ export function ProductCard({
         className="product-card-image"
         href={`/${locale}/catalog/${product.category.slug}/${product.slug}`}
       >
-        {primaryImage?.url.startsWith("/") ? (
+        {primaryImage ? (
           <Image
             alt={primaryImage.alt}
             fill
@@ -47,7 +59,7 @@ export function ProductCard({
         {product.brand ? <p>{product.brand.name}</p> : null}
         <div className="product-card-footer">
           <span>{formattedPrice}</span>
-          <span>{product.availability.replaceAll("_", " ")}</span>
+          <span>{availability}</span>
         </div>
       </div>
     </article>

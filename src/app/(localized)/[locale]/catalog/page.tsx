@@ -4,7 +4,11 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getPublicCatalog } from "@/lib/catalog/public-query";
+import {
+  getPublicCatalog,
+  getPublicCategories,
+} from "@/lib/catalog/public-query";
+import { storefrontScope } from "@/lib/catalog/scope";
 import { isDatabaseConfigured } from "@/lib/env";
 import { indexingRobots, localizedAlternates } from "@/lib/seo";
 
@@ -37,7 +41,13 @@ export default async function CatalogPage({
   }
 
   const dictionary = getDictionary(locale);
-  const products = isDatabaseConfigured() ? await getPublicCatalog(locale) : [];
+  const scope = storefrontScope();
+  const [products, categories] = isDatabaseConfigured()
+    ? await Promise.all([
+        getPublicCatalog(locale, scope),
+        getPublicCategories(locale, scope),
+      ])
+    : [[], []];
 
   return (
     <>
@@ -45,15 +55,28 @@ export default async function CatalogPage({
         <div className="container">
           <span className="eyebrow">Andrelook</span>
           <h1>{dictionary.catalog}</h1>
+          <p>{dictionary.catalogIntro}</p>
         </div>
       </header>
+      <div className="container">
+        <CategoryNavigation
+          categories={categories}
+          dictionary={dictionary}
+          locale={locale}
+        />
+      </div>
       <section
         aria-label={dictionary.catalog}
         className="container catalog-grid"
       >
         {products.length ? (
           products.map((product) => (
-            <ProductCard key={product.id} locale={locale} product={product} />
+            <ProductCard
+              dictionary={dictionary}
+              key={product.id}
+              locale={locale}
+              product={product}
+            />
           ))
         ) : (
           <div className="empty-state">
@@ -64,3 +87,4 @@ export default async function CatalogPage({
     </>
   );
 }
+import { CategoryNavigation } from "@/components/category-navigation";

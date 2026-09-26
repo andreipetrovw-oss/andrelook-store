@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - v1-foundation
+      - phase6c-staging-storefront
 
 permissions:
   contents: read

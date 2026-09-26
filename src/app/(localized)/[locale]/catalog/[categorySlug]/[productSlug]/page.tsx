@@ -1,11 +1,17 @@
+import { randomUUID } from "node:crypto";
+
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { cache } from "react";
 
-import { isLocale, type Locale } from "@/config/locales";
+import { RequestForm } from "@/components/request-form";
+import { SizeGuide } from "@/components/size-guide";
+import { isLocale } from "@/config/locales";
+import { getDictionary } from "@/i18n/dictionaries";
 import { getPublicProduct } from "@/lib/catalog/public-query";
-import { isDatabaseConfigured } from "@/lib/env";
+import { storefrontScope } from "@/lib/catalog/scope";
+import { parseSizeChart } from "@/lib/catalog/size-chart";
 import { indexingRobots, localizedAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -18,75 +24,181 @@ type Props = {
   }>;
 };
 
-const loadProduct = cache(
-  async (locale: Locale, categorySlug: string, productSlug: string) => {
-    if (!isDatabaseConfigured()) {
-      return null;
-    }
-    return getPublicProduct(locale, categorySlug, productSlug);
-  },
-);
+async function resolveProduct(params: Props["params"]) {
+  const { categorySlug, locale, productSlug } = await params;
+  if (!isLocale(locale)) return null;
+  return getPublicProduct(locale, categorySlug, productSlug, storefrontScope());
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { categorySlug, locale, productSlug } = await params;
-  if (!isLocale(locale)) {
-    return {};
-  }
-
-  const product = await loadProduct(locale, categorySlug, productSlug);
+  const resolved = await params;
+  if (!isLocale(resolved.locale)) notFound();
+  const product = await resolveProduct(Promise.resolve(resolved));
+  if (!product) notFound();
+  const path = `catalog/${resolved.categorySlug}/${resolved.productSlug}`;
   return {
-    alternates: localizedAlternates(
-      locale,
-      `catalog/${categorySlug}/${productSlug}`,
-    ),
-    description: product?.shortDescription ?? undefined,
+    alternates: localizedAlternates(resolved.locale, path),
+    description: product.shortDescription ?? undefined,
+    openGraph: {
+      images: product.images[0]?.url ? [product.images[0].url] : undefined,
+      title: product.name,
+      type: "website",
+    },
     robots: indexingRobots(),
-    title: product?.name ?? "Andrelook",
+    title: product.name,
   };
 }
 
+function ProductStructuredData({
+  product,
+  url,
+}: {
+  product: NonNullable<Awaited<ReturnType<typeof resolveProduct>>>;
+  url: string;
+}) {
+  if (
+    storefrontScope() === "local-review" ||
+    !product.currency ||
+    product.retailPriceMinor === null ||
+    !product.availability
+  ) {
+    return null;
+  }
+  const availability = {
+    IN_STOCK: "https://schema.org/InStock",
+    PRE_ORDER: "https://schema.org/PreOrder",
+    UNAVAILABLE: "https://schema.org/OutOfStock",
+  }[product.availability];
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    description: product.description ?? undefined,
+    image: product.images.map((image) => image.url),
+    name: product.name,
+    offers: {
+      "@type": "Offer",
+      availability,
+      price: (product.retailPriceMinor / 100).toFixed(2),
+      priceCurrency: product.currency,
+      url,
+    },
+  };
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(data).replaceAll("<", "\\u003c"),
+      }}
+      type="application/ld+json"
+    />
+  );
+}
+
 export default async function ProductPage({ params }: Props) {
-  const { categorySlug, locale, productSlug } = await params;
-  if (!isLocale(locale)) {
-    notFound();
-  }
-
-  const product = await loadProduct(locale, categorySlug, productSlug);
-  if (!product) {
-    notFound();
-  }
-
-  const formattedPrice = new Intl.NumberFormat(locale, {
-    currency: product.currency,
-    style: "currency",
-  }).format(product.retailPriceMinor / 100);
+  const resolved = await params;
+  if (!isLocale(resolved.locale)) notFound();
+  const dictionary = getDictionary(resolved.locale);
+  const product = await resolveProduct(Promise.resolve(resolved));
+  if (!product) notFound();
+  const formattedPrice =
+    product.currency && product.retailPriceMinor !== null
+      ? new Intl.NumberFormat(resolved.locale, {
+          currency: product.currency,
+          style: "currency",
+        }).format(product.retailPriceMinor / 100)
+      : dictionary.pricePending;
+  const chart = product.sizeChart
+    ? parseSizeChart(product.sizeChart.data)
+    : null;
+  const sizes = chart?.sizes ?? [];
+  const url = `/${resolved.locale}/catalog/${resolved.categorySlug}/${resolved.productSlug}`;
+  const availability = product.availability
+    ? {
+        IN_STOCK: dictionary.availabilityInStock,
+        PRE_ORDER: dictionary.availabilityPreOrder,
+        UNAVAILABLE: dictionary.availabilityUnavailable,
+      }[product.availability]
+    : dictionary.availabilityPending;
 
   return (
-    <article className="container product-detail">
-      <div className="product-detail-grid">
-        <div className="product-detail-gallery">
-          {product.images.map((image) =>
-            image.url.startsWith("/") ? (
-              <Image
-                alt={image.alt}
-                height={image.height}
-                key={image.url}
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                src={image.url}
-                width={image.width}
+    <>
+      <ProductStructuredData product={product} url={url} />
+      <article className="container product-detail">
+        <nav aria-label="Breadcrumb" className="breadcrumb">
+          <Link href={`/${resolved.locale}/catalog`}>{dictionary.catalog}</Link>
+          <span aria-hidden="true">/</span>
+          <Link href={`/${resolved.locale}/catalog/${resolved.categorySlug}`}>
+            {product.category.name}
+          </Link>
+        </nav>
+        <div className="product-detail-grid">
+          <div className="product-detail-gallery">
+            {product.images.length ? (
+              product.images.map((image, index) => (
+                <div className="gallery-frame" key={`${image.url}-${index}`}>
+                  <Image
+                    alt={image.alt}
+                    fill
+                    priority={index === 0}
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    src={image.url}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="gallery-placeholder">
+                <span>ANDRELOOK STUDIO</span>
+                <p>{dictionary.galleryPending}</p>
+              </div>
+            )}
+          </div>
+          <div className="product-summary">
+            <span className="eyebrow">{product.category.name}</span>
+            <h1>{product.name}</h1>
+            <p className="product-price">{formattedPrice}</p>
+            <dl className="product-facts">
+              <div>
+                <dt>{dictionary.availability}</dt>
+                <dd>{availability}</dd>
+              </div>
+              <div>
+                <dt>{dictionary.colour}</dt>
+                <dd>
+                  {product.colors.length
+                    ? product.colors.map((colour) => colour.name).join(", ")
+                    : dictionary.colourPending}
+                </dd>
+              </div>
+            </dl>
+            {chart && product.sizeChart ? (
+              <SizeGuide
+                chart={chart}
+                dictionary={dictionary}
+                locale={resolved.locale}
+                units={product.sizeChart.units}
               />
-            ) : null,
-          )}
+            ) : (
+              <p className="pending-note">{dictionary.sizeGuidePending}</p>
+            )}
+            <a className="primary-action" href="#request">
+              {dictionary.requestAction}
+            </a>
+            <section className="product-copy">
+              <h2>{dictionary.details}</h2>
+              <p>{product.description ?? dictionary.descriptionPending}</p>
+            </section>
+            <RequestForm
+              availability={product.availability}
+              colours={product.colors}
+              dictionary={dictionary}
+              locale={resolved.locale}
+              productId={product.id}
+              productVersion={product.version}
+              requestKey={randomUUID()}
+              sizes={sizes}
+            />
+          </div>
         </div>
-        <div>
-          <span className="eyebrow">{product.category.name}</span>
-          <h1>{product.name}</h1>
-          {product.brand ? <p>{product.brand.name}</p> : null}
-          <p>{formattedPrice}</p>
-          <p>{product.availability.replaceAll("_", " ")}</p>
-          {product.description ? <p>{product.description}</p> : null}
-        </div>
-      </div>
-    </article>
+      </article>
+    </>
   );
 }
