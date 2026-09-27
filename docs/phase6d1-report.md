@@ -20,7 +20,7 @@ domain, changing DNS, or touching customer production.
 - The required Phase 6D commit remains an ancestor of the Phase 6D.1 branch.
 - No reset, rebase, force-push, merge to `main`, or history rewrite occurred.
 - Application code verified in staging:
-  `c5ae2d47b626d02af3c2bf6afb5c7e0a67279b38`.
+  `e747ed2231828f91c498a60327e7791ea57f8118`.
 - The final completion record identifies the later documentation-only commit,
   its exact remote SHA, and its exact green CI run.
 - Only `phase6d1-crm-completion` was pushed. Preserved branch and archive refs
@@ -250,8 +250,8 @@ The final clean reproducibility gate covers:
 - secret scan;
 - `git diff --check`.
 
-Earlier application-head GitHub Actions run `36306741045` completed successfully
-at `c5ae2d47b626d02af3c2bf6afb5c7e0a67279b38`. The final completion record
+Application-head GitHub Actions run `36322267142` completed successfully at
+`e747ed2231828f91c498a60327e7791ea57f8118`. The final completion record
 identifies the required fully green run for the exact final documentation HEAD.
 
 ## W. Staging deployment
@@ -259,10 +259,10 @@ identifies the required fully green run for the exact final documentation HEAD.
 - Project: `andrelook-v1-staging`
 - Project ID: `prj_M6hDxQzBiShNOpWkWwSj3FOZmf1m`
 - Owner URL: <https://andrelook-v1-staging.vercel.app>
-- Verified runtime deployment ID: `dpl_6GawSkpvynwbvJ9z64Y9JPbbmTaj`
+- Verified runtime deployment ID: `dpl_87kVD2kQ367Zb5FmwJWD9BCuFvJV`
 - State: `READY`
 - Runtime application commit:
-  `c5ae2d47b626d02af3c2bf6afb5c7e0a67279b38`
+  `e747ed2231828f91c498a60327e7791ea57f8118`
 - Runtime: Node.js 24 / Next.js 16.3.6
 
 The final branch HEAD may be a later report-only commit. That distinction does
@@ -325,9 +325,11 @@ Phase 6D.1 commits before the final report-only commit:
 - `fe99111` — finish Russian review copy and distinct photo-role labels;
 - `c85b2f9` — contain mobile catalog cards;
 - `c5ae2d4` — protect narrow CRM product layouts.
+- `e747ed2` — keep supplier URLs server-only and add the private-query
+  regression test.
 
-The final completion record identifies the later privacy-hardening and report
-commits added after the owner-session leak check.
+The final completion record identifies the later report-only commit added after
+the owner-session leak check.
 
 Key artifacts include:
 
