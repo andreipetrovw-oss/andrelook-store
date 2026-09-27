@@ -57,12 +57,29 @@ export const imageRoleLabel: Record<ImageRole, string> = {
   SIDE: "Сбоку",
   ALTERNATIVE: "Альтернативный ракурс",
   INTERIOR: "Внутри",
-  GALLERY: "Дополнительное",
+  GALLERY: "Галерея",
   DETAIL: "Деталь",
   BRANDING: "Логотип / брендинг",
   ADDITIONAL: "Дополнительное",
   SIZE_CHART: "Размерная сетка",
 };
+
+const legacyBlockingIssueLabel: Record<string, string> = {
+  "Owner retail price and availability are not approved.":
+    "Розничная цена и наличие не подтверждены владельцем.",
+  "Customer-selectable colours and sizes are not approved.":
+    "Размеры и цвета для выбора покупателем не подтверждены.",
+  "RU, ET and EN customer descriptions are not approved.":
+    "Описания для покупателей на русском, эстонском и английском не подтверждены.",
+  "No Studio candidate has passed the owner fidelity gate.":
+    "Ни одна версия Andrelook Studio не прошла проверку соответствия владельцем.",
+  "Explicit owner publication approval is missing.":
+    "Нет явного решения владельца о публикации.",
+};
+
+export function presentBlockingIssue(issue: string) {
+  return legacyBlockingIssueLabel[issue] ?? issue;
+}
 
 export const channelLabel: Record<AcquisitionChannel, string> = {
   DIRECT: "Прямое обращение",

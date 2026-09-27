@@ -13,6 +13,7 @@ import {
   availabilityLabel,
   formatDateTime,
   imageRoleLabel,
+  presentBlockingIssue,
   publicationLabel,
   reviewDecisionLabel,
   sourceReviewLabel,
@@ -128,9 +129,9 @@ export default async function AdminCatalogProductPage({
     })
     .join("\n");
   const issues = Array.isArray(product.review?.blockingIssues)
-    ? product.review.blockingIssues.filter(
-        (issue): issue is string => typeof issue === "string",
-      )
+    ? product.review.blockingIssues
+        .filter((issue): issue is string => typeof issue === "string")
+        .map(presentBlockingIssue)
     : [];
 
   const sectionGates = [
