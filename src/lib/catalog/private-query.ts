@@ -17,7 +17,13 @@ export async function getPrivateCatalogProduct(productId: string) {
         include: { sourceImage: true, translations: true },
         orderBy: { sortOrder: "asc" },
       },
-      privateData: true,
+      privateData: {
+        select: {
+          sourceReviewStatus: true,
+          supplierName: true,
+          supplierProductCode: true,
+        },
+      },
       review: true,
       reviewEvents: {
         include: { changedByAdmin: { select: { email: true } } },

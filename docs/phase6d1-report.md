@@ -242,7 +242,7 @@ The final clean reproducibility gate covers:
 - Prettier;
 - ESLint;
 - strict TypeScript;
-- the complete Vitest suite (19 files / 53 tests);
+- the complete Vitest suite (20 files / 54 tests);
 - Prisma schema validation;
 - deployed migration status and migration synthesis;
 - Next.js production build;
@@ -287,6 +287,12 @@ secondary, images loaded visually, image controls were clear, and no broken
 placeholder, page error, console error, supplier URL leakage, accidental mass
 approval, invented fact, or publication was found.
 
+The final owner-session check also removed a legacy direct supplier-album link
+from the private page and narrowed the product query to the non-URL supplier
+fields the interface actually needs. Supplier URLs now remain server-only for
+the authenticated image proxy rather than being serialized into owner-page
+markup.
+
 ## Y. Remaining owner decisions
 
 ### Decisions that genuinely require the owner
@@ -319,6 +325,9 @@ Phase 6D.1 commits before the final report-only commit:
 - `fe99111` — finish Russian review copy and distinct photo-role labels;
 - `c85b2f9` — contain mobile catalog cards;
 - `c5ae2d4` — protect narrow CRM product layouts.
+
+The final completion record identifies the later privacy-hardening and report
+commits added after the owner-session leak check.
 
 Key artifacts include:
 

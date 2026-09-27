@@ -270,16 +270,6 @@ export default async function AdminCatalogProductPage({
                   </dd>
                 </div>
               </dl>
-              {product.privateData?.supplierAlbumUrl ? (
-                <a
-                  className="text-link"
-                  href={product.privateData.supplierAlbumUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Открыть закрытый альбом ↗
-                </a>
-              ) : null}
             </details>
           </div>
         </section>
