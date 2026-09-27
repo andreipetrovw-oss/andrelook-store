@@ -4,6 +4,14 @@ import { NextResponse } from "next/server";
 
 const clerkProxy = clerkMiddleware(async (auth, request) => {
   if (request.nextUrl.pathname.startsWith("/admin")) {
+    // Next.js Server Actions POST back to the protected route. Let Clerk attach
+    // its request context without converting that internal POST into a sign-in
+    // redirect; every admin action independently calls requireActiveAdmin and
+    // therefore still fails closed before reading or mutating data.
+    const isServerAction =
+      request.method === "POST" && request.headers.has("next-action");
+    if (isServerAction) return NextResponse.next();
+
     const { userId } = await auth();
     if (!userId) {
       const signInUrl = new URL("/sign-in", request.url);
