@@ -1752,6 +1752,10 @@ button:disabled {
   margin-bottom: 1.5rem;
 }
 
+.product-editor-identity {
+  min-width: 0;
+}
+
 .product-editor-meta {
   display: flex;
   flex-wrap: wrap;
@@ -2261,6 +2265,11 @@ button:disabled {
   }
 
   .owner-product-footer small {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .product-editor-identity h1 {
     overflow-wrap: anywhere;
   }
 
