@@ -61,7 +61,7 @@ export async function storeApprovedPublicImage(formData: FormData) {
   const input = values(formData);
   const file = formData.get("candidate");
   if (!(file instanceof File))
-    throw new Error("A Studio candidate is required.");
+    throw new Error("Добавьте версию Andrelook Studio.");
   await approveAndStorePublicImage(input, file);
   refresh(String(input.productId));
 }

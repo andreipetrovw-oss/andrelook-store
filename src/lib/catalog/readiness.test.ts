@@ -60,7 +60,7 @@ describe("golden product publication readiness", () => {
       ]),
     });
     expect(() => assertPublicationReady(product)).toThrow(
-      "Product is not publication-ready",
+      "Товар пока не готов к публикации",
     );
   });
 

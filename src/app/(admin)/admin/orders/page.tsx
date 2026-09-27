@@ -2,85 +2,173 @@ import { OrderStatus } from "@prisma/client";
 import Link from "next/link";
 
 import { getAdminOrders } from "@/lib/admin/query";
+import {
+  channelLabel,
+  formatDate,
+  formatMoney,
+  orderStatusLabel,
+} from "@/lib/admin/presentation";
+
+function paymentState(order: {
+  balanceMinor: number | null;
+  confirmedTotalMinor: number | null;
+  currency: string | null;
+  paidMinor: number;
+}) {
+  if (order.confirmedTotalMinor === null) return "Сумма не подтверждена";
+  if (order.balanceMinor === 0) return "Оплачено";
+  if (order.paidMinor > 0) {
+    return `Осталось ${formatMoney(order.balanceMinor, order.currency)}`;
+  }
+  return "Оплата ожидается";
+}
 
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ attention?: string; q?: string; status?: string }>;
 }) {
   const filters = await searchParams;
   const orders = await getAdminOrders({
+    attention: filters.attention,
     query: filters.q,
     status: filters.status,
   });
+
   return (
     <>
-      <span className="eyebrow">Assisted sales</span>
-      <h1>Orders</h1>
+      <header className="admin-page-header">
+        <span className="eyebrow">Работа с клиентами</span>
+        <h1>Заказы</h1>
+        <p>Заявки, оплаты и следующие действия — в одном рабочем списке.</p>
+      </header>
+
+      {filters.attention === "overdue" ? (
+        <div className="active-filter">
+          <span>Показаны просроченные задачи</span>
+          <Link href="/admin/orders">Сбросить</Link>
+        </div>
+      ) : null}
+
       <form className="admin-filters">
         <label>
-          <span>Search</span>
+          <span>Поиск</span>
           <input
             defaultValue={filters.q}
             name="q"
-            placeholder="Reference, customer or product"
+            placeholder="Номер, клиент или товар"
           />
         </label>
         <label>
-          <span>Status</span>
+          <span>Статус</span>
           <select defaultValue={filters.status ?? ""} name="status">
-            <option value="">All statuses</option>
+            <option value="">Все статусы</option>
             {Object.values(OrderStatus).map((status) => (
               <option key={status} value={status}>
-                {status.replaceAll("_", " ")}
+                {orderStatusLabel[status]}
               </option>
             ))}
           </select>
         </label>
-        <button type="submit">Apply</button>
+        <button type="submit">Показать</button>
       </form>
-      <div className="admin-table-wrap" tabIndex={0}>
-        <table className="admin-table">
+
+      <div className="admin-table-wrap orders-desktop" tabIndex={0}>
+        <table className="admin-table orders-table">
           <thead>
             <tr>
-              <th>Reference</th>
-              <th>Customer</th>
-              <th>Product</th>
-              <th>Status</th>
-              <th>Source</th>
-              <th>Date</th>
-              <th>Next action</th>
-              <th>Balance</th>
+              <th>Заказ</th>
+              <th>Клиент и товар</th>
+              <th>Размер / цвет</th>
+              <th>Статус</th>
+              <th>Источник</th>
+              <th>Дата</th>
+              <th>Следующее действие</th>
+              <th>Оплата</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td>
-                  <Link href={`/admin/orders/${order.id}`}>
-                    {order.displayNumber}
-                  </Link>
-                </td>
-                <td>{order.customer.name}</td>
-                <td>{order.items[0]?.productNameSnapshot ?? "—"}</td>
-                <td>{order.status.replaceAll("_", " ")}</td>
-                <td>{order.acquisitionChannel}</td>
-                <td>{order.orderDate.toLocaleDateString("en-GB")}</td>
-                <td>
-                  {order.nextActionAt?.toLocaleDateString("en-GB") ?? "—"}
-                </td>
-                <td>
-                  {order.balanceMinor === null || !order.currency
-                    ? "Pending"
-                    : `${(order.balanceMinor / 100).toFixed(2)} ${order.currency}`}
-                </td>
-              </tr>
-            ))}
+            {orders.map((order) => {
+              const item = order.items[0];
+              return (
+                <tr key={order.id}>
+                  <td>
+                    <Link href={`/admin/orders/${order.id}`}>
+                      {order.displayNumber}
+                    </Link>
+                  </td>
+                  <td>
+                    <strong>{order.customer.name}</strong>
+                    <small>
+                      {item?.productNameSnapshot ?? "Товар не указан"}
+                    </small>
+                  </td>
+                  <td>
+                    {item?.sizeSnapshot ?? "—"} / {item?.colorSnapshot ?? "—"}
+                  </td>
+                  <td>
+                    <span
+                      className={`status-pill status-${order.status.toLowerCase()}`}
+                    >
+                      {orderStatusLabel[order.status]}
+                    </span>
+                  </td>
+                  <td>{channelLabel[order.acquisitionChannel]}</td>
+                  <td>{formatDate(order.orderDate)}</td>
+                  <td>{formatDate(order.nextActionAt)}</td>
+                  <td>{paymentState(order)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+
+      <div className="orders-mobile">
+        {orders.map((order) => {
+          const item = order.items[0];
+          return (
+            <Link
+              className="order-mobile-card"
+              href={`/admin/orders/${order.id}`}
+              key={order.id}
+            >
+              <div className="order-mobile-heading">
+                <strong>{order.displayNumber}</strong>
+                <span
+                  className={`status-pill status-${order.status.toLowerCase()}`}
+                >
+                  {orderStatusLabel[order.status]}
+                </span>
+              </div>
+              <h2>{order.customer.name}</h2>
+              <p>{item?.productNameSnapshot ?? "Товар не указан"}</p>
+              <dl>
+                <div>
+                  <dt>Размер / цвет</dt>
+                  <dd>
+                    {item?.sizeSnapshot ?? "—"} / {item?.colorSnapshot ?? "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Следующее действие</dt>
+                  <dd>{formatDate(order.nextActionAt)}</dd>
+                </div>
+                <div>
+                  <dt>Оплата</dt>
+                  <dd>{paymentState(order)}</dd>
+                </div>
+              </dl>
+            </Link>
+          );
+        })}
+      </div>
+
       {!orders.length ? (
-        <p className="admin-empty">No matching orders.</p>
+        <div className="admin-empty">
+          <strong>Заказы не найдены</strong>
+          <p>Измените поиск или фильтр.</p>
+        </div>
       ) : null}
     </>
   );

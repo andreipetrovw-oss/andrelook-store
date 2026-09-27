@@ -17,6 +17,11 @@ const clerkProxy = clerkMiddleware(async (auth, request) => {
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
   if (process.env.AUTH_PROVIDER !== "clerk") {
+    if (request.nextUrl.pathname.startsWith("/admin")) {
+      const signInUrl = new URL("/sign-in", request.url);
+      signInUrl.searchParams.set("reason", "not-configured");
+      return NextResponse.redirect(signInUrl);
+    }
     return NextResponse.next();
   }
 

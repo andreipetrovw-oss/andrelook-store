@@ -1,8 +1,18 @@
 import type { NextConfig } from "next";
 
+const crmAllowedOrigins = (process.env.CRM_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
   experimental: {
-    serverActions: { bodySizeLimit: "15mb" },
+    serverActions: {
+      ...(crmAllowedOrigins.length
+        ? { allowedOrigins: crmAllowedOrigins }
+        : {}),
+      bodySizeLimit: "15mb",
+    },
   },
   images: {
     remotePatterns: [

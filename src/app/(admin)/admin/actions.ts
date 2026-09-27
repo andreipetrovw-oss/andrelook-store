@@ -27,7 +27,7 @@ const paymentSchema = z.object({
 
 export async function updateOrderStatus(formData: FormData) {
   const parsed = statusSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) throw new Error("Invalid status update.");
+  if (!parsed.success) throw new Error("Не удалось проверить новый статус.");
   const changedByAdminId = (await requireActiveAdmin()).id;
   const prisma = getPrisma();
   await prisma.$transaction(async (tx) => {
@@ -58,7 +58,7 @@ export async function updateOrderStatus(formData: FormData) {
 
 export async function recordPayment(formData: FormData) {
   const parsed = paymentSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) throw new Error("Invalid payment.");
+  if (!parsed.success) throw new Error("Проверьте данные оплаты.");
   const recordedByAdminId = (await requireActiveAdmin()).id;
   await getPrisma().payment.create({
     data: {

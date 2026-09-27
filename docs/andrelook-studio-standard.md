@@ -1,6 +1,6 @@
 # Andrelook Studio product-image standard
 
-Status: specification only. Phase 6B does not modify the 1,431 source images or generate public product images.
+Status: approved workflow foundation. Phase 6D.1 does not bulk-process the 1,431 source images or generate public product images.
 
 ## Universal requirements
 
@@ -68,3 +68,31 @@ An asset is accepted only when:
 8. an Andrelook-controlled public asset is created separately from the private source reference.
 
 If any product fact is ambiguous, reject or hold for review. Presentation consistency never overrides source truth.
+
+## Deterministic asset system
+
+- Preserve the untouched highest-resolution source privately with its source-image database ID and SHA-256 when available.
+- Working master canvas: 2400×3000 px, 4:5, sRGB.
+- Public derivatives: 480×600, 960×1200, 1440×1800 and 2400×3000 where the source supports them; WebP/AVIF may supplement a high-quality JPEG master.
+- Naming: `andrelook-{product-internal-code}-{role}-v{two-digit-version}-{width}x{height}.{ext}` using lower-case ASCII and the canonical role.
+- A new visual treatment creates a new version. Never overwrite a previously owner-approved master in place.
+- The ProductImage record remains linked to the exact ProductSourceImage and records role, dimensions, owner approval and storage key.
+
+## Owner review workflow
+
+`PRIVATE SOURCE → SOURCE SELECTED → STUDIO CANDIDATE → SIDE-BY-SIDE FIDELITY REVIEW → OWNER APPROVED → PUBLIC PRODUCT IMAGE`
+
+The private CRM renders supplier sources only through its authenticated same-origin proxy. Studio files enter public Blob storage only after the owner selects an already approved source, uploads a candidate and explicitly confirms fidelity. Rejection or revision never creates a public ProductImage.
+
+## Preferred gallery order
+
+1. Главная
+2. Спереди
+3. Сзади
+4. Сбоку — only when supported by the source
+5. Внутри — only when supported by the source
+6. Детали
+7. Фурнитура / branding detail where useful
+8. Размерная сетка
+
+Unsupported views are omitted, not synthesized. Catalog-card primary images must use the same 4:5 framing, scale band, margins, neutral warm background and restrained shadow standard.

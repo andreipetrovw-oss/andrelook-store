@@ -10,6 +10,7 @@ export type ServerConfig = {
   authProvider: AuthProvider;
   clerkPublishableKey: string | null;
   clerkSecretKey: string | null;
+  crmOrigin: URL | null;
   databaseUrl: string | null;
   indexingEnabled: boolean;
   storefrontReviewMode: boolean;
@@ -63,6 +64,9 @@ export function getServerConfig(): ServerConfig {
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     ),
     clerkSecretKey: optionalValue(process.env.CLERK_SECRET_KEY),
+    crmOrigin: optionalValue(process.env.CRM_ORIGIN)
+      ? new URL(optionalValue(process.env.CRM_ORIGIN)!)
+      : null,
     databaseUrl: optionalValue(process.env.DATABASE_URL),
     indexingEnabled: process.env.INDEXING_ENABLED === "true",
     storefrontReviewMode:

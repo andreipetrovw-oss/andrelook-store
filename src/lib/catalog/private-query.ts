@@ -32,3 +32,20 @@ export async function getPrivateCatalogProduct(productId: string) {
     where: { id: productId },
   });
 }
+
+export async function getPrivateSourceImage(imageId: string) {
+  await requireOwner();
+
+  return getPrisma().productSourceImage.findUnique({
+    select: {
+      previewUrl: true,
+      product: {
+        select: {
+          privateData: { select: { supplierAlbumUrl: true } },
+        },
+      },
+      sourceUrl: true,
+    },
+    where: { id: imageId },
+  });
+}

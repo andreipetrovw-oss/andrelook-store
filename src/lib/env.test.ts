@@ -38,4 +38,13 @@ describe("staging environment safety", () => {
     delete process.env.OWNER_EMAILS;
     expect(() => getServerConfig()).toThrow("Clerk authentication requires");
   });
+
+  it("accepts an optional dedicated CRM origin without changing the storefront origin", () => {
+    process.env.NEXT_PUBLIC_SITE_URL =
+      "https://andrelook-v1-staging.vercel.app";
+    process.env.CRM_ORIGIN = "https://crm.andrelook.store";
+    const config = getServerConfig();
+    expect(config.siteUrl.hostname).toBe("andrelook-v1-staging.vercel.app");
+    expect(config.crmOrigin?.hostname).toBe("crm.andrelook.store");
+  });
 });

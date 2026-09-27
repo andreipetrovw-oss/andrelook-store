@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   robots: { follow: false, index: false, nocache: true },
-  title: "Owner access | Andrelook",
+  title: "Вход владельца | Andrelook",
 };
 
 export default function SignInPage() {
@@ -16,11 +16,11 @@ export default function SignInPage() {
   if (config.authProvider !== "clerk" || !config.clerkPublishableKey) {
     return (
       <main className="auth-boundary">
-        <span className="eyebrow">Owner access</span>
-        <h1>Authentication is not configured</h1>
+        <span className="eyebrow">Доступ владельца</span>
+        <h1>Вход пока не настроен</h1>
         <p>
-          The admin area is fail-closed. Configure the approved Clerk project,
-          its environment keys, and OWNER_EMAILS before staging access.
+          Кабинет закрыт по умолчанию. Для доступа нужно настроить одобренный
+          проект Clerk и точный список адресов владельца.
         </p>
       </main>
     );
@@ -29,6 +29,11 @@ export default function SignInPage() {
   return (
     <ClerkProvider publishableKey={config.clerkPublishableKey}>
       <main className="auth-boundary">
+        <div className="auth-heading">
+          <span className="eyebrow">Закрытый кабинет</span>
+          <h1>Войти в Andrelook CRM</h1>
+          <p>Доступ разрешён только владельцу Andrelook.</p>
+        </div>
         <SignIn forceRedirectUrl="/admin" />
       </main>
     </ClerkProvider>

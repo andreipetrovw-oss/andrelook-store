@@ -90,7 +90,7 @@ export function assertPublicationReady(product: PublicationReadinessInput) {
   const result = evaluatePublicationReadiness(product);
   if (!result.ready) {
     throw new Error(
-      `Product is not publication-ready: ${result.reasons.join(", ")}`,
+      `Товар пока не готов к публикации: ${result.reasons.join(", ")}`,
     );
   }
   return result;

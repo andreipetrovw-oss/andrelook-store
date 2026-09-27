@@ -261,9 +261,9 @@ export async function updateProductOptions(raw: OwnerOptionsInput) {
   const sizes = parseLines(raw.sizes);
   const colors = parseColors(raw.colors);
   if (!sizes.length)
-    throw new Error("At least one owner-approved size is required.");
+    throw new Error("Укажите хотя бы один подтверждённый размер.");
   if (!colors.length)
-    throw new Error("At least one owner-approved colour is required.");
+    throw new Error("Укажите хотя бы один подтверждённый цвет.");
 
   const admin = await requireActiveAdmin();
   const prisma = getPrisma();
@@ -360,7 +360,7 @@ const uploadSchema = z.object({
 export async function approveAndStorePublicImage(raw: unknown, file: File) {
   const input = uploadSchema.parse(raw);
   if (!(file instanceof File) || file.size === 0 || file.size > 15_000_000) {
-    throw new Error("A Studio candidate up to 15 MB is required.");
+    throw new Error("Добавьте версию Studio размером до 15 МБ.");
   }
   const admin = await requireActiveAdmin();
   const prisma = getPrisma();
@@ -374,13 +374,15 @@ export async function approveAndStorePublicImage(raw: unknown, file: File) {
   const bytes = Buffer.from(await file.arrayBuffer());
   const metadata = await sharp(bytes).metadata();
   if (!metadata.width || !metadata.height || !metadata.format) {
-    throw new Error("The uploaded candidate is not a supported image.");
+    throw new Error(
+      "Загруженный файл не является поддерживаемым изображением.",
+    );
   }
   if (
     !["avif", "jpeg", "png", "webp"].includes(metadata.format) ||
     metadata.width * metadata.height > 50_000_000
   ) {
-    throw new Error("The candidate format or dimensions are not supported.");
+    throw new Error("Формат или размер изображения не поддерживается.");
   }
 
   const extension = metadata.format === "jpeg" ? "jpg" : metadata.format;

@@ -1,9 +1,22 @@
 import { OrderStatus, PaymentKind } from "@prisma/client";
+import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  channelLabel,
+  contactMethodLabel,
+  formatDate,
+  formatDateTime,
+  formatMoney,
+  orderStatusLabel,
+  paymentKindLabel,
+} from "@/lib/admin/presentation";
 import { getAdminOrder } from "@/lib/admin/query";
 
 import { recordPayment, updateOrderStatus } from "../../actions";
+
+const orderProgress = Object.values(OrderStatus);
 
 export default async function AdminOrderPage({
   params,
@@ -13,159 +26,245 @@ export default async function AdminOrderPage({
   const { id } = await params;
   const order = await getAdminOrder(id);
   if (!order) notFound();
+
+  const firstItem = order.items[0];
+  const imageUrl = firstItem?.product?.images[0]?.url;
+
   return (
     <>
-      <span className="eyebrow">{order.displayNumber}</span>
-      <h1>{order.customer.name}</h1>
+      <Link className="admin-back-link" href="/admin/orders">
+        ← Назад к заказам
+      </Link>
+      <header className="order-hero">
+        <div>
+          <span className="eyebrow">{order.displayNumber}</span>
+          <h1>{order.customer.name}</h1>
+          <p>
+            {contactMethodLabel[order.customer.preferredContactMethod]} ·{" "}
+            {order.customer.preferredContactValue}
+          </p>
+        </div>
+        <span className={`status-pill status-${order.status.toLowerCase()}`}>
+          {orderStatusLabel[order.status]}
+        </span>
+      </header>
+
+      <section
+        aria-label="Краткая информация о заказе"
+        className="order-summary-card"
+      >
+        <div className="order-product-thumb">
+          {imageUrl ? (
+            <Image
+              alt={firstItem?.productNameSnapshot ?? "Товар"}
+              height={160}
+              sizes="96px"
+              src={imageUrl}
+              width={128}
+            />
+          ) : (
+            <span aria-hidden="true">A</span>
+          )}
+        </div>
+        <div className="order-summary-product">
+          <span>Товар</span>
+          <strong>{firstItem?.productNameSnapshot ?? "Не указан"}</strong>
+        </div>
+        <dl>
+          <div>
+            <dt>Размер</dt>
+            <dd>{firstItem?.sizeSnapshot ?? "Не указан"}</dd>
+          </div>
+          <div>
+            <dt>Цвет</dt>
+            <dd>{firstItem?.colorSnapshot ?? "Не указан"}</dd>
+          </div>
+          <div>
+            <dt>Подтверждённая сумма</dt>
+            <dd>{formatMoney(order.confirmedTotalMinor, order.currency)}</dd>
+          </div>
+          <div>
+            <dt>Оплачено</dt>
+            <dd>{formatMoney(order.paidMinor, order.currency)}</dd>
+          </div>
+          <div>
+            <dt>Осталось</dt>
+            <dd>{formatMoney(order.balanceMinor, order.currency)}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        aria-labelledby="progress-heading"
+        className="admin-panel admin-panel-wide"
+      >
+        <div className="section-heading-row">
+          <div>
+            <span className="admin-section-label">Текущий этап</span>
+            <h2 id="progress-heading">Путь заказа</h2>
+          </div>
+        </div>
+        <ol className="order-progress">
+          {orderProgress.map((status) => (
+            <li
+              className={status === order.status ? "is-current" : undefined}
+              key={status}
+            >
+              <span>{orderStatusLabel[status]}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <div className="order-detail-grid">
         <section className="admin-panel">
-          <h2>Contact</h2>
+          <span className="admin-section-label">Клиент</span>
+          <h2>Контакт</h2>
           <dl>
             <div>
-              <dt>Method</dt>
-              <dd>{order.customer.preferredContactMethod}</dd>
+              <dt>Способ связи</dt>
+              <dd>
+                {contactMethodLabel[order.customer.preferredContactMethod]}
+              </dd>
             </div>
             <div>
-              <dt>Value</dt>
+              <dt>Контакт</dt>
               <dd>{order.customer.preferredContactValue}</dd>
             </div>
             <div>
-              <dt>Locale</dt>
+              <dt>Язык заявки</dt>
               <dd>{order.requestedLocale}</dd>
             </div>
             <div>
-              <dt>Source</dt>
-              <dd>{order.acquisitionChannel}</dd>
+              <dt>Источник</dt>
+              <dd>{channelLabel[order.acquisitionChannel]}</dd>
             </div>
           </dl>
         </section>
+
         <section className="admin-panel">
-          <h2>Request</h2>
-          {order.items.map((item) => (
-            <dl key={item.id}>
-              <div>
-                <dt>Product</dt>
-                <dd>{item.productNameSnapshot}</dd>
-              </div>
-              <div>
-                <dt>Size</dt>
-                <dd>{item.sizeSnapshot ?? "Pending"}</dd>
-              </div>
-              <div>
-                <dt>Colour</dt>
-                <dd>{item.colorSnapshot ?? "Pending"}</dd>
-              </div>
-              <div>
-                <dt>Price snapshot</dt>
-                <dd>
-                  {item.unitPriceMinor === null || !order.currency
-                    ? "Pending"
-                    : `${(item.unitPriceMinor / 100).toFixed(2)} ${order.currency}`}
-                </dd>
-              </div>
-            </dl>
-          ))}
-        </section>
-        <section className="admin-panel">
-          <h2>Operations</h2>
+          <span className="admin-section-label">Следующий шаг</span>
+          <h2>Работа с заказом</h2>
           <dl>
             <div>
-              <dt>Supplier ordered</dt>
-              <dd>
-                {order.supplierOrderedAt?.toLocaleDateString("en-GB") ?? "—"}
-              </dd>
+              <dt>Следующее действие</dt>
+              <dd>{formatDateTime(order.nextActionAt)}</dd>
             </div>
             <div>
-              <dt>ETA</dt>
-              <dd>
-                {order.etaText ??
-                  order.etaDate?.toLocaleDateString("en-GB") ??
-                  "—"}
-              </dd>
+              <dt>Заказано поставщику</dt>
+              <dd>{formatDate(order.supplierOrderedAt)}</dd>
             </div>
             <div>
-              <dt>Tracking</dt>
-              <dd>{order.trackingReference ?? "—"}</dd>
+              <dt>Ожидаемый срок</dt>
+              <dd>{order.etaText ?? formatDate(order.etaDate)}</dd>
             </div>
             <div>
-              <dt>Next action</dt>
-              <dd>{order.nextActionAt?.toLocaleString("en-GB") ?? "—"}</dd>
+              <dt>Отслеживание</dt>
+              <dd>{order.trackingReference ?? "Не указано"}</dd>
             </div>
             <div>
-              <dt>Notes</dt>
-              <dd>{order.internalNotes ?? "—"}</dd>
+              <dt>Внутренняя заметка</dt>
+              <dd>{order.internalNotes ?? "Нет заметок"}</dd>
             </div>
           </dl>
         </section>
+
         <section className="admin-panel">
-          <h2>Status</h2>
+          <span className="admin-section-label">Действие владельца</span>
+          <h2>Изменить статус</h2>
           <form action={updateOrderStatus} className="admin-stack-form">
             <input name="orderId" type="hidden" value={order.id} />
-            <select defaultValue={order.status} name="status">
-              {Object.values(OrderStatus).map((status) => (
-                <option key={status} value={status}>
-                  {status.replaceAll("_", " ")}
-                </option>
-              ))}
-            </select>
-            <input name="note" placeholder="Optional timeline note" />
-            <button type="submit">Update status</button>
+            <label>
+              <span>Новый статус</span>
+              <select defaultValue={order.status} name="status">
+                {Object.values(OrderStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {orderStatusLabel[status]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Комментарий в историю</span>
+              <input name="note" placeholder="Необязательно" />
+            </label>
+            <button type="submit">Сохранить статус</button>
           </form>
         </section>
+
         <section className="admin-panel">
-          <h2>Payments</h2>
-          <p>
-            Paid: {(order.paidMinor / 100).toFixed(2)} {order.currency ?? ""}
-          </p>
-          <p>
-            Balance:{" "}
-            {order.balanceMinor === null
-              ? "Pending confirmed total"
-              : `${(order.balanceMinor / 100).toFixed(2)} ${order.currency ?? ""}`}
-          </p>
+          <span className="admin-section-label">Финансы</span>
+          <h2>Оплаты</h2>
+          <div className="payment-summary">
+            <p>
+              <span>Оплачено</span>
+              <strong>{formatMoney(order.paidMinor, order.currency)}</strong>
+            </p>
+            <p>
+              <span>Осталось</span>
+              <strong>{formatMoney(order.balanceMinor, order.currency)}</strong>
+            </p>
+          </div>
           <form action={recordPayment} className="admin-stack-form">
-            <input name="orderId" type="hidden" value={order.id} />
-            <select name="kind">
-              {Object.values(PaymentKind).map((kind) => (
-                <option key={kind} value={kind}>
-                  {kind}
-                </option>
-              ))}
-            </select>
-            <input
-              inputMode="decimal"
-              min="0.01"
-              name="amount"
-              placeholder="Amount"
-              required
-              step="0.01"
-            />
-            <input
-              defaultValue={order.currency ?? "EUR"}
-              maxLength={3}
-              name="currency"
-              required
-            />
-            <input name="reference" placeholder="Reference" />
-            <button type="submit">Record payment</button>
+            <label>
+              <span>Тип оплаты</span>
+              <select name="kind">
+                {Object.values(PaymentKind).map((kind) => (
+                  <option key={kind} value={kind}>
+                    {paymentKindLabel[kind]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Сумма</span>
+              <input
+                inputMode="decimal"
+                min="0.01"
+                name="amount"
+                placeholder="0,00"
+                required
+                step="0.01"
+              />
+            </label>
+            <label>
+              <span>Валюта</span>
+              <input
+                defaultValue={order.currency ?? "EUR"}
+                maxLength={3}
+                name="currency"
+                required
+              />
+            </label>
+            <label>
+              <span>Номер или комментарий</span>
+              <input name="reference" placeholder="Необязательно" />
+            </label>
+            <button type="submit">Записать оплату</button>
           </form>
-          <ul className="timeline">
-            {order.payments.map((payment) => (
-              <li key={payment.id}>
-                {payment.kind} · {(payment.amountMinor / 100).toFixed(2)}{" "}
-                {payment.currency} ·{" "}
-                {payment.receivedAt.toLocaleDateString("en-GB")}
-              </li>
-            ))}
-          </ul>
+          {order.payments.length ? (
+            <ul className="timeline compact">
+              {order.payments.map((payment) => (
+                <li key={payment.id}>
+                  {paymentKindLabel[payment.kind]} ·{" "}
+                  {formatMoney(payment.amountMinor, payment.currency)} ·{" "}
+                  {formatDate(payment.receivedAt)}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="pending-note">Оплат пока нет.</p>
+          )}
         </section>
-        <section className="admin-panel">
-          <h2>Timeline</h2>
+
+        <section className="admin-panel admin-panel-wide">
+          <span className="admin-section-label">Неизменяемый журнал</span>
+          <h2>История статусов</h2>
           <ol className="timeline">
             {order.statusHistory.map((entry) => (
               <li key={entry.id}>
-                <strong>{entry.toStatus.replaceAll("_", " ")}</strong>
-                <span>{entry.createdAt.toLocaleString("en-GB")}</span>
+                <strong>{orderStatusLabel[entry.toStatus]}</strong>
+                <span>{formatDateTime(entry.createdAt)}</span>
                 {entry.note ? <p>{entry.note}</p> : null}
               </li>
             ))}
