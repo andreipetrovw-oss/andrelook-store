@@ -8,6 +8,7 @@ on:
       - v1-foundation
       - phase6c-staging-storefront
       - phase6d-owner-golden-products
+      - phase6d1-crm-completion
 
 permissions:
   contents: read
