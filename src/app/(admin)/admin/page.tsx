@@ -77,7 +77,22 @@ export default async function AdminOverviewPage() {
           </Link>
         ))}
 
-        {!overview.overdue && !visibleActions.length ? (
+        {overview.productsForReview > 0 ? (
+          <Link className="attention-item" href="/admin/catalog?state=review">
+            <div>
+              <strong>Товары ждут решения</strong>
+              <span>
+                Откройте карточки и завершите только подтверждённые владельцем
+                данные.
+              </span>
+            </div>
+            <b>{overview.productsForReview}</b>
+          </Link>
+        ) : null}
+
+        {!overview.overdue &&
+        !visibleActions.length &&
+        !overview.productsForReview ? (
           <div className="admin-empty is-positive">
             <strong>Срочных действий нет</strong>
             <p>Новые задачи появятся здесь автоматически.</p>

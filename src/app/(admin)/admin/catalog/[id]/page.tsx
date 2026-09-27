@@ -20,6 +20,7 @@ import {
 } from "@/lib/admin/presentation";
 import { getProductReadiness } from "@/lib/catalog/owner-control";
 import { getPrivateCatalogProduct } from "@/lib/catalog/private-query";
+import { getGoldenWorkspace } from "@/lib/catalog/golden-workspace";
 
 import {
   saveCommercialFields,
@@ -71,6 +72,92 @@ function chartSizes(chartData: unknown): string[] {
     : [];
 }
 
+function evidenceNotes(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function sourceRoleValue(image: SourceImageCardProps["image"]): ImageRole {
+  return Object.values(ImageRole).includes(
+    image.assignedSourceRole as ImageRole,
+  )
+    ? (image.assignedSourceRole as ImageRole)
+    : image.isSizeChart
+      ? ImageRole.SIZE_CHART
+      : ImageRole.ADDITIONAL;
+}
+
+type SourceImageCardProps = {
+  image: {
+    assignedSourceRole: string | null;
+    height: number | null;
+    id: string;
+    isSizeChart: boolean;
+    reviewStatus: SourceReviewStatus;
+    sourcePosition: number;
+    width: number | null;
+  };
+  productId: string;
+  shortlistReason?: string;
+};
+
+function SourceImageReviewCard({
+  image,
+  productId,
+  shortlistReason,
+}: SourceImageCardProps) {
+  return (
+    <article className="source-review-card">
+      <PrivateSourceImage
+        alt={`Исходник товара, позиция ${image.sourcePosition}`}
+        imageId={image.id}
+      />
+      <div className="source-card-meta">
+        <strong>Позиция {image.sourcePosition}</strong>
+        <span>
+          {image.width && image.height
+            ? `${image.width}×${image.height}`
+            : "Размер не указан"}
+        </span>
+        {shortlistReason ? (
+          <span className="shortlist-badge">
+            Подборка Studio · {shortlistReason}
+          </span>
+        ) : null}
+      </div>
+      <form action={saveSourceImageReview} className="admin-stack-form">
+        <input name="productId" type="hidden" value={productId} />
+        <input name="imageId" type="hidden" value={image.id} />
+        <label>
+          <span>Роль изображения</span>
+          <select
+            defaultValue={sourceRoleValue(image)}
+            name="assignedSourceRole"
+          >
+            {Object.values(ImageRole).map((role) => (
+              <option key={role} value={role}>
+                {imageRoleLabel[role]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Решение</span>
+          <select defaultValue={image.reviewStatus} name="reviewStatus">
+            {Object.values(SourceReviewStatus).map((state) => (
+              <option key={state} value={state}>
+                {sourceReviewLabel[state]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button type="submit">Сохранить решение</button>
+      </form>
+    </article>
+  );
+}
+
 function decisionSelect(name: string, current?: string) {
   return (
     <select defaultValue={current ?? "PENDING"} name={name}>
@@ -93,6 +180,7 @@ export default async function AdminCatalogProductPage({
   if (!product) notFound();
 
   const readiness = await getProductReadiness(id);
+  const goldenWorkspace = getGoldenWorkspace(product.internalCode);
   const ru = translation(product.translations, "RU");
   const et = translation(product.translations, "ET");
   const en = translation(product.translations, "EN");
@@ -114,6 +202,16 @@ export default async function AdminCatalogProductPage({
         .filter((item): item is string => Boolean(item)),
     ),
   ];
+  const shortlistByPosition = new Map(
+    goldenWorkspace?.shortlist.map((item) => [item.position, item]) ?? [],
+  );
+  const shortlistedSources = product.sourceImages.filter((image) =>
+    shortlistByPosition.has(image.sourcePosition),
+  );
+  const remainingSources = product.sourceImages.filter(
+    (image) => !shortlistByPosition.has(image.sourcePosition),
+  );
+  const sizeEvidenceNotes = evidenceNotes(product.sizeChart?.evidence?.notes);
   const optionsColors = product.colors
     .map((color) => {
       const names = Object.fromEntries(
@@ -215,6 +313,29 @@ export default async function AdminCatalogProductPage({
               .map((reason) => readinessReason[reason] ?? reason)
               .join("; ")}.`}
       </p>
+
+      {goldenWorkspace ? (
+        <section
+          aria-labelledby="owner-decisions"
+          className="owner-decision-brief"
+        >
+          <div>
+            <span className="admin-section-label">
+              Золотой товар · решение владельца
+            </span>
+            <h2 id="owner-decisions">Что нужно решить</h2>
+            <p>
+              Источник, предложения и решения владельца показаны отдельно.
+              Ничего ниже не считается одобренным автоматически.
+            </p>
+          </div>
+          <ul>
+            {goldenWorkspace.decisionPrompts.map((prompt) => (
+              <li key={prompt}>{prompt}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="product-editor-sections">
         <section className="admin-panel editor-section" id="main">
@@ -359,8 +480,21 @@ export default async function AdminCatalogProductPage({
           {sizes.length ? (
             <p className="evidence-note">
               В исходной размерной сетке найдены размеры: {sizes.join(", ")}.
+              {product.sizeChart?.units
+                ? ` Единицы источника: ${product.sizeChart.units}.`
+                : " Единицы в источнике не указаны — они не были выведены автоматически."}
+              {product.sizeChart?.evidence?.sourceImagePosition
+                ? ` Источник: позиция ${product.sizeChart.evidence.sourceImagePosition}.`
+                : ""}
               Это справка, а не автоматическое одобрение.
             </p>
+          ) : null}
+          {sizeEvidenceNotes.length ? (
+            <ul className="evidence-details">
+              {sizeEvidenceNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
           ) : null}
           <form
             action={saveProductOptions}
@@ -408,6 +542,24 @@ export default async function AdminCatalogProductPage({
             Русский, эстонский и английский хранятся отдельно. Используйте
             только подтверждённые факты о товаре.
           </p>
+          {goldenWorkspace ? (
+            <details className="content-suggestions" open>
+              <summary>Предложения на основе источника · не одобрены</summary>
+              <p>
+                Это черновики для проверки владельцем. Они не сохранены как
+                одобренный контент и не меняют готовность товара.
+              </p>
+              <div className="suggestion-grid">
+                {(["RU", "ET", "EN"] as const).map((locale) => (
+                  <article key={locale}>
+                    <span>{languageNames[locale]}</span>
+                    <strong>{goldenWorkspace.content[locale].name}</strong>
+                    <p>{goldenWorkspace.content[locale].description}</p>
+                  </article>
+                ))}
+              </div>
+            </details>
+          ) : null}
           <form
             action={saveLocalizedContent}
             className="localized-content-form"
@@ -478,65 +630,43 @@ export default async function AdminCatalogProductPage({
 
           <details className="source-image-workspace" open>
             <summary>
-              Исходники поставщика <span>{product.sourceImages.length}</span>
+              Подборка для решения <span>{shortlistedSources.length}</span>
             </summary>
             <p>
-              Исходники доступны только владельцу. Выбирайте роль исключительно
-              по видимому ракурсу. Одобрение исходника ещё не публикует его.
+              Это 3–6 наиболее полезных исходников, отобранных по видимому
+              ракурсу. Они остаются закрытыми и неодобренными, пока владелец не
+              сохранит своё решение.
             </p>
             <div className="source-review-grid">
-              {product.sourceImages.map((image) => (
-                <article className="source-review-card" key={image.id}>
-                  <PrivateSourceImage
-                    alt={`Исходник товара, позиция ${image.sourcePosition}`}
-                    imageId={image.id}
-                  />
-                  <div className="source-card-meta">
-                    <strong>Позиция {image.sourcePosition}</strong>
-                    <span>
-                      {image.width && image.height
-                        ? `${image.width}×${image.height}`
-                        : "Размер не указан"}
-                    </span>
-                  </div>
-                  <form
-                    action={saveSourceImageReview}
-                    className="admin-stack-form"
-                  >
-                    <input name="productId" type="hidden" value={product.id} />
-                    <input name="imageId" type="hidden" value={image.id} />
-                    <label>
-                      <span>Роль изображения</span>
-                      <select
-                        defaultValue={
-                          image.assignedSourceRole ??
-                          (image.isSizeChart ? "SIZE_CHART" : "ADDITIONAL")
-                        }
-                        name="assignedSourceRole"
-                      >
-                        {Object.values(ImageRole).map((role) => (
-                          <option key={role} value={role}>
-                            {imageRoleLabel[role]}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      <span>Решение</span>
-                      <select
-                        defaultValue={image.reviewStatus}
-                        name="reviewStatus"
-                      >
-                        {Object.values(SourceReviewStatus).map((state) => (
-                          <option key={state} value={state}>
-                            {sourceReviewLabel[state]}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <button type="submit">Сохранить решение</button>
-                  </form>
-                </article>
+              {shortlistedSources.map((image) => (
+                <SourceImageReviewCard
+                  image={image}
+                  key={image.id}
+                  productId={product.id}
+                  shortlistReason={
+                    shortlistByPosition.get(image.sourcePosition)?.reason
+                  }
+                />
+              ))}
+            </div>
+          </details>
+
+          <details className="source-image-workspace">
+            <summary>
+              Остальные закрытые исходники{" "}
+              <span>{remainingSources.length}</span>
+            </summary>
+            <p>
+              Полный источник сохранён для аудита. Эти изображения не выбраны в
+              компактную подборку, но остаются доступны владельцу.
+            </p>
+            <div className="source-review-grid">
+              {remainingSources.map((image) => (
+                <SourceImageReviewCard
+                  image={image}
+                  key={image.id}
+                  productId={product.id}
+                />
               ))}
             </div>
           </details>

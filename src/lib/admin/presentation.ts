@@ -60,6 +60,7 @@ export const imageRoleLabel: Record<ImageRole, string> = {
   GALLERY: "Галерея",
   DETAIL: "Деталь",
   BRANDING: "Логотип / брендинг",
+  HARDWARE: "Фурнитура",
   ADDITIONAL: "Дополнительное",
   SIZE_CHART: "Размерная сетка",
 };

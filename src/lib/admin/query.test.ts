@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   count: vi.fn(),
   findMany: vi.fn(),
   groupBy: vi.fn(),
+  productCount: vi.fn(),
   requireOwner: vi.fn(),
 }));
 
@@ -17,7 +18,7 @@ vi.mock("@/lib/db", () => ({
       findMany: mocks.findMany,
       groupBy: mocks.groupBy,
     },
-    product: { findMany: mocks.findMany },
+    product: { count: mocks.productCount, findMany: mocks.findMany },
   }),
 }));
 
@@ -32,9 +33,11 @@ describe("owner CRM data boundary", () => {
   it("authorizes before dashboard reads", async () => {
     mocks.groupBy.mockResolvedValue([{ _count: { _all: 2 }, status: "NEW" }]);
     mocks.count.mockResolvedValue(1);
+    mocks.productCount.mockResolvedValue(4);
     await expect(getAdminOverview()).resolves.toEqual({
       counts: { NEW: 2 },
       overdue: 1,
+      productsForReview: 4,
     });
     expect(mocks.requireOwner).toHaveBeenCalledOnce();
   });

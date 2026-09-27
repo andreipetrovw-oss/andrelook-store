@@ -865,6 +865,38 @@ button:disabled {
   border-color: var(--color-gold);
 }
 
+.owner-decision-brief {
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-gold);
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 0.8fr) minmax(16rem, 1.2fr);
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+}
+
+.owner-decision-brief h2 {
+  font-family: var(--font-editorial);
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+}
+
+.owner-decision-brief p,
+.owner-decision-brief ul {
+  margin: 0;
+}
+
+.owner-decision-brief ul {
+  columns: 2;
+  padding-left: 1.2rem;
+}
+
+.owner-decision-brief li {
+  break-inside: avoid;
+  margin-bottom: 0.45rem;
+}
+
 .admin-form-grid,
 .locale-editor-grid,
 .review-checklist {
@@ -1862,6 +1894,13 @@ button:disabled {
   padding: 0.8rem 1rem;
 }
 
+.evidence-details {
+  color: var(--color-ink-muted);
+  font-size: 0.82rem;
+  margin: -0.25rem 0 1rem;
+  padding-left: 1.25rem;
+}
+
 .option-editor {
   grid-template-columns: minmax(12rem, 0.7fr) minmax(18rem, 1.3fr);
 }
@@ -1870,6 +1909,53 @@ button:disabled {
   display: grid;
   gap: 0.65rem;
   margin-top: 1.2rem;
+}
+
+.content-suggestions {
+  border: 1px solid var(--color-gold);
+  margin-top: 1rem;
+}
+
+.content-suggestions > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.9rem 1rem;
+}
+
+.content-suggestions[open] > summary {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.content-suggestions > p {
+  color: var(--color-ink-muted);
+  margin: 1rem;
+}
+
+.suggestion-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 1rem;
+}
+
+.suggestion-grid article {
+  background: var(--color-background-warm);
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.suggestion-grid article > span {
+  color: var(--color-gold);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.suggestion-grid article > p {
+  font-size: 0.84rem;
+  margin: 0;
 }
 
 .language-editor summary {
@@ -1980,6 +2066,13 @@ button:disabled {
 
 .source-card-meta span {
   color: var(--color-ink-muted);
+}
+
+.source-card-meta .shortlist-badge {
+  background: var(--color-accent-soft);
+  border-left: 2px solid var(--color-gold);
+  color: var(--color-ink);
+  padding: 0.35rem 0.45rem;
 }
 
 .studio-workspace {
@@ -2219,6 +2312,15 @@ button:disabled {
   .option-editor,
   .studio-comparison {
     grid-template-columns: 1fr;
+  }
+
+  .owner-decision-brief,
+  .suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-decision-brief ul {
+    columns: 1;
   }
 
   .product-editor-nav {

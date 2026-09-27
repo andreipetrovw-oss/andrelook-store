@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  auditCreate: vi.fn(),
   findUniqueOrThrow: vi.fn(),
   requireActiveAdmin: vi.fn(),
   transaction: vi.fn(),
@@ -18,7 +19,7 @@ vi.mock("@/lib/db", () => ({
   }),
 }));
 
-import { updateOrderStatus } from "./actions";
+import { updateOrderOperations, updateOrderStatus } from "./actions";
 
 describe("owner CRM status mutation", () => {
   beforeEach(() => {
@@ -31,6 +32,7 @@ describe("owner CRM status mutation", () => {
           findUniqueOrThrow: mocks.findUniqueOrThrow,
           update: mocks.update,
         },
+        orderAuditEvent: { create: mocks.auditCreate },
       }),
     );
   });
@@ -64,5 +66,50 @@ describe("owner CRM status mutation", () => {
     form.set("status", "CONTACTED");
     await expect(updateOrderStatus(form)).rejects.toThrow("forbidden");
     expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+
+  it("updates operational fields and records an immutable audit event", async () => {
+    mocks.findUniqueOrThrow.mockResolvedValueOnce({
+      cancelledReason: null,
+      confirmedTotalMinor: null,
+      currency: null,
+      etaDate: null,
+      etaText: null,
+      internalNotes: null,
+      nextActionAt: null,
+      supplierOrderedAt: null,
+      trackingReference: null,
+    });
+    const form = new FormData();
+    form.set("orderId", "order_1");
+    form.set("confirmedTotal", "200");
+    form.set("currency", "eur");
+    form.set("nextActionAt", "2026-09-28T10:30");
+    form.set("supplierOrderedAt", "2026-09-27");
+    form.set("etaDate", "2026-10-05");
+    form.set("etaText", "Проверочный срок");
+    form.set("trackingReference", "STAGING-TEST");
+    form.set("internalNotes", "Изолированная тестовая запись");
+    form.set("cancelledReason", "");
+
+    await updateOrderOperations(form);
+
+    expect(mocks.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          confirmedTotalMinor: 20_000,
+          currency: "EUR",
+          internalNotes: "Изолированная тестовая запись",
+        }),
+        where: { id: "order_1" },
+      }),
+    );
+    expect(mocks.auditCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: "OPERATIONAL_FIELDS_UPDATED",
+        changedByAdminId: "admin_1",
+        orderId: "order_1",
+      }),
+    });
   });
 });

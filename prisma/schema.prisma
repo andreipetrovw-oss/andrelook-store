@@ -88,6 +88,7 @@ enum ImageRole {
   GALLERY
   DETAIL
   BRANDING
+  HARDWARE
   ADDITIONAL
   SIZE_CHART
 }
@@ -420,6 +421,7 @@ model Order {
   items               OrderItem[]
   payments            Payment[]
   statusHistory       OrderStatusHistory[]
+  auditEvents         OrderAuditEvent[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
@@ -482,6 +484,22 @@ model OrderStatusHistory {
   @@index([orderId, createdAt])
 }
 
+model OrderAuditEvent {
+  id               String     @id @default(cuid())
+  orderId          String
+  order            Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedByAdminId String?
+  changedByAdmin   AdminUser? @relation("OrderAuditActor", fields: [changedByAdminId], references: [id], onDelete: SetNull)
+  action           String
+  beforeState      Json?
+  afterState       Json?
+  note             String?
+  createdAt        DateTime   @default(now())
+
+  @@index([orderId, createdAt])
+  @@index([changedByAdminId, createdAt])
+}
+
 model AdminUser {
   id                  String               @id @default(cuid())
   provider            String
@@ -490,6 +508,7 @@ model AdminUser {
   isActive            Boolean              @default(true)
   payments            Payment[]            @relation("PaymentRecorder")
   statusChanges       OrderStatusHistory[] @relation("StatusChanger")
+  orderAuditEvents    OrderAuditEvent[]    @relation("OrderAuditActor")
   productImages       ProductImage[]       @relation("ProductImageApprover")
   productReviews      ProductReview[]      @relation("ProductReviewOwner")
   productReviewEvents ProductReviewEvent[] @relation("ProductReviewEventOwner")

@@ -9,6 +9,7 @@ on:
       - phase6c-staging-storefront
       - phase6d-owner-golden-products
       - phase6d1-crm-completion
+      - phase6d2-golden-finalization
 
 permissions:
   contents: read

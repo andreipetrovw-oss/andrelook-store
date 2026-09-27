@@ -12,9 +12,17 @@ import {
   orderStatusLabel,
   paymentKindLabel,
 } from "@/lib/admin/presentation";
+import {
+  formatDateInput,
+  formatOwnerDateTimeInput,
+} from "@/lib/admin/date-input";
 import { getAdminOrder } from "@/lib/admin/query";
 
-import { recordPayment, updateOrderStatus } from "../../actions";
+import {
+  recordPayment,
+  updateOrderOperations,
+  updateOrderStatus,
+} from "../../actions";
 
 const orderProgress = Object.values(OrderStatus);
 
@@ -142,31 +150,97 @@ export default async function AdminOrderPage({
           </dl>
         </section>
 
-        <section className="admin-panel">
+        <section className="admin-panel admin-panel-wide">
           <span className="admin-section-label">Следующий шаг</span>
-          <h2>Работа с заказом</h2>
-          <dl>
-            <div>
-              <dt>Следующее действие</dt>
-              <dd>{formatDateTime(order.nextActionAt)}</dd>
-            </div>
-            <div>
-              <dt>Заказано поставщику</dt>
-              <dd>{formatDate(order.supplierOrderedAt)}</dd>
-            </div>
-            <div>
-              <dt>Ожидаемый срок</dt>
-              <dd>{order.etaText ?? formatDate(order.etaDate)}</dd>
-            </div>
-            <div>
-              <dt>Отслеживание</dt>
-              <dd>{order.trackingReference ?? "Не указано"}</dd>
-            </div>
-            <div>
-              <dt>Внутренняя заметка</dt>
-              <dd>{order.internalNotes ?? "Нет заметок"}</dd>
-            </div>
-          </dl>
+          <h2>Рабочие данные заказа</h2>
+          <p>
+            Заполняйте только подтверждённые данные. Каждое изменение попадает в
+            неизменяемый журнал.
+          </p>
+          <form action={updateOrderOperations} className="admin-form-grid">
+            <input name="orderId" type="hidden" value={order.id} />
+            <label>
+              <span>Подтверждённая сумма</span>
+              <input
+                defaultValue={
+                  order.confirmedTotalMinor === null
+                    ? ""
+                    : order.confirmedTotalMinor / 100
+                }
+                inputMode="decimal"
+                min="0.01"
+                name="confirmedTotal"
+                placeholder="Не указана"
+                step="0.01"
+              />
+            </label>
+            <label>
+              <span>Валюта</span>
+              <input
+                defaultValue={order.currency ?? "EUR"}
+                maxLength={3}
+                name="currency"
+              />
+            </label>
+            <label>
+              <span>Следующее действие · время Эстонии</span>
+              <input
+                defaultValue={formatOwnerDateTimeInput(order.nextActionAt)}
+                name="nextActionAt"
+                type="datetime-local"
+              />
+            </label>
+            <label>
+              <span>Заказано поставщику</span>
+              <input
+                defaultValue={formatDateInput(order.supplierOrderedAt)}
+                name="supplierOrderedAt"
+                type="date"
+              />
+            </label>
+            <label>
+              <span>Ожидаемая дата</span>
+              <input
+                defaultValue={formatDateInput(order.etaDate)}
+                name="etaDate"
+                type="date"
+              />
+            </label>
+            <label>
+              <span>Пояснение срока</span>
+              <input
+                defaultValue={order.etaText ?? ""}
+                name="etaText"
+                placeholder="Только подтверждённая информация"
+              />
+            </label>
+            <label>
+              <span>Номер отслеживания</span>
+              <input
+                defaultValue={order.trackingReference ?? ""}
+                name="trackingReference"
+                placeholder="Не указан"
+              />
+            </label>
+            <label>
+              <span>Причина отмены</span>
+              <input
+                defaultValue={order.cancelledReason ?? ""}
+                name="cancelledReason"
+                placeholder="Только для отменённого заказа"
+              />
+            </label>
+            <label className="wide">
+              <span>Внутренняя заметка</span>
+              <textarea
+                defaultValue={order.internalNotes ?? ""}
+                name="internalNotes"
+                placeholder="Следующий шаг или важный контекст"
+                rows={4}
+              />
+            </label>
+            <button type="submit">Сохранить рабочие данные</button>
+          </form>
         </section>
 
         <section className="admin-panel">
@@ -269,6 +343,29 @@ export default async function AdminOrderPage({
               </li>
             ))}
           </ol>
+        </section>
+
+        <section className="admin-panel admin-panel-wide">
+          <span className="admin-section-label">Неизменяемый журнал</span>
+          <h2>История рабочих данных</h2>
+          {order.auditEvents.length ? (
+            <ol className="timeline">
+              {order.auditEvents.map((entry) => (
+                <li key={entry.id}>
+                  <strong>Обновлены рабочие данные</strong>
+                  <span>
+                    {formatDateTime(entry.createdAt)}
+                    {entry.changedByAdmin?.email
+                      ? ` · ${entry.changedByAdmin.email}`
+                      : ""}
+                  </span>
+                  {entry.note ? <p>{entry.note}</p> : null}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="pending-note">Изменений пока нет.</p>
+          )}
         </section>
       </div>
     </>

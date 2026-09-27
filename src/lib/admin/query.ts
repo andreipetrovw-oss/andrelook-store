@@ -9,7 +9,7 @@ import { calculateFinancials } from "@/lib/orders/financials";
 export async function getAdminOverview() {
   await requireOwner();
   const prisma = getPrisma();
-  const [groups, overdue] = await Promise.all([
+  const [groups, overdue, productsForReview] = await Promise.all([
     prisma.order.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.order.count({
       where: {
@@ -17,12 +17,14 @@ export async function getAdminOverview() {
         status: { notIn: ["DELIVERED", "CANCELLED"] },
       },
     }),
+    prisma.product.count({ where: { publicationStatus: "READY" } }),
   ]);
   return {
     counts: Object.fromEntries(
       groups.map((group) => [group.status, group._count._all]),
     ),
     overdue,
+    productsForReview,
   };
 }
 
@@ -97,6 +99,10 @@ export async function getAdminOrder(id: string) {
   await requireOwner();
   const order = await getPrisma().order.findUnique({
     include: {
+      auditEvents: {
+        include: { changedByAdmin: { select: { email: true } } },
+        orderBy: { createdAt: "desc" },
+      },
       customer: true,
       items: {
         include: {
