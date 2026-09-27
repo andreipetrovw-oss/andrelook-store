@@ -1657,7 +1657,12 @@ button:disabled {
 .owner-product-body {
   display: grid;
   gap: 0.65rem;
+  min-width: 0;
   padding: 1rem;
+}
+
+.owner-product-body > * {
+  min-width: 0;
 }
 
 .owner-product-body h2 {
@@ -2248,6 +2253,15 @@ button:disabled {
   .owner-product-state-row {
     align-items: start;
     flex-direction: column;
+  }
+
+  .owner-product-footer {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .owner-product-footer small {
+    overflow-wrap: anywhere;
   }
 
   .catalog-search {
