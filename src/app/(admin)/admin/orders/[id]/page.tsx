@@ -280,6 +280,7 @@ export default async function AdminOrderPage({
             </p>
           </div>
           <form action={recordPayment} className="admin-stack-form">
+            <input name="orderId" type="hidden" value={order.id} />
             <label>
               <span>Тип оплаты</span>
               <select name="kind">

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   auditCreate: vi.fn(),
   findUniqueOrThrow: vi.fn(),
+  paymentCreate: vi.fn(),
   requireActiveAdmin: vi.fn(),
   transaction: vi.fn(),
   update: vi.fn(),
@@ -15,11 +16,15 @@ vi.mock("@/lib/admin/identity", () => ({
 vi.mock("@/lib/db", () => ({
   getPrisma: () => ({
     $transaction: mocks.transaction,
-    payment: { create: vi.fn() },
+    payment: { create: mocks.paymentCreate },
   }),
 }));
 
-import { updateOrderOperations, updateOrderStatus } from "./actions";
+import {
+  recordPayment,
+  updateOrderOperations,
+  updateOrderStatus,
+} from "./actions";
 
 describe("owner CRM status mutation", () => {
   beforeEach(() => {
@@ -109,6 +114,28 @@ describe("owner CRM status mutation", () => {
         action: "OPERATIONAL_FIELDS_UPDATED",
         changedByAdminId: "admin_1",
         orderId: "order_1",
+      }),
+    });
+  });
+
+  it("records a payment against the submitted order", async () => {
+    const form = new FormData();
+    form.set("orderId", "order_1");
+    form.set("kind", "DEPOSIT");
+    form.set("amount", "50");
+    form.set("currency", "eur");
+    form.set("reference", "P6D2-STAGING-DEPOSIT");
+
+    await recordPayment(form);
+
+    expect(mocks.paymentCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        amountMinor: 5_000,
+        currency: "EUR",
+        kind: "DEPOSIT",
+        orderId: "order_1",
+        recordedByAdminId: "admin_1",
+        reference: "P6D2-STAGING-DEPOSIT",
       }),
     });
   });
