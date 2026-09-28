@@ -82,6 +82,30 @@ function jsonRecord(value: unknown): Record<string, unknown> {
     : {};
 }
 
+function invariantList(value: unknown): Array<{
+  area: string;
+  evidencePositions: number[];
+  requirement: string;
+}> {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    const record = jsonRecord(item);
+    if (
+      typeof record.area !== "string" ||
+      typeof record.requirement !== "string"
+    ) {
+      return [];
+    }
+    return [
+      {
+        area: record.area,
+        evidencePositions: numberList(record.evidencePositions),
+        requirement: record.requirement,
+      },
+    ];
+  });
+}
+
 function translation(
   items: Array<{ description: string | null; locale: string; name: string }>,
   locale: string,
@@ -236,6 +260,15 @@ export default async function AdminCatalogProductPage({
   );
   const remainingSources = product.sourceImages.filter(
     (image) => !shortlistByPosition.has(image.sourcePosition),
+  );
+  const activeStudioCandidates = product.studioCandidates.filter(
+    (candidate) => candidate.status !== "REJECTED",
+  );
+  const archivedStudioCandidates = product.studioCandidates.filter(
+    (candidate) => candidate.status === "REJECTED",
+  );
+  const primaryStudioCandidate = activeStudioCandidates.find(
+    (candidate) => candidate.role === "PRIMARY",
   );
   const sizeEvidenceNotes = evidenceNotes(product.sizeChart?.evidence?.notes);
   const optionsColors = product.colors
@@ -710,9 +743,9 @@ export default async function AdminCatalogProductPage({
               </p>
             </div>
 
-            {product.studioCandidates.length ? (
+            {activeStudioCandidates.length ? (
               <div className="studio-candidate-list">
-                {product.studioCandidates.map((candidate) => {
+                {activeStudioCandidates.map((candidate) => {
                   const primarySource = candidate.sources.find(
                     (source) => source.isPrimary,
                   )?.sourceImage;
@@ -723,6 +756,7 @@ export default async function AdminCatalogProductPage({
                   const supporting = numberList(
                     reference.supportingSourcePositions,
                   );
+                  const invariants = invariantList(reference.invariantMap);
                   return (
                     <article className="studio-candidate" key={candidate.id}>
                       <header className="studio-candidate-heading">
@@ -788,6 +822,38 @@ export default async function AdminCatalogProductPage({
                         {stringList(reference.uncertaintyNotes).map((note) => (
                           <small key={note}>{note}</small>
                         ))}
+                        <small>Метод: {candidate.method}</small>
+                        {invariants.length ? (
+                          <details className="studio-invariants">
+                            <summary>
+                              Карта инвариантов · {invariants.length}
+                            </summary>
+                            <ul>
+                              {invariants.map((item) => (
+                                <li key={item.area}>
+                                  <strong>{item.area}</strong>
+                                  <span>{item.requirement}</span>
+                                  <small>
+                                    Источники:{" "}
+                                    {item.evidencePositions.join(", ")}
+                                  </small>
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        ) : null}
+                        {stringList(reference.iterationHistory).length ? (
+                          <details className="studio-invariants">
+                            <summary>История генерации и ревизий</summary>
+                            <ol>
+                              {stringList(reference.iterationHistory).map(
+                                (item) => (
+                                  <li key={item}>{item}</li>
+                                ),
+                              )}
+                            </ol>
+                          </details>
+                        ) : null}
                         <a
                           href={`/admin/studio-candidates/${encodeURIComponent(candidate.id)}`}
                           rel="noreferrer"
@@ -869,9 +935,38 @@ export default async function AdminCatalogProductPage({
               </div>
             )}
 
-            {product.studioCandidates.find(
-              (candidate) => candidate.role === "PRIMARY",
-            ) ? (
+            {archivedStudioCandidates.length ? (
+              <details className="studio-archive">
+                <summary>
+                  Архив отклонённых экспериментов Phase 6D.3 ·{" "}
+                  {archivedStudioCandidates.length}
+                </summary>
+                <p>
+                  Эти source-pixel cutout версии сохранены только для аудита.
+                  Они отклонены, не участвуют в активном выборе и не могут быть
+                  показаны в preview витрины.
+                </p>
+                <ul>
+                  {archivedStudioCandidates.map((candidate) => (
+                    <li key={candidate.id}>
+                      <span>
+                        {imageRoleLabel[candidate.role]} · версия{" "}
+                        {candidate.version} · {candidate.method}
+                      </span>
+                      <a
+                        href={`/admin/studio-candidates/${encodeURIComponent(candidate.id)}`}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        Открыть архивную версию
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
+
+            {primaryStudioCandidate ? (
               <section
                 className="studio-private-preview"
                 aria-labelledby="studio-preview-heading"
@@ -889,9 +984,7 @@ export default async function AdminCatalogProductPage({
                   </p>
                 </header>
                 {(() => {
-                  const primary = product.studioCandidates.find(
-                    (candidate) => candidate.role === "PRIMARY",
-                  )!;
+                  const primary = primaryStudioCandidate;
                   return (
                     <div className="studio-preview-grid">
                       <article className="studio-card-preview">
