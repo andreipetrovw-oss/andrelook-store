@@ -2161,6 +2161,12 @@ button:disabled {
   margin: 0;
 }
 
+.studio-evidence-summary small,
+.studio-archive li span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .studio-evidence-summary a {
   color: inherit;
   font-size: 0.75rem;
