@@ -3,6 +3,8 @@ import "server-only";
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 
+import { evaluatePublicationReadiness } from "./readiness";
+
 export async function getPrivateCatalogProduct(productId: string) {
   await requireOwner();
 
@@ -55,6 +57,21 @@ export async function getPrivateCatalogProduct(productId: string) {
     },
     where: { id: productId },
   });
+}
+
+export async function getPrivateCatalogProductWorkspace(productId: string) {
+  const product = await getPrivateCatalogProduct(productId);
+  if (!product) return null;
+
+  return {
+    product,
+    readiness: evaluatePublicationReadiness({
+      ...product,
+      enabledVariantCount: product.variants.filter((item) => item.isEnabled)
+        .length,
+      primaryImages: product.images,
+    }),
+  };
 }
 
 export async function getPrivateStudioCandidate(candidateId: string) {

@@ -19,8 +19,7 @@ import {
   reviewDecisionLabel,
   sourceReviewLabel,
 } from "@/lib/admin/presentation";
-import { getProductReadiness } from "@/lib/catalog/owner-control";
-import { getPrivateCatalogProduct } from "@/lib/catalog/private-query";
+import { getPrivateCatalogProductWorkspace } from "@/lib/catalog/private-query";
 import { getGoldenWorkspace } from "@/lib/catalog/golden-workspace";
 import { studioFidelityChecklist } from "@/lib/studio/fidelity";
 
@@ -204,10 +203,9 @@ export default async function AdminCatalogProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await getPrivateCatalogProduct(id);
-  if (!product) notFound();
-
-  const readiness = await getProductReadiness(id);
+  const workspace = await getPrivateCatalogProductWorkspace(id);
+  if (!workspace) notFound();
+  const { product, readiness } = workspace;
   const goldenWorkspace = getGoldenWorkspace(product.internalCode);
   const ru = translation(product.translations, "RU");
   const et = translation(product.translations, "ET");

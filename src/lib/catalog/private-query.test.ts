@@ -18,6 +18,7 @@ vi.mock("@/lib/db", () => ({
 
 import {
   getPrivateCatalogProduct,
+  getPrivateCatalogProductWorkspace,
   getPrivateStudioCandidate,
 } from "./private-query";
 
@@ -60,5 +61,27 @@ describe("private catalog product query", () => {
       },
       where: { id: "candidate_1" },
     });
+  });
+
+  it("derives owner workspace readiness from the authenticated product read", async () => {
+    mocks.findUnique.mockResolvedValue({
+      availabilityType: null,
+      categoryId: null,
+      currency: null,
+      images: [],
+      retailPriceMinor: null,
+      review: null,
+      sizeChart: null,
+      slug: null,
+      translations: [],
+      variants: [{ isEnabled: true }, { isEnabled: false }],
+    });
+
+    const workspace = await getPrivateCatalogProductWorkspace("product_1");
+
+    expect(mocks.requireOwner).toHaveBeenCalledOnce();
+    expect(mocks.findUnique).toHaveBeenCalledOnce();
+    expect(workspace?.readiness.ready).toBe(false);
+    expect(workspace?.readiness.reasons).toContain("commercial");
   });
 });

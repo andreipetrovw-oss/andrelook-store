@@ -35,14 +35,17 @@ export async function GET(
   }
   if (!candidate) return errorImage("Версия Studio не найдена", 404);
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
   try {
     if (!process.env.STUDIO_STORE_ID) {
       return errorImage("Хранилище Studio не настроено", 503);
     }
     const result = await get(candidate.privateBlobUrl, {
       access: "private",
+      abortSignal: controller.signal,
       storeId: process.env.STUDIO_STORE_ID,
-      useCache: false,
+      useCache: true,
     });
     if (!result || result.statusCode !== 200) {
       return errorImage("Версия Studio временно недоступна", 502);
@@ -52,7 +55,7 @@ export async function GET(
     }
     return new Response(result.stream, {
       headers: {
-        "Cache-Control": "private, no-store, no-transform",
+        "Cache-Control": "private, max-age=300, no-transform",
         "Content-Length": String(result.blob.size),
         "Content-Type": result.blob.contentType,
         ETag: result.blob.etag,
@@ -62,5 +65,7 @@ export async function GET(
     });
   } catch {
     return errorImage("Не удалось загрузить версию Studio", 502);
+  } finally {
+    clearTimeout(timeout);
   }
 }

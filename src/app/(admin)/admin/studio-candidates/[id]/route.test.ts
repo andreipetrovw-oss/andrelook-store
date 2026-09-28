@@ -46,11 +46,17 @@ describe("private Studio candidate proxy", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("cache-control")).toContain("no-store");
+    expect(response.headers.get("cache-control")).toContain("private");
+    expect(response.headers.get("cache-control")).toContain("max-age=300");
     expect(response.headers.get("x-robots-tag")).toContain("noindex");
     expect(mocks.blobGet).toHaveBeenCalledWith(
       "https://private.blob.vercel-storage.com/secret.png",
-      { access: "private", storeId: "store_private", useCache: false },
+      expect.objectContaining({
+        access: "private",
+        abortSignal: expect.any(AbortSignal),
+        storeId: "store_private",
+        useCache: true,
+      }),
     );
     expect(await response.text()).not.toContain("private.blob");
   });
