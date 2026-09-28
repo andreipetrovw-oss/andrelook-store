@@ -23,7 +23,7 @@ export function PrivateStudioCandidateImage({
           Версия Studio временно недоступна
         </span>
       ) : null}
-      {/* Candidate bytes stay behind the owner-authenticated, no-store route. */}
+      {/* Candidate bytes stay behind the owner-authenticated private route. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         alt={alt}
