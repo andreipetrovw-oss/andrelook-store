@@ -40,6 +40,13 @@ enum ReviewDecision {
   NEEDS_REVISION
 }
 
+enum StudioCandidateStatus {
+  NEEDS_REVIEW
+  NEEDS_REVISION
+  REJECTED
+  OWNER_APPROVED
+}
+
 enum OrderStatus {
   NEW
   CONTACTED
@@ -159,6 +166,7 @@ model Product {
   orderItems           OrderItem[]
   review               ProductReview?
   reviewEvents         ProductReviewEvent[]
+  studioCandidates     StudioCandidate[]
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
@@ -202,28 +210,73 @@ model ProductPrivate {
 }
 
 model ProductSourceImage {
-  id                 String             @id @default(cuid())
-  productId          String
-  product            Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sourcePosition     Int
-  sourceName         String?
-  sourceUrl          String
-  previewUrl         String?
-  width              Int?
-  height             Int?
-  isSizeChart        Boolean            @default(false)
-  inferredView       String?
-  assignedSourceRole String?
-  sourceSha256       String?
-  localOriginalPath  String?
-  httpValidation     Json?
-  reviewStatus       SourceReviewStatus @default(CANDIDATE)
-  publicAssets       ProductImage[]
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  id                     String                  @id @default(cuid())
+  productId              String
+  product                Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sourcePosition         Int
+  sourceName             String?
+  sourceUrl              String
+  previewUrl             String?
+  width                  Int?
+  height                 Int?
+  isSizeChart            Boolean                 @default(false)
+  inferredView           String?
+  assignedSourceRole     String?
+  sourceSha256           String?
+  localOriginalPath      String?
+  httpValidation         Json?
+  reviewStatus           SourceReviewStatus      @default(CANDIDATE)
+  publicAssets           ProductImage[]
+  studioCandidateSources StudioCandidateSource[]
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 
   @@unique([productId, sourcePosition])
   @@index([productId, isSizeChart])
+}
+
+model StudioCandidate {
+  id                     String                  @id @default(cuid())
+  productId              String
+  product                Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  role                   ImageRole
+  version                Int
+  storageKey             String                  @unique
+  privateBlobUrl         String                  @unique
+  width                  Int
+  height                 Int
+  format                 String
+  fileSizeBytes          Int
+  method                 String
+  status                 StudioCandidateStatus   @default(NEEDS_REVIEW)
+  referencePack          Json
+  technicalQa            Json
+  fidelityChecklist      Json?
+  engineeringNotes       String?
+  ownerNote              String?
+  ownerReviewedAt        DateTime?
+  ownerReviewedByAdminId String?
+  ownerReviewedByAdmin   AdminUser?              @relation("StudioCandidateReviewer", fields: [ownerReviewedByAdminId], references: [id], onDelete: SetNull)
+  sources                StudioCandidateSource[]
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  @@unique([productId, role, version])
+  @@index([productId, status, role])
+  @@index([ownerReviewedByAdminId])
+}
+
+model StudioCandidateSource {
+  candidateId   String
+  candidate     StudioCandidate    @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  sourceImageId String
+  sourceImage   ProductSourceImage @relation(fields: [sourceImageId], references: [id], onDelete: Restrict)
+  purpose       String
+  isPrimary     Boolean            @default(false)
+  sortOrder     Int                @default(0)
+
+  @@id([candidateId, sourceImageId])
+  @@index([sourceImageId])
 }
 
 model ProductImage {
@@ -501,19 +554,20 @@ model OrderAuditEvent {
 }
 
 model AdminUser {
-  id                  String               @id @default(cuid())
-  provider            String
-  providerSubject     String
-  email               String               @unique
-  isActive            Boolean              @default(true)
-  payments            Payment[]            @relation("PaymentRecorder")
-  statusChanges       OrderStatusHistory[] @relation("StatusChanger")
-  orderAuditEvents    OrderAuditEvent[]    @relation("OrderAuditActor")
-  productImages       ProductImage[]       @relation("ProductImageApprover")
-  productReviews      ProductReview[]      @relation("ProductReviewOwner")
-  productReviewEvents ProductReviewEvent[] @relation("ProductReviewEventOwner")
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  id                     String               @id @default(cuid())
+  provider               String
+  providerSubject        String
+  email                  String               @unique
+  isActive               Boolean              @default(true)
+  payments               Payment[]            @relation("PaymentRecorder")
+  statusChanges          OrderStatusHistory[] @relation("StatusChanger")
+  orderAuditEvents       OrderAuditEvent[]    @relation("OrderAuditActor")
+  productImages          ProductImage[]       @relation("ProductImageApprover")
+  productReviews         ProductReview[]      @relation("ProductReviewOwner")
+  productReviewEvents    ProductReviewEvent[] @relation("ProductReviewEventOwner")
+  studioCandidateReviews StudioCandidate[]    @relation("StudioCandidateReviewer")
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
 
   @@unique([provider, providerSubject])
 }

@@ -4,15 +4,22 @@ vi.mock("server-only", () => ({}));
 
 const mocks = vi.hoisted(() => ({
   findUnique: vi.fn(),
+  studioFindUnique: vi.fn(),
   requireOwner: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/server", () => ({ requireOwner: mocks.requireOwner }));
 vi.mock("@/lib/db", () => ({
-  getPrisma: () => ({ product: { findUnique: mocks.findUnique } }),
+  getPrisma: () => ({
+    product: { findUnique: mocks.findUnique },
+    studioCandidate: { findUnique: mocks.studioFindUnique },
+  }),
 }));
 
-import { getPrivateCatalogProduct } from "./private-query";
+import {
+  getPrivateCatalogProduct,
+  getPrivateStudioCandidate,
+} from "./private-query";
 
 describe("private catalog product query", () => {
   beforeEach(() => {
@@ -38,5 +45,20 @@ describe("private catalog product query", () => {
         }),
       }),
     );
+  });
+
+  it("authorizes candidate lookups and selects only proxy metadata", async () => {
+    mocks.studioFindUnique.mockResolvedValue(null);
+    await getPrivateStudioCandidate("candidate_1");
+    expect(mocks.requireOwner).toHaveBeenCalledOnce();
+    expect(mocks.studioFindUnique).toHaveBeenCalledWith({
+      select: {
+        id: true,
+        privateBlobUrl: true,
+        productId: true,
+        status: true,
+      },
+      where: { id: "candidate_1" },
+    });
   });
 });

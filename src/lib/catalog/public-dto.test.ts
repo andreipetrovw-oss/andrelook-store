@@ -41,6 +41,12 @@ const record: PublicProductRecord & Record<string, unknown> = {
   sizeChart: null,
   slug: "approved-product",
   sourceImages: [{ sourceUrl: "https://supplier.invalid/image.jpg" }],
+  studioCandidates: [
+    {
+      privateBlobUrl: "https://private.blob.invalid/golden-master.png",
+      referencePack: { sourceUrl: "https://supplier.invalid/private-source" },
+    },
+  ],
   supplierCostMinor: 9000,
   translations: [
     {
@@ -72,6 +78,8 @@ describe("public product serialization", () => {
       "margin",
       "internalNotes",
       "sourceImages",
+      "studioCandidates",
+      "private.blob.invalid",
       "customer",
       "private@example.com",
     ]) {

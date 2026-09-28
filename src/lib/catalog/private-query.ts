@@ -32,10 +32,42 @@ export async function getPrivateCatalogProduct(productId: string) {
       },
       sizeChart: { include: { evidence: true } },
       sourceImages: { orderBy: { sourcePosition: "asc" } },
+      studioCandidates: {
+        include: {
+          ownerReviewedByAdmin: { select: { email: true } },
+          sources: {
+            include: {
+              sourceImage: {
+                select: {
+                  assignedSourceRole: true,
+                  id: true,
+                  sourcePosition: true,
+                },
+              },
+            },
+            orderBy: { sortOrder: "asc" },
+          },
+        },
+        orderBy: [{ role: "asc" }, { version: "desc" }],
+      },
       translations: true,
       variants: { orderBy: [{ sizeLabel: "asc" }, { variantKey: "asc" }] },
     },
     where: { id: productId },
+  });
+}
+
+export async function getPrivateStudioCandidate(candidateId: string) {
+  await requireOwner();
+
+  return getPrisma().studioCandidate.findUnique({
+    select: {
+      id: true,
+      privateBlobUrl: true,
+      productId: true,
+      status: true,
+    },
+    where: { id: candidateId },
   });
 }
 

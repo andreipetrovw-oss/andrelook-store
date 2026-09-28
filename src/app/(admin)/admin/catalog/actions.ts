@@ -3,12 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import {
-  approveAndStorePublicImage,
   updateCommercialFields,
   updateLocalizedContent,
   updateOwnerReview,
   updateProductOptions,
   updateSourceImageReview,
+  updateStudioCandidateReview,
 } from "@/lib/catalog/owner-control";
 
 function values(formData: FormData) {
@@ -57,11 +57,11 @@ export async function saveOwnerReview(formData: FormData) {
   refresh(String(input.productId));
 }
 
-export async function storeApprovedPublicImage(formData: FormData) {
+export async function saveStudioCandidateReview(formData: FormData) {
   const input = values(formData);
-  const file = formData.get("candidate");
-  if (!(file instanceof File))
-    throw new Error("Добавьте версию Andrelook Studio.");
-  await approveAndStorePublicImage(input, file);
+  await updateStudioCandidateReview({
+    ...input,
+    checks: formData.getAll("checks").map(String),
+  });
   refresh(String(input.productId));
 }

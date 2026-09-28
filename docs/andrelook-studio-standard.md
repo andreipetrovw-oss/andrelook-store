@@ -76,13 +76,14 @@ If any product fact is ambiguous, reject or hold for review. Presentation consis
 - Public derivatives: 480×600, 960×1200, 1440×1800 and 2400×3000 where the source supports them; WebP/AVIF may supplement a high-quality JPEG master.
 - Naming: `andrelook-{product-internal-code}-{role}-v{two-digit-version}-{width}x{height}.{ext}` using lower-case ASCII and the canonical role.
 - A new visual treatment creates a new version. Never overwrite a previously owner-approved master in place.
-- The ProductImage record remains linked to the exact ProductSourceImage and records role, dimensions, owner approval and storage key.
+- The private `StudioCandidate` records product, role, deterministic version, private master, primary/supporting source references, method, technical QA, fidelity checklist and explicit owner decision. It is never silently overwritten.
+- A separate `ProductImage` may be created only by a later explicit public-promotion operation after owner approval.
 
 ## Owner review workflow
 
 `PRIVATE SOURCE → SOURCE SELECTED → STUDIO CANDIDATE → SIDE-BY-SIDE FIDELITY REVIEW → OWNER APPROVED → PUBLIC PRODUCT IMAGE`
 
-The private CRM renders supplier sources only through its authenticated same-origin proxy. Studio files enter public Blob storage only after the owner selects an already approved source, uploads a candidate and explicitly confirms fidelity. Rejection or revision never creates a public ProductImage.
+The private CRM renders supplier sources and private Studio candidates only through authenticated same-origin proxies. Candidates remain in private Blob storage while the owner compares them side by side and completes the fidelity gate. Candidate approval, rejection or revision does not create a public `ProductImage`. Public derivatives and public Blob upload are a distinct, later promotion step requiring validated localized alt text and explicit publication authorization.
 
 ## Preferred gallery order
 

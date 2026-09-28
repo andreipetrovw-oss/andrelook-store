@@ -1,8 +1,5 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
-
-import { del, put } from "@vercel/blob";
 import {
   AvailabilityType,
   ImageRole,
@@ -10,12 +7,13 @@ import {
   Prisma,
   ReviewDecision,
   SourceReviewStatus,
+  StudioCandidateStatus,
 } from "@prisma/client";
-import sharp from "sharp";
 import { z } from "zod";
 
 import { requireActiveAdmin } from "@/lib/admin/identity";
 import { getPrisma } from "@/lib/db";
+import { studioFidelityCheckIds } from "@/lib/studio/fidelity";
 
 import {
   assertPublicationReady,
@@ -347,96 +345,75 @@ export async function updateSourceImageReview(raw: unknown) {
   });
 }
 
-const uploadSchema = z.object({
-  altEN: z.string().trim().min(1).max(300),
-  altET: z.string().trim().min(1).max(300),
-  altRU: z.string().trim().min(1).max(300),
-  fidelityApproved: z.literal("yes"),
+const studioCandidateReviewSchema = z.object({
+  candidateId: z.string().min(1),
+  checks: z.array(z.enum(studioFidelityCheckIds)),
+  decision: z.enum([
+    StudioCandidateStatus.OWNER_APPROVED,
+    StudioCandidateStatus.NEEDS_REVISION,
+    StudioCandidateStatus.REJECTED,
+  ]),
+  ownerNote: z.string().trim().max(1_000).optional(),
   productId: productIdSchema,
-  role: z.enum(ImageRole),
-  sourceImageId: z.string().min(1),
 });
 
-export async function approveAndStorePublicImage(raw: unknown, file: File) {
-  const input = uploadSchema.parse(raw);
-  if (!(file instanceof File) || file.size === 0 || file.size > 15_000_000) {
-    throw new Error("Добавьте версию Studio размером до 15 МБ.");
+export async function updateStudioCandidateReview(raw: unknown) {
+  const input = studioCandidateReviewSchema.parse(raw);
+  const checked = new Set(input.checks);
+  if (
+    input.decision === StudioCandidateStatus.OWNER_APPROVED &&
+    studioFidelityCheckIds.some((id) => !checked.has(id))
+  ) {
+    throw new Error("Для одобрения подтвердите весь чек-лист соответствия.");
+  }
+  if (
+    input.decision === StudioCandidateStatus.NEEDS_REVISION &&
+    !input.ownerNote
+  ) {
+    throw new Error("Коротко опишите, что нужно исправить.");
   }
   const admin = await requireActiveAdmin();
   const prisma = getPrisma();
-  const source = await prisma.productSourceImage.findFirstOrThrow({
-    where: {
-      id: input.sourceImageId,
-      productId: input.productId,
-      reviewStatus: "APPROVED",
-    },
-  });
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const metadata = await sharp(bytes).metadata();
-  if (!metadata.width || !metadata.height || !metadata.format) {
-    throw new Error(
-      "Загруженный файл не является поддерживаемым изображением.",
-    );
-  }
-  if (
-    !["avif", "jpeg", "png", "webp"].includes(metadata.format) ||
-    metadata.width * metadata.height > 50_000_000
-  ) {
-    throw new Error("Формат или размер изображения не поддерживается.");
-  }
 
-  const extension = metadata.format === "jpeg" ? "jpg" : metadata.format;
-  const storageKey = `andrelook-v1/phase6d/${input.productId}/${randomUUID()}.${extension}`;
-  const blob = await put(storageKey, bytes, {
-    access: "public",
-    addRandomSuffix: false,
-    contentType:
-      metadata.format === "jpeg" ? "image/jpeg" : `image/${metadata.format}`,
-  });
-
-  try {
-    await prisma.$transaction(async (tx) => {
-      const image = await tx.productImage.create({
-        data: {
-          approvedAt: new Date(),
-          approvedByAdminId: admin.id,
-          height: metadata.height!,
-          productId: input.productId,
-          reviewStatus: "APPROVED",
-          role: input.role,
-          sortOrder: source.sourcePosition,
-          sourceImageId: source.id,
-          storageKey,
-          translations: {
-            create: [
-              { altText: input.altRU, locale: "RU" },
-              { altText: input.altET, locale: "ET" },
-              { altText: input.altEN, locale: "EN" },
-            ],
-          },
-          url: blob.url,
-          width: metadata.width!,
-        },
-      });
-      await resetAffectedReview(tx, input.productId, admin.id, "imageDecision");
-      await createAuditEvent(tx, {
-        action: "PUBLIC_IMAGE_FIDELITY_APPROVED",
-        adminId: admin.id,
-        after: {
-          imageId: image.id,
-          role: image.role,
-          sourceImageId: source.id,
-          storageKey,
-        },
-        before: { sourceImageId: source.id },
-        note: "Owner explicitly confirmed SOURCE vs STUDIO fidelity.",
-        productId: input.productId,
-      });
+  await prisma.$transaction(async (tx) => {
+    const before = await tx.studioCandidate.findFirstOrThrow({
+      where: { id: input.candidateId, productId: input.productId },
     });
-  } catch (error) {
-    await del(blob.url);
-    throw error;
-  }
+    const after = await tx.studioCandidate.update({
+      data: {
+        fidelityChecklist: auditJson({
+          checked: input.checks,
+          completed:
+            input.decision === StudioCandidateStatus.OWNER_APPROVED &&
+            studioFidelityCheckIds.every((id) => checked.has(id)),
+        }),
+        ownerNote: input.ownerNote || null,
+        ownerReviewedAt: new Date(),
+        ownerReviewedByAdminId: admin.id,
+        status: input.decision,
+      },
+      where: { id: input.candidateId },
+    });
+    await resetAffectedReview(tx, input.productId, admin.id, "imageDecision");
+    await createAuditEvent(tx, {
+      action: "STUDIO_CANDIDATE_REVIEWED",
+      adminId: admin.id,
+      after: {
+        candidateId: after.id,
+        role: after.role,
+        status: after.status,
+        version: after.version,
+      },
+      before: {
+        candidateId: before.id,
+        role: before.role,
+        status: before.status,
+        version: before.version,
+      },
+      note: input.ownerNote,
+      productId: input.productId,
+    });
+  });
 }
 
 function readinessSelect() {

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PrivateSourceImage } from "@/components/private-source-image";
+import { PrivateStudioCandidateImage } from "@/components/private-studio-candidate-image";
 import {
   availabilityLabel,
   formatDateTime,
@@ -21,6 +22,7 @@ import {
 import { getProductReadiness } from "@/lib/catalog/owner-control";
 import { getPrivateCatalogProduct } from "@/lib/catalog/private-query";
 import { getGoldenWorkspace } from "@/lib/catalog/golden-workspace";
+import { studioFidelityChecklist } from "@/lib/studio/fidelity";
 
 import {
   saveCommercialFields,
@@ -28,7 +30,7 @@ import {
   saveOwnerReview,
   saveProductOptions,
   saveSourceImageReview,
-  storeApprovedPublicImage,
+  saveStudioCandidateReview,
 } from "../actions";
 
 const languageNames = { RU: "Русский", ET: "Eesti", EN: "English" } as const;
@@ -52,8 +54,34 @@ const auditLabel: Record<string, string> = {
   CUSTOMER_OPTIONS_UPDATED: "Обновлены размеры и цвета",
   SOURCE_IMAGE_REVIEWED: "Проверен исходник",
   PUBLIC_IMAGE_FIDELITY_APPROVED: "Одобрена версия Andrelook",
+  STUDIO_CANDIDATE_REVIEWED: "Проверена версия Andrelook Studio",
   OWNER_REVIEW_UPDATED: "Обновлена проверка товара",
 };
+
+const studioStatusLabel: Record<string, string> = {
+  NEEDS_REVIEW: "Ждёт решения владельца",
+  NEEDS_REVISION: "Нужна доработка",
+  OWNER_APPROVED: "Одобрено владельцем",
+  REJECTED: "Отклонено",
+};
+
+function stringList(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function numberList(value: unknown): number[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is number => typeof item === "number")
+    : [];
+}
+
+function jsonRecord(value: unknown): Record<string, unknown> {
+  return value && !Array.isArray(value) && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
 
 function translation(
   items: Array<{ description: string | null; locale: string; name: string }>,
@@ -679,139 +707,227 @@ export default async function AdminCatalogProductPage({
               <span className="admin-section-label">Andrelook Studio</span>
               <h3 id="studio-heading">Сравнение перед публикацией</h3>
               <p>
-                Исходник → выбранный исходник → версия Andrelook → сравнение →
-                решение владельца → публичное изображение.
+                Исходник → закрытая версия Andrelook → сравнение → решение
+                владельца. Одобрение кандидата само по себе не публикует фото.
               </p>
             </div>
 
-            {product.images.length ? (
-              <div className="studio-comparisons">
-                {product.images.map((image) => (
-                  <article className="studio-comparison" key={image.id}>
-                    <figure>
-                      {image.sourceImage ? (
-                        <PrivateSourceImage
-                          alt={`Исходник для ${imageRoleLabel[image.role]}`}
-                          imageId={image.sourceImage.id}
-                        />
-                      ) : (
-                        <div className="product-image-placeholder">
-                          Нет исходника
+            {product.studioCandidates.length ? (
+              <div className="studio-candidate-list">
+                {product.studioCandidates.map((candidate) => {
+                  const primarySource = candidate.sources.find(
+                    (source) => source.isPrimary,
+                  )?.sourceImage;
+                  const reference = jsonRecord(candidate.referencePack);
+                  const checked = new Set(
+                    stringList(jsonRecord(candidate.fidelityChecklist).checked),
+                  );
+                  const supporting = numberList(
+                    reference.supportingSourcePositions,
+                  );
+                  return (
+                    <article className="studio-candidate" key={candidate.id}>
+                      <header className="studio-candidate-heading">
+                        <div>
+                          <span className="admin-section-label">
+                            {imageRoleLabel[candidate.role]} · версия{" "}
+                            {candidate.version}
+                          </span>
+                          <h4>{studioStatusLabel[candidate.status]}</h4>
                         </div>
-                      )}
-                      <figcaption>Исходник</figcaption>
-                    </figure>
-                    <figure>
-                      <Image
-                        alt={
-                          image.translations.find(
-                            (item) => item.locale === "RU",
-                          )?.altText ?? imageRoleLabel[image.role]
-                        }
-                        height={500}
-                        sizes="(max-width: 768px) 100vw, 40vw"
-                        src={image.url}
-                        width={400}
-                      />
-                      <figcaption>
-                        Версия Andrelook · {imageRoleLabel[image.role]} ·{" "}
-                        {sourceReviewLabel[image.reviewStatus]}
-                      </figcaption>
-                    </figure>
-                  </article>
-                ))}
+                        <span
+                          className={`studio-status is-${candidate.status.toLowerCase()}`}
+                        >
+                          {candidate.width}×{candidate.height} ·{" "}
+                          {candidate.format.toUpperCase()}
+                        </span>
+                      </header>
+
+                      <div className="studio-comparison">
+                        <figure>
+                          {primarySource ? (
+                            <PrivateSourceImage
+                              alt={`Основной исходник, позиция ${primarySource.sourcePosition}`}
+                              imageId={primarySource.id}
+                            />
+                          ) : (
+                            <div className="product-image-placeholder">
+                              Нет исходника
+                            </div>
+                          )}
+                          <figcaption>
+                            Слева · исходник, позиция{" "}
+                            {primarySource?.sourcePosition ?? "—"}
+                            {supporting.length
+                              ? ` · сверка: ${supporting.join(", ")}`
+                              : ""}
+                          </figcaption>
+                        </figure>
+                        <figure>
+                          <PrivateStudioCandidateImage
+                            alt={`Версия Andrelook Studio: ${imageRoleLabel[candidate.role]}`}
+                            candidateId={candidate.id}
+                          />
+                          <figcaption>
+                            Справа · Andrelook Studio · не опубликовано
+                            {candidate.engineeringNotes
+                              ? ` · ${candidate.engineeringNotes}`
+                              : ""}
+                          </figcaption>
+                        </figure>
+                      </div>
+
+                      <div className="studio-evidence-summary">
+                        <strong>
+                          Почему этот ракурс считается подтверждённым
+                        </strong>
+                        <p>
+                          {String(
+                            reference.purpose ??
+                              "Источник зафиксирован в пакете проверки.",
+                          )}
+                        </p>
+                        {stringList(reference.uncertaintyNotes).map((note) => (
+                          <small key={note}>{note}</small>
+                        ))}
+                        <a
+                          href={`/admin/studio-candidates/${encodeURIComponent(candidate.id)}`}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          Открыть версию Studio в полном размере
+                        </a>
+                      </div>
+
+                      <form
+                        action={saveStudioCandidateReview}
+                        className="studio-review-form"
+                      >
+                        <input
+                          name="candidateId"
+                          type="hidden"
+                          value={candidate.id}
+                        />
+                        <input
+                          name="productId"
+                          type="hidden"
+                          value={product.id}
+                        />
+                        <fieldset className="studio-fidelity-list">
+                          <legend>Проверка соответствия источнику</legend>
+                          {studioFidelityChecklist.map(([checkId, label]) => (
+                            <label key={checkId}>
+                              <input
+                                defaultChecked={checked.has(checkId)}
+                                name="checks"
+                                type="checkbox"
+                                value={checkId}
+                              />
+                              <span>{label}</span>
+                            </label>
+                          ))}
+                        </fieldset>
+                        <label className="studio-owner-note">
+                          <span>Комментарий владельца</span>
+                          <textarea
+                            defaultValue={candidate.ownerNote ?? ""}
+                            name="ownerNote"
+                            placeholder="Например: молния отличается от исходника"
+                            rows={3}
+                          />
+                        </label>
+                        <div className="studio-owner-actions">
+                          <button
+                            name="decision"
+                            type="submit"
+                            value="OWNER_APPROVED"
+                          >
+                            Одобрить
+                          </button>
+                          <button
+                            name="decision"
+                            type="submit"
+                            value="NEEDS_REVISION"
+                          >
+                            На доработку
+                          </button>
+                          <button
+                            name="decision"
+                            type="submit"
+                            value="REJECTED"
+                          >
+                            Отклонить
+                          </button>
+                        </div>
+                      </form>
+                    </article>
+                  );
+                })}
               </div>
             ) : (
               <div className="admin-empty">
-                <strong>Версий Andrelook пока нет</strong>
-                <p>
-                  Сначала владелец должен выбрать и одобрить подходящий
-                  исходник.
-                </p>
+                <strong>Версии Studio ещё не подготовлены</strong>
+                <p>Публичные изображения не создаются автоматически.</p>
               </div>
             )}
 
-            <details className="studio-upload">
-              <summary>Добавить проверенную версию Andrelook</summary>
-              <p>
-                Загружайте файл только после сравнения силуэта, цвета, логотипа,
-                фурнитуры, швов, карманов, пропорций и материала.
-              </p>
-              <form
-                action={storeApprovedPublicImage}
-                className="admin-form-grid"
+            {product.studioCandidates.find(
+              (candidate) => candidate.role === "PRIMARY",
+            ) ? (
+              <section
+                className="studio-private-preview"
+                aria-labelledby="studio-preview-heading"
               >
-                <input name="productId" type="hidden" value={product.id} />
-                <label>
-                  <span>Одобренный исходник</span>
-                  <select name="sourceImageId" required>
-                    <option value="">Выберите</option>
-                    {product.sourceImages
-                      .filter(
-                        (image) =>
-                          image.reviewStatus === "APPROVED" &&
-                          !image.isSizeChart,
-                      )
-                      .map((image) => (
-                        <option key={image.id} value={image.id}>
-                          Позиция {image.sourcePosition} ·{" "}
-                          {image.assignedSourceRole
-                            ? imageRoleLabel[
-                                image.assignedSourceRole as ImageRole
-                              ]
-                            : "роль не выбрана"}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <label>
-                  <span>Роль на витрине</span>
-                  <select name="role">
-                    {Object.values(ImageRole)
-                      .filter((role) => role !== "SIZE_CHART")
-                      .map((role) => (
-                        <option key={role} value={role}>
-                          {imageRoleLabel[role]}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <label>
-                  <span>Файл Studio</span>
-                  <input
-                    accept="image/avif,image/jpeg,image/png,image/webp"
-                    name="candidate"
-                    required
-                    type="file"
-                  />
-                </label>
-                <label>
-                  <span>Alt-текст RU</span>
-                  <input name="altRU" required />
-                </label>
-                <label>
-                  <span>Alt-текст ET</span>
-                  <input name="altET" required />
-                </label>
-                <label>
-                  <span>Alt-текст EN</span>
-                  <input name="altEN" required />
-                </label>
-                <label className="checkbox-row wide">
-                  <input
-                    name="fidelityApproved"
-                    required
-                    type="checkbox"
-                    value="yes"
-                  />
-                  <span>
-                    Я сравнил(а) исходник и версию Andrelook и подтверждаю
-                    точное визуальное соответствие.
+                <header>
+                  <span className="admin-section-label">
+                    Preview / не опубликовано
                   </span>
-                </label>
-                <button type="submit">Одобрить и сохранить</button>
-              </form>
-            </details>
+                  <h4 id="studio-preview-heading">
+                    Проверка в масштабе витрины
+                  </h4>
+                  <p>
+                    Закрытый макет. Он не публикует Dillon и не создаёт
+                    ProductImage.
+                  </p>
+                </header>
+                {(() => {
+                  const primary = product.studioCandidates.find(
+                    (candidate) => candidate.role === "PRIMARY",
+                  )!;
+                  return (
+                    <div className="studio-preview-grid">
+                      <article className="studio-card-preview">
+                        <span>Карточка товара</span>
+                        <PrivateStudioCandidateImage
+                          alt="Закрытый preview главного изображения Dillon"
+                          candidateId={primary.id}
+                        />
+                        <strong>
+                          {title ?? "Dillon — название на проверке"}
+                        </strong>
+                        <small>PREVIEW · НЕ ОПУБЛИКОВАНО</small>
+                      </article>
+                      <article className="studio-product-preview">
+                        <span>Страница товара</span>
+                        <PrivateStudioCandidateImage
+                          alt="Закрытый крупный preview изображения Dillon"
+                          candidateId={primary.id}
+                        />
+                        <div>
+                          <strong>
+                            {title ?? "Dillon — название на проверке"}
+                          </strong>
+                          <p>
+                            Только визуальная проверка масштаба и кадрирования.
+                          </p>
+                          <small>PREVIEW · НЕ ОПУБЛИКОВАНО</small>
+                        </div>
+                      </article>
+                    </div>
+                  );
+                })()}
+              </section>
+            ) : null}
           </section>
         </section>
 

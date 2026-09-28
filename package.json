@@ -22,6 +22,8 @@
     "seed:phase6d": "tsx scripts/seed-phase6d-review.ts",
     "seed:phase6d-images": "tsx scripts/seed-phase6d-image-candidates.ts",
     "review:phase6d-images": "tsx scripts/create-phase6d-contact-sheets.ts",
+    "studio:phase6d3:create": "tsx scripts/create-phase6d3-studio-masters.ts",
+    "studio:phase6d3:import": "tsx scripts/import-phase6d3-studio-candidates.ts",
     "postinstall": "prisma generate",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test:run && npm run db:validate && npm run build"
   },
