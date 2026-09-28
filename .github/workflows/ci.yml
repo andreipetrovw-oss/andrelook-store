@@ -11,6 +11,7 @@ on:
       - phase6d1-crm-completion
       - phase6d2-golden-finalization
       - phase6d3-studio-golden-master
+      - phase6d4-generative-studio-master
 
 permissions:
   contents: read
