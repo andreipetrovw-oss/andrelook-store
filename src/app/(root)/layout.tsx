@@ -1,10 +1,11 @@
 import "@/styles/globals.css";
+import { andrelookFontVariables } from "@/lib/fonts";
 
 export default function RootRedirectLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html className={andrelookFontVariables} lang="ru">
       <body>{children}</body>
     </html>
   );

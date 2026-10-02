@@ -7,6 +7,7 @@ import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localizedAlternates, indexingRobots } from "@/lib/seo";
 import { getServerConfig } from "@/lib/env";
+import { andrelookFontVariables } from "@/lib/fonts";
 import "@/styles/globals.css";
 
 export function generateStaticParams() {
@@ -72,7 +73,7 @@ export default async function LocalizedLayout({
     url: new URL(`/${locale}`, getServerConfig().siteUrl).toString(),
   };
   return (
-    <html lang={locale}>
+    <html className={andrelookFontVariables} lang={locale}>
       <body>
         <a className="skip-link" href="#main-content">
           {dictionary.skipToContent}

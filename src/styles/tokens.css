@@ -13,8 +13,9 @@
   --color-gold: #806945;
   --color-error: #84251d;
   --color-success: #315a43;
-  --font-editorial: "Cormorant Garamond", Georgia, serif;
-  --font-interface: "Outfit", system-ui, sans-serif;
+  --font-editorial:
+    var(--font-andrelook-serif), "Cormorant Garamond", Georgia, serif;
+  --font-interface: var(--font-andrelook-sans), "Outfit", system-ui, sans-serif;
   --content-max: 1360px;
   --header-height: 80px;
   --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);

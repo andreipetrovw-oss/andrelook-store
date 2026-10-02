@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getOwnerAccess } from "@/lib/auth/server";
+import { andrelookFontVariables } from "@/lib/fonts";
 import "@/styles/globals.css";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <html lang="en">
+    <html className={andrelookFontVariables} lang="en">
       <body>
         <div className="admin-shell">
           <aside className="admin-sidebar">

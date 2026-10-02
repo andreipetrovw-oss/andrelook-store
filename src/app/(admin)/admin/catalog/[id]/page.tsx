@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { getPrivateCatalogProduct } from "@/lib/catalog/private-query";
+import { updateProductCommercialState } from "@/app/(admin)/admin/actions";
 
 export default async function AdminCatalogProductPage({
   params,
@@ -42,6 +43,72 @@ export default async function AdminCatalogProductPage({
               </dd>
             </div>
           </dl>
+          <form
+            action={updateProductCommercialState}
+            className="admin-stack-form"
+          >
+            <input name="productId" type="hidden" value={product.id} />
+            <label>
+              <span>Publication state</span>
+              <select
+                defaultValue={product.publicationStatus}
+                name="publicationStatus"
+              >
+                <option value="DRAFT">Draft</option>
+                <option value="READY">Ready for protected review</option>
+                <option value="PUBLISHED">Published</option>
+                <option value="ARCHIVED">Archived</option>
+              </select>
+            </label>
+            <label>
+              <span>Availability</span>
+              <select
+                defaultValue={product.availabilityType ?? ""}
+                name="availabilityType"
+              >
+                <option value="">Not confirmed</option>
+                <option value="IN_STOCK">In stock</option>
+                <option value="PRE_ORDER">Pre-order</option>
+                <option value="UNAVAILABLE">Unavailable</option>
+              </select>
+            </label>
+            <label>
+              <span>Retail price</span>
+              <input
+                defaultValue={
+                  product.retailPriceMinor === null
+                    ? ""
+                    : (product.retailPriceMinor / 100).toFixed(2)
+                }
+                inputMode="decimal"
+                name="retailPrice"
+                placeholder="Leave empty until approved"
+              />
+            </label>
+            <label>
+              <span>Currency</span>
+              <input
+                defaultValue={product.currency ?? ""}
+                maxLength={3}
+                name="currency"
+                placeholder="EUR"
+              />
+            </label>
+            <label>
+              <span>Pre-order estimate</span>
+              <input
+                defaultValue={product.preorderEstimateText ?? ""}
+                name="preorderEstimateText"
+                placeholder="Only when owner-approved"
+              />
+            </label>
+            <button type="submit">Save commercial state</button>
+          </form>
+          <p className="admin-readiness-note">
+            Publishing is fail-closed until a slug, three translations, category
+            translations, approved primary image, availability, retail price and
+            currency are present.
+          </p>
         </section>
         <section className="admin-panel">
           <h2>Private source</h2>
@@ -73,6 +140,42 @@ export default async function AdminCatalogProductPage({
               Open private source album
             </a>
           ) : null}
+        </section>
+        <section className="admin-panel">
+          <h2>Storefront readiness</h2>
+          <dl>
+            <div>
+              <dt>Localized identity</dt>
+              <dd>{product.translations.length}/3</dd>
+            </div>
+            <div>
+              <dt>Approved public images</dt>
+              <dd>
+                {
+                  product.images.filter(
+                    (image) =>
+                      image.reviewStatus === "APPROVED" && image.approvedAt,
+                  ).length
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Approved colours</dt>
+              <dd>
+                {
+                  product.colors.filter(
+                    (colour) => colour.reviewStatus === "APPROVED",
+                  ).length
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Enabled variants</dt>
+              <dd>
+                {product.variants.filter((variant) => variant.isEnabled).length}
+              </dd>
+            </div>
+          </dl>
         </section>
         <section className="admin-panel">
           <h2>Size evidence</h2>

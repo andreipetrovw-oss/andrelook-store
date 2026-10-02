@@ -1,6 +1,11 @@
 "use server";
 
-import { OrderStatus, PaymentKind } from "@prisma/client";
+import {
+  AvailabilityType,
+  OrderStatus,
+  PaymentKind,
+  PublicationStatus,
+} from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -23,6 +28,15 @@ const paymentSchema = z.object({
   kind: z.enum(PaymentKind),
   orderId: z.string().min(1),
   reference: z.string().trim().max(200).optional(),
+});
+
+const productCommercialSchema = z.object({
+  availabilityType: z.union([z.enum(AvailabilityType), z.literal("")]),
+  currency: z.string().trim().max(3),
+  preorderEstimateText: z.string().trim().max(300),
+  productId: z.string().min(1),
+  publicationStatus: z.enum(PublicationStatus),
+  retailPrice: z.string().trim().max(20),
 });
 
 async function adminId() {
@@ -92,4 +106,88 @@ export async function recordPayment(formData: FormData) {
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
+}
+
+export async function updateProductCommercialState(formData: FormData) {
+  await requireOwner();
+  const parsed = productCommercialSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) throw new Error("Invalid product commercial update.");
+  const retailPrice = parsed.data.retailPrice
+    ? Number.parseFloat(parsed.data.retailPrice.replace(",", "."))
+    : null;
+  if (
+    retailPrice !== null &&
+    (!Number.isFinite(retailPrice) || retailPrice < 0)
+  ) {
+    throw new Error("Retail price must be a positive number or empty.");
+  }
+  const currency = parsed.data.currency
+    ? parsed.data.currency.toUpperCase()
+    : null;
+  if (currency && !/^[A-Z]{3}$/.test(currency)) {
+    throw new Error("Currency must be a three-letter ISO code.");
+  }
+
+  const prisma = getPrisma();
+  const product = await prisma.product.findUniqueOrThrow({
+    select: {
+      _count: {
+        select: {
+          images: {
+            where: {
+              approvedAt: { not: null },
+              reviewStatus: "APPROVED",
+              role: "PRIMARY",
+            },
+          },
+          translations: true,
+        },
+      },
+      category: { select: { translations: true } },
+      publicationStatus: true,
+      slug: true,
+    },
+    where: { id: parsed.data.productId },
+  });
+
+  if (parsed.data.publicationStatus === "PUBLISHED") {
+    const blockers = [
+      !product.slug ? "storefront slug" : null,
+      product._count.translations !== 3 ? "three product translations" : null,
+      product.category?.translations.length !== 3
+        ? "three category translations"
+        : null,
+      product._count.images === 0 ? "an approved primary image" : null,
+      !parsed.data.availabilityType ? "availability" : null,
+      retailPrice === null ? "retail price" : null,
+      !currency ? "currency" : null,
+    ].filter(Boolean);
+    if (blockers.length) {
+      throw new Error(`Publishing blocked: missing ${blockers.join(", ")}.`);
+    }
+  }
+
+  await prisma.product.update({
+    data: {
+      availabilityType: parsed.data.availabilityType || null,
+      currency,
+      preorderEstimateText: parsed.data.preorderEstimateText || null,
+      publicationStatus: parsed.data.publicationStatus,
+      publishedAt:
+        parsed.data.publicationStatus === "PUBLISHED"
+          ? product.publicationStatus === "PUBLISHED"
+            ? undefined
+            : new Date()
+          : null,
+      retailPriceMinor:
+        retailPrice === null ? null : Math.round(retailPrice * 100),
+    },
+    where: { id: parsed.data.productId },
+  });
+
+  revalidatePath(`/admin/catalog/${parsed.data.productId}`);
+  revalidatePath("/admin/catalog");
+  revalidatePath("/", "layout");
 }

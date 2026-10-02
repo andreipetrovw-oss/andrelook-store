@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
+import { getStorefrontContent } from "@/i18n/storefront-content";
 import type { PublicProductDto } from "@/lib/catalog/public-dto";
 
 import { ProductCard } from "./product-card";
@@ -65,36 +66,64 @@ export function CatalogExperience({
   params: CatalogParams;
   products: PublicProductDto[];
 }) {
+  const content = getStorefrontContent(locale);
   const visibleProducts = filterAndSortProducts(products, params);
   const hasFilters = Boolean(params.q || params.availability || params.sort);
+  const availabilityOptions = [
+    { label: dictionary.filterAll, value: "" },
+    { label: dictionary.availabilityInStock, value: "IN_STOCK" },
+    { label: dictionary.availabilityPreOrder, value: "PRE_ORDER" },
+    { label: dictionary.availabilityUnavailable, value: "UNAVAILABLE" },
+  ];
+  const availabilityHref = (value: string) => {
+    const next = new URLSearchParams();
+    if (params.q) next.set("q", params.q);
+    if (params.sort) next.set("sort", params.sort);
+    if (value) next.set("availability", value);
+    const query = next.toString();
+    return query ? `${basePath}?${query}` : basePath;
+  };
   return (
     <section aria-label={dictionary.catalog} className="catalog-results">
-      <div className="container catalog-toolbar" id="catalog-controls">
+      <div className="catalog-discovery" id="catalog-controls">
+        <div className="container catalog-discovery-inner">
+          <div className="catalog-filter-heading">
+            <span className="eyebrow">{content.catalog.filterHint}</span>
+            <p>{content.catalog.discoveryNote}</p>
+          </div>
+          <nav
+            aria-label={dictionary.filterAvailability}
+            className="availability-filters"
+          >
+            {availabilityOptions.map((option) => (
+              <Link
+                aria-current={
+                  (params.availability ?? "") === option.value
+                    ? "page"
+                    : undefined
+                }
+                href={availabilityHref(option.value)}
+                key={option.value || "all"}
+              >
+                {option.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+      <div className="container catalog-toolbar">
         <form action={basePath} className="catalog-controls" method="get">
           <label className="search-control">
             <span>{dictionary.search}</span>
-            <input
-              defaultValue={params.q}
-              name="q"
-              placeholder={dictionary.catalogSearch}
-              type="search"
-            />
-          </label>
-          <label>
-            <span>{dictionary.filterAvailability}</span>
-            <select
-              defaultValue={params.availability ?? ""}
-              name="availability"
-            >
-              <option value="">{dictionary.filterAll}</option>
-              <option value="IN_STOCK">{dictionary.availabilityInStock}</option>
-              <option value="PRE_ORDER">
-                {dictionary.availabilityPreOrder}
-              </option>
-              <option value="UNAVAILABLE">
-                {dictionary.availabilityUnavailable}
-              </option>
-            </select>
+            <span className="search-input-wrap">
+              <input
+                defaultValue={params.q}
+                name="q"
+                placeholder={dictionary.catalogSearch}
+                type="search"
+              />
+              <span aria-hidden="true">⌕</span>
+            </span>
           </label>
           <label>
             <span>{dictionary.sort}</span>
@@ -107,6 +136,13 @@ export function CatalogExperience({
               </option>
             </select>
           </label>
+          {params.availability ? (
+            <input
+              name="availability"
+              type="hidden"
+              value={params.availability}
+            />
+          ) : null}
           <button type="submit">{dictionary.search}</button>
           {hasFilters ? (
             <Link className="clear-action" href={basePath}>
@@ -115,7 +151,7 @@ export function CatalogExperience({
           ) : null}
         </form>
         <p aria-live="polite" className="result-count">
-          {visibleProducts.length} {dictionary.catalogResults}
+          <span>{visibleProducts.length}</span> {content.catalog.resultsLabel}
         </p>
       </div>
       <div className="container catalog-grid">

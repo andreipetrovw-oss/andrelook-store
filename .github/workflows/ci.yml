@@ -8,6 +8,7 @@ on:
       - v1-foundation
       - phase6c-staging-storefront
       - phase6d-storefront-completion
+      - phase6e-storefront-finalization
 
 permissions:
   contents: read

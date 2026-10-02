@@ -8,10 +8,14 @@ export async function getPrivateCatalogProduct(productId: string) {
 
   return getPrisma().product.findUnique({
     include: {
+      category: { include: { translations: true } },
+      colors: { include: { translations: true } },
+      images: true,
       privateData: true,
       sizeChart: { include: { evidence: true } },
       sourceImages: { orderBy: { sourcePosition: "asc" } },
       translations: true,
+      variants: true,
     },
     where: { id: productId },
   });

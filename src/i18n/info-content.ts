@@ -22,6 +22,288 @@ export type InfoPage = {
   requiresApproval?: boolean;
 };
 
+const supplementalContent: Record<
+  Locale,
+  Record<InfoPageSlug, InfoPage["sections"]>
+> = {
+  ru: {
+    about: [
+      {
+        title: "Каталог с границами",
+        body: "Цена, наличие, цвета и другие коммерческие сведения появляются только после подтверждения. Непроверенные данные не выдаются за факты.",
+      },
+      {
+        title: "Три языка",
+        body: "Вы можете пройти весь путь и получить поддержку на русском, эстонском или английском языке.",
+      },
+    ],
+    "how-to-order": [
+      {
+        title: "Помощь с размером",
+        body: "Используйте проверенную таблицу на странице модели или добавьте вопрос в комментарий к запросу.",
+      },
+      {
+        title: "Запрос — не оплата",
+        body: "Отправка формы не списывает средства и не подтверждает покупку автоматически.",
+      },
+    ],
+    "delivery-payment": [
+      {
+        title: "Что ещё требуется",
+        body: "До публикации владелец должен утвердить способы оплаты, географию, стоимость и сроки доставки.",
+      },
+      {
+        title: "Для конкретного запроса",
+        body: "Применимые условия сообщаются напрямую после уточнения модели, статуса и места назначения.",
+      },
+    ],
+    "pre-order": [
+      {
+        title: "Без выдуманных сроков",
+        body: "Если срок не подтверждён, сайт его не показывает. Актуальная оценка сообщается до оформления.",
+      },
+      {
+        title: "Следующий шаг",
+        body: "Оставьте запрос по модели; это позволит проверить доступность без автоматического обязательства купить.",
+      },
+    ],
+    "returns-exchanges": [
+      {
+        title: "Что должно быть утверждено",
+        body: "Владельцу и юридическому консультанту необходимо подтвердить сроки, исключения, процедуру и контакт для обращений.",
+      },
+      {
+        title: "До публикации политики",
+        body: "Не полагайтесь на эту страницу как на окончательные условия покупки; запросите применимые условия напрямую.",
+      },
+    ],
+    faq: [
+      {
+        title: "Почему цена может отсутствовать?",
+        body: "Цена показывается только после владельческого подтверждения. Если её нет, она будет уточнена в ответе на запрос.",
+      },
+      {
+        title: "Что означают статусы?",
+        body: "«В наличии», «Предзаказ» и «Недоступно» показываются только для моделей с подтверждённым коммерческим статусом.",
+      },
+    ],
+    contact: [
+      {
+        title: "Что указать",
+        body: "Пришлите название модели, желаемый размер и вопрос. Не отправляйте платёжные данные через форму запроса.",
+      },
+      {
+        title: "Язык общения",
+        body: "Можно написать на русском, эстонском или английском языке.",
+      },
+    ],
+    privacy: [
+      {
+        title: "Данные формы",
+        body: "Технически форма сохраняет имя, выбранный канал и контакт, выбранную модель и параметры, комментарий, язык и подтверждение согласия для обработки запроса.",
+      },
+      {
+        title: "Что ещё требуется",
+        body: "До публикации владелец и юридический консультант должны утвердить правовое основание, сроки хранения, права пользователя и контакты ответственного лица.",
+      },
+    ],
+    terms: [
+      {
+        title: "Статус каталога",
+        body: "Карточка модели сама по себе не является офертой; цена, наличие и применимые условия требуют подтверждения.",
+      },
+      {
+        title: "Что ещё требуется",
+        body: "До публикации должны быть утверждены сведения о продавце, порядок заключения договора, оплаты, доставки, возврата и разрешения споров.",
+      },
+    ],
+  },
+  et: {
+    about: [
+      {
+        title: "Selged piirid",
+        body: "Hind, saadavus, värvid ja muu müügiinfo kuvatakse alles pärast kinnitamist. Kontrollimata andmeid ei esitata faktina.",
+      },
+      {
+        title: "Kolm keelt",
+        body: "Kogu teekond ja personaalne tugi on saadaval eesti, vene või inglise keeles.",
+      },
+    ],
+    "how-to-order": [
+      {
+        title: "Suuruse valiku abi",
+        body: "Kasuta mudeli kontrollitud suurustabelit või lisa küsimus päringu kommentaari.",
+      },
+      {
+        title: "Päring ei ole makse",
+        body: "Vormi saatmine ei võta raha ega kinnita ostu automaatselt.",
+      },
+    ],
+    "delivery-payment": [
+      {
+        title: "Mis vajab veel kinnitamist",
+        body: "Enne avaldamist peab omanik kinnitama makseviisid, piirkonnad, tarnekulu ja ajad.",
+      },
+      {
+        title: "Konkreetse päringu jaoks",
+        body: "Kehtivad tingimused antakse otse pärast mudeli, oleku ja sihtkoha täpsustamist.",
+      },
+    ],
+    "pre-order": [
+      {
+        title: "Väljamõeldud aegu ei kuvata",
+        body: "Kui tähtaega pole kinnitatud, veebileht seda ei luba. Hetkehinnang antakse enne tellimist.",
+      },
+      {
+        title: "Järgmine samm",
+        body: "Saada mudeli kohta päring, et saadavust kontrollida ilma automaatse ostukohustuseta.",
+      },
+    ],
+    "returns-exchanges": [
+      {
+        title: "Mis tuleb kinnitada",
+        body: "Omanik ja õigusnõustaja peavad kinnitama tähtajad, erandid, menetluse ja pöördumise kontakti.",
+      },
+      {
+        title: "Enne poliitika avaldamist",
+        body: "Ära käsitle seda lehte lõplike ostutingimustena; küsi kehtivad tingimused otse.",
+      },
+    ],
+    faq: [
+      {
+        title: "Miks võib hind puududa?",
+        body: "Hinda näidatakse ainult pärast omaniku kinnitust. Puuduv hind täpsustatakse päringule vastates.",
+      },
+      {
+        title: "Mida olekud tähendavad?",
+        body: "„Laos”, „Eeltellimus” ja „Pole saadaval” kuvatakse ainult kinnitatud müügiolekuga mudelitel.",
+      },
+    ],
+    contact: [
+      {
+        title: "Mida lisada",
+        body: "Kirjuta mudeli nimi, soovitud suurus ja küsimus. Ära saada päringuvormi kaudu makseandmeid.",
+      },
+      {
+        title: "Suhtluskeel",
+        body: "Kirjutada saab eesti, vene või inglise keeles.",
+      },
+    ],
+    privacy: [
+      {
+        title: "Vormi andmed",
+        body: "Vorm salvestab tehniliselt nime, valitud kontaktkanali ja kontakti, mudeli ja valikud, kommentaari, keele ning nõusoleku kinnituse päringu käsitlemiseks.",
+      },
+      {
+        title: "Mis vajab veel kinnitamist",
+        body: "Enne avaldamist peavad omanik ja õigusnõustaja kinnitama õigusliku aluse, säilitamisajad, kasutaja õigused ja vastutava isiku kontaktid.",
+      },
+    ],
+    terms: [
+      {
+        title: "Kataloogi staatus",
+        body: "Tooteleht ei ole iseenesest siduv pakkumus; hind, saadavus ja kohaldatavad tingimused vajavad kinnitamist.",
+      },
+      {
+        title: "Mis vajab veel kinnitamist",
+        body: "Enne avaldamist tuleb kinnitada müüja teave ning lepingu, makse, tarne, tagastuse ja vaidluste kord.",
+      },
+    ],
+  },
+  en: {
+    about: [
+      {
+        title: "Clear evidence boundaries",
+        body: "Price, availability, colours and other commercial details appear only after confirmation. Unreviewed information is never presented as fact.",
+      },
+      {
+        title: "Three languages",
+        body: "The complete journey and personal support are available in English, Estonian or Russian.",
+      },
+    ],
+    "how-to-order": [
+      {
+        title: "Sizing support",
+        body: "Use the verified chart on the product page or add a sizing question to your request.",
+      },
+      {
+        title: "A request is not payment",
+        body: "Submitting the form does not charge you or automatically complete a purchase.",
+      },
+    ],
+    "delivery-payment": [
+      {
+        title: "Still to be approved",
+        body: "Payment methods, service areas, delivery costs and delivery times require owner approval before publication.",
+      },
+      {
+        title: "For a specific request",
+        body: "Applicable details are shared directly after the piece, status and destination are confirmed.",
+      },
+    ],
+    "pre-order": [
+      {
+        title: "No invented timing",
+        body: "When timing is not confirmed, the website does not promise it. A current estimate is shared before ordering.",
+      },
+      {
+        title: "The next step",
+        body: "Send a request for the piece so availability can be checked without an automatic commitment to buy.",
+      },
+    ],
+    "returns-exchanges": [
+      {
+        title: "What must be approved",
+        body: "The owner and legal reviewer must confirm time limits, exceptions, the process and the contact for requests.",
+      },
+      {
+        title: "Before policy publication",
+        body: "Do not treat this page as final purchase terms; ask Andrelook for the terms that apply.",
+      },
+    ],
+    faq: [
+      {
+        title: "Why might a price be missing?",
+        body: "A price appears only after owner confirmation. If absent, it will be checked in the response to your request.",
+      },
+      {
+        title: "What do product states mean?",
+        body: "In stock, Pre-order and Unavailable are shown only for pieces with a confirmed commercial state.",
+      },
+    ],
+    contact: [
+      {
+        title: "What to include",
+        body: "Share the model name, preferred size and your question. Do not send payment information through the request form.",
+      },
+      {
+        title: "Language",
+        body: "You can write in English, Estonian or Russian.",
+      },
+    ],
+    privacy: [
+      {
+        title: "Request-form data",
+        body: "The form technically stores a name, selected contact method and contact, model and choices, comment, language and consent confirmation to handle the request.",
+      },
+      {
+        title: "Still to be approved",
+        body: "Before publication, the owner and legal reviewer must approve the legal basis, retention periods, user rights and controller contact details.",
+      },
+    ],
+    terms: [
+      {
+        title: "Catalog status",
+        body: "A product page is not by itself a binding offer; price, availability and applicable terms require confirmation.",
+      },
+      {
+        title: "Still to be approved",
+        body: "Seller details and the contracting, payment, delivery, returns and dispute processes must be approved before publication.",
+      },
+    ],
+  },
+};
+
 const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
   ru: {
     about: {
@@ -424,7 +706,11 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
 };
 
 export function getInfoPage(locale: Locale, slug: string): InfoPage | null {
-  return infoPageSlugs.includes(slug as InfoPageSlug)
-    ? content[locale][slug as InfoPageSlug]
-    : null;
+  if (!infoPageSlugs.includes(slug as InfoPageSlug)) return null;
+  const typedSlug = slug as InfoPageSlug;
+  const page = content[locale][typedSlug];
+  return {
+    ...page,
+    sections: [...page.sections, ...supplementalContent[locale][typedSlug]],
+  };
 }

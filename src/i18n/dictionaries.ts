@@ -54,6 +54,7 @@ export type Dictionary = {
   optional: string;
   overview: string;
   personalService: string;
+  price: string;
   pricePending: string;
   productInformation: string;
   requestAction: string;
@@ -140,7 +141,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     footerCustomerCare: "Покупателям",
     footerLegal: "Информация",
     formError: "Проверьте отмеченные поля.",
-    galleryPending: "Фотографии готовятся к проверке владельцем",
+    galleryPending: "Место для фотографий модели",
     galleryLabel: "Фотографии модели",
     home: "Главная",
     howItWorks: "Как это работает",
@@ -158,6 +159,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     optional: "необязательно",
     overview: "Обзор",
     personalService: "Личный сервис из Таллинна по всей Европе",
+    price: "Цена",
     pricePending: "Цена уточняется",
     productInformation: "Важная информация",
     requestAction: "Уточнить наличие",
@@ -247,7 +249,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     footerCustomerCare: "Kliendile",
     footerLegal: "Teave",
     formError: "Kontrolli märgitud välju.",
-    galleryPending: "Fotod ootavad omaniku ülevaatust",
+    galleryPending: "Tootefotode ala",
     galleryLabel: "Toote fotod",
     home: "Avaleht",
     howItWorks: "Kuidas see toimib",
@@ -266,6 +268,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     optional: "valikuline",
     overview: "Ülevaade",
     personalService: "Personaalne teenindus Tallinnast üle Euroopa",
+    price: "Hind",
     pricePending: "Hind täpsustamisel",
     productInformation: "Oluline teave",
     requestAction: "Küsi saadavust",
@@ -357,7 +360,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     footerCustomerCare: "Customer care",
     footerLegal: "Information",
     formError: "Please check the highlighted fields.",
-    galleryPending: "Images are awaiting owner review",
+    galleryPending: "Product photography area",
     galleryLabel: "Product images",
     home: "Home",
     howItWorks: "How it works",
@@ -375,6 +378,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     optional: "optional",
     overview: "Overview",
     personalService: "Personal service from Tallinn across Europe",
+    price: "Price",
     pricePending: "Price to be confirmed",
     productInformation: "Important information",
     requestAction: "Confirm availability",

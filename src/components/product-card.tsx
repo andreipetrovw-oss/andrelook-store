@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { Locale } from "@/config/locales";
+import { getStorefrontContent } from "@/i18n/storefront-content";
 import type { PublicProductDto } from "@/lib/catalog/public-dto";
 
 import { ProductPlaceholder } from "./product-placeholder";
@@ -15,6 +16,7 @@ export function ProductCard({
   locale: Locale;
   product: PublicProductDto;
 }) {
+  const content = getStorefrontContent(locale);
   const primaryImage = product.images.find((image) => image.role === "PRIMARY");
   const formattedPrice =
     product.currency && product.retailPriceMinor !== null
@@ -22,14 +24,17 @@ export function ProductCard({
           currency: product.currency,
           style: "currency",
         }).format(product.retailPriceMinor / 100)
-      : dictionary.pricePending;
+      : content.commerce.priceOnRequest;
   const availability = product.availability
     ? {
         IN_STOCK: dictionary.availabilityInStock,
         PRE_ORDER: dictionary.availabilityPreOrder,
         UNAVAILABLE: dictionary.availabilityUnavailable,
       }[product.availability]
-    : dictionary.availabilityPending;
+    : content.commerce.detailsPending;
+  const statusClass = product.availability
+    ? `status-${product.availability.toLowerCase().replace("_", "-")}`
+    : "status-pending";
 
   return (
     <article className="product-card">
@@ -48,9 +53,17 @@ export function ProductCard({
         ) : (
           <ProductPlaceholder compact dictionary={dictionary} />
         )}
+        <span className={`product-card-status status-pill ${statusClass}`}>
+          {availability}
+        </span>
       </Link>
       <div className="product-card-body">
-        <span className="product-card-category">{product.category.name}</span>
+        <div className="product-card-meta">
+          <span className="product-card-category">{product.category.name}</span>
+          {product.brand ? (
+            <span className="product-card-brand">{product.brand.name}</span>
+          ) : null}
+        </div>
         <h2>
           <Link
             href={`/${locale}/catalog/${product.category.slug}/${product.slug}`}
@@ -58,12 +71,15 @@ export function ProductCard({
             {product.name}
           </Link>
         </h2>
-        {product.brand ? (
-          <p className="product-card-brand">{product.brand.name}</p>
+        {product.colors.length ? (
+          <p className="product-card-options">
+            {dictionary.colour}:{" "}
+            {product.colors.map((colour) => colour.name).join(", ")}
+          </p>
         ) : null}
         <div className="product-card-footer">
           <span>{formattedPrice}</span>
-          <span>{availability}</span>
+          <span className="product-card-cta">{dictionary.viewProduct} ↗</span>
         </div>
       </div>
     </article>
