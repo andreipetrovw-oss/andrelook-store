@@ -9,10 +9,14 @@ import {
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 
-function FieldError({ errors }: { errors?: string[] }) {
-  return errors?.length ? (
-    <span className="field-error">{errors[0]}</span>
-  ) : null;
+function FieldError({
+  errors,
+  message,
+}: {
+  errors?: string[];
+  message: string;
+}) {
+  return errors?.length ? <span className="field-error">{message}</span> : null;
 }
 
 const initialRequestFormState: RequestFormState = { status: "idle" };
@@ -57,6 +61,7 @@ export function RequestForm({
       >
         <span className="eyebrow">Andrelook</span>
         <h2>{dictionary.requestSuccess}</h2>
+        <p>{dictionary.requestNextStep}</p>
         <p>
           {dictionary.requestTitle}: <strong>{state.reference}</strong>
         </p>
@@ -87,7 +92,10 @@ export function RequestForm({
                 </option>
               ))}
             </select>
-            <FieldError errors={state.errors?.size} />
+            <FieldError
+              errors={state.errors?.size}
+              message={dictionary.validationRequired}
+            />
           </label>
         ) : null}
 
@@ -102,14 +110,20 @@ export function RequestForm({
                 </option>
               ))}
             </select>
-            <FieldError errors={state.errors?.colour} />
+            <FieldError
+              errors={state.errors?.colour}
+              message={dictionary.validationRequired}
+            />
           </label>
         ) : null}
 
         <label>
           <span>{dictionary.name}</span>
           <input autoComplete="name" name="name" required />
-          <FieldError errors={state.errors?.name} />
+          <FieldError
+            errors={state.errors?.name}
+            message={dictionary.validationRequired}
+          />
         </label>
 
         <label>
@@ -117,21 +131,39 @@ export function RequestForm({
           <select defaultValue="TELEGRAM" name="contactMethod">
             <option value="TELEGRAM">{dictionary.contactTelegram}</option>
             <option value="INSTAGRAM">{dictionary.contactInstagram}</option>
+            <option value="PHONE">{dictionary.contactPhone}</option>
             <option value="EMAIL">{dictionary.contactEmail}</option>
           </select>
         </label>
 
         <label>
           <span>{dictionary.contactValue}</span>
-          <input autoComplete="email" name="contactValue" required />
-          <FieldError errors={state.errors?.contactValue} />
+          <input name="contactValue" required />
+          <FieldError
+            errors={state.errors?.contactValue}
+            message={dictionary.validationRequired}
+          />
+        </label>
+
+        <label>
+          <span>
+            {dictionary.requestComment} <small>({dictionary.optional})</small>
+          </span>
+          <textarea maxLength={1000} name="comment" rows={4} />
+          <FieldError
+            errors={state.errors?.comment}
+            message={dictionary.formError}
+          />
         </label>
 
         <label className="consent-row">
           <input name="consent" required type="checkbox" value="accepted" />
           <span>{dictionary.consent}</span>
         </label>
-        <FieldError errors={state.errors?.consent} />
+        <FieldError
+          errors={state.errors?.consent}
+          message={dictionary.validationRequired}
+        />
 
         {state.status === "error" ? (
           <p aria-live="polite" className="form-error">

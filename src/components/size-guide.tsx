@@ -5,21 +5,36 @@ import type { SizeChartTable } from "@/lib/catalog/size-chart";
 const measurementLabels: Record<Locale, Record<string, string>> = {
   en: {
     bust: "Bust",
+    chest: "Chest",
     "clothes length": "Garment length",
+    hips: "Hips",
+    inseam: "Inseam",
+    length: "Length",
     shoulder: "Shoulder",
     sleeve: "Sleeve",
+    waist: "Waist",
   },
   et: {
     bust: "Rinnaümbermõõt",
+    chest: "Rind",
     "clothes length": "Rõiva pikkus",
+    hips: "Puus",
+    inseam: "Sisesäär",
+    length: "Pikkus",
     shoulder: "Õlg",
     sleeve: "Varrukas",
+    waist: "Vöö",
   },
   ru: {
     bust: "Обхват груди",
+    chest: "Грудь",
     "clothes length": "Длина изделия",
+    hips: "Бёдра",
+    inseam: "Внутренний шов",
+    length: "Длина",
     shoulder: "Плечо",
     sleeve: "Рукав",
+    waist: "Талия",
   },
 };
 
@@ -73,6 +88,7 @@ export function SizeGuide({
           </tbody>
         </table>
       </div>
+      <p className="size-guide-note">{dictionary.sizeGuideNote}</p>
     </details>
   );
 }

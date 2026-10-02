@@ -11,6 +11,8 @@
   --color-accent: #3d3028;
   --color-accent-soft: #f0ebe6;
   --color-gold: #806945;
+  --color-error: #84251d;
+  --color-success: #315a43;
   --font-editorial: "Cormorant Garamond", Georgia, serif;
   --font-interface: "Outfit", system-ui, sans-serif;
   --content-max: 1360px;
@@ -18,4 +20,8 @@
   --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
   --space-page: clamp(1rem, 4vw, 5rem);
   --space-section: clamp(5rem, 9vw, 9rem);
+  --space-section-compact: clamp(3.5rem, 6vw, 6.5rem);
+  --content-narrow: 820px;
+  --control-height: 3.25rem;
+  --transition-fast: 180ms var(--ease-editorial);
 }

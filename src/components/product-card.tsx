@@ -4,6 +4,8 @@ import Link from "next/link";
 import type { Locale } from "@/config/locales";
 import type { PublicProductDto } from "@/lib/catalog/public-dto";
 
+import { ProductPlaceholder } from "./product-placeholder";
+
 export function ProductCard({
   dictionary,
   locale,
@@ -44,7 +46,7 @@ export function ProductCard({
             src={primaryImage.url}
           />
         ) : (
-          <span aria-hidden="true">Andrelook</span>
+          <ProductPlaceholder compact dictionary={dictionary} />
         )}
       </Link>
       <div className="product-card-body">
@@ -56,7 +58,9 @@ export function ProductCard({
             {product.name}
           </Link>
         </h2>
-        {product.brand ? <p>{product.brand.name}</p> : null}
+        {product.brand ? (
+          <p className="product-card-brand">{product.brand.name}</p>
+        ) : null}
         <div className="product-card-footer">
           <span>{formattedPrice}</span>
           <span>{availability}</span>

@@ -104,7 +104,7 @@ export async function createOrderRequest(
     email: input.contactMethod === "EMAIL" ? input.contactValue : null,
     instagramHandle:
       input.contactMethod === "INSTAGRAM" ? input.contactValue : null,
-    phone: null,
+    phone: input.contactMethod === "PHONE" ? input.contactValue : null,
     telegramHandle:
       input.contactMethod === "TELEGRAM" ? input.contactValue : null,
   };
@@ -128,6 +128,7 @@ export async function createOrderRequest(
           customerId: customer.id,
           displayNumber: displayNumber(),
           initialReferrer: context.initialReferrer,
+          internalNotes: input.comment ?? null,
           landingPath: context.landingPath,
           requestKey: input.requestKey,
           requestedLocale: databaseLocale[input.locale],

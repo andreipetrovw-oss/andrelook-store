@@ -6,7 +6,10 @@ import { Suspense } from "react";
 import { ProductCard } from "@/components/product-card";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getPublicCatalog } from "@/lib/catalog/public-query";
+import {
+  getPublicCatalog,
+  getPublicCategories,
+} from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
 import { isDatabaseConfigured } from "@/lib/env";
 
@@ -38,20 +41,35 @@ async function HomeCollection({
   locale: Parameters<typeof getPublicCatalog>[0];
   scope: ReturnType<typeof storefrontScope>;
 }) {
-  const products = isDatabaseConfigured()
-    ? (await getPublicCatalog(locale, scope)).slice(0, 3)
-    : [];
+  const [products, categories] = isDatabaseConfigured()
+    ? await Promise.all([
+        getPublicCatalog(locale, scope),
+        getPublicCategories(locale, scope),
+      ])
+    : [[], []];
 
   return (
     <section className="container collection-preview">
       <header className="section-heading">
         <span className="eyebrow">{dictionary.exploreCollection}</span>
-        <h2>{dictionary.catalog}</h2>
+        <h2>{dictionary.selectedProducts}</h2>
         <p>{dictionary.catalogIntro}</p>
       </header>
+      {categories.length ? (
+        <nav aria-label={dictionary.catalog} className="home-categories">
+          {categories.flatMap((category) =>
+            category.children.map((child) => (
+              <Link href={`/${locale}/catalog/${child.slug}`} key={child.slug}>
+                <span>{child.name}</span>
+                <small>{child.productCount}</small>
+              </Link>
+            )),
+          )}
+        </nav>
+      ) : null}
       {products.length ? (
         <div className="catalog-grid compact-grid">
-          {products.map((product) => (
+          {products.slice(0, 6).map((product) => (
             <ProductCard
               dictionary={dictionary}
               key={product.id}
@@ -65,6 +83,11 @@ async function HomeCollection({
           <p>{dictionary.catalogEmpty}</p>
         </div>
       )}
+      <div className="section-action">
+        <Link className="secondary-button" href={`/${locale}/catalog`}>
+          {dictionary.viewCatalog}
+        </Link>
+      </div>
     </section>
   );
 }
@@ -124,6 +147,40 @@ export default async function LocalizedHome({
               <p>{step}</p>
             </article>
           ))}
+        </div>
+      </section>
+      <section className="container trust-section">
+        <header className="section-heading">
+          <span className="eyebrow">Andrelook</span>
+          <h2>{dictionary.whyAndrelook}</h2>
+        </header>
+        <div className="trust-grid">
+          {[
+            dictionary.trustClarity,
+            dictionary.trustSupport,
+            dictionary.trustLanguages,
+          ].map((item, index) => (
+            <article key={item}>
+              <span>0{index + 1}</span>
+              <p>{item}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="contact-band">
+        <div className="container contact-band-inner">
+          <div>
+            <span className="eyebrow">{dictionary.personalSizing}</span>
+            <h2>{dictionary.needHelp}</h2>
+          </div>
+          <div className="contact-band-actions">
+            <Link className="primary-action-inline" href={`/${locale}/contact`}>
+              {dictionary.contact}
+            </Link>
+            <Link className="text-action" href={`/${locale}/faq`}>
+              {dictionary.faq} →
+            </Link>
+          </div>
         </div>
       </section>
     </>

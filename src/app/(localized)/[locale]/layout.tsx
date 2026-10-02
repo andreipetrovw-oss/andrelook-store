@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localizedAlternates, indexingRobots } from "@/lib/seo";
+import { getServerConfig } from "@/lib/env";
 import "@/styles/globals.css";
 
 export function generateStaticParams() {
@@ -26,10 +27,22 @@ export async function generateMetadata({
   return {
     alternates: localizedAlternates(locale, ""),
     description: dictionary.tagline,
+    metadataBase: getServerConfig().siteUrl,
+    openGraph: {
+      description: dictionary.tagline,
+      siteName: "Andrelook",
+      title: "Andrelook",
+      type: "website",
+    },
     robots: indexingRobots(),
     title: {
       default: "Andrelook",
       template: "%s | Andrelook",
+    },
+    twitter: {
+      card: "summary",
+      description: dictionary.tagline,
+      title: "Andrelook",
     },
   };
 }
@@ -47,11 +60,31 @@ export default async function LocalizedLayout({
   }
 
   const dictionary = getDictionary(locale);
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    email: "info.andrelook@gmail.com",
+    name: "Andrelook",
+    sameAs: [
+      "https://t.me/andrelookstore",
+      "https://www.instagram.com/andrelook.store/",
+    ],
+    url: new URL(`/${locale}`, getServerConfig().siteUrl).toString(),
+  };
   return (
     <html lang={locale}>
       <body>
+        <a className="skip-link" href="#main-content">
+          {dictionary.skipToContent}
+        </a>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organization).replaceAll("<", "\\u003c"),
+          }}
+          type="application/ld+json"
+        />
         <SiteHeader dictionary={dictionary} locale={locale} />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <SiteFooter dictionary={dictionary} locale={locale} />
       </body>
     </html>

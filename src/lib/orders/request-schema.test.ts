@@ -51,4 +51,17 @@ describe("assisted order request validation", () => {
       expect(result.data).not.toHaveProperty("productName");
     }
   });
+
+  it("accepts a bounded optional comment and phone contact", () => {
+    const form = validForm();
+    form.set("contactMethod", "PHONE");
+    form.set("contactValue", "+372 5555 5555");
+    form.set("comment", "Please contact me in the afternoon.");
+    const result = requestOrderInput(form);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.comment).toBe("Please contact me in the afternoon.");
+      expect(result.data.contactMethod).toBe("PHONE");
+    }
+  });
 });

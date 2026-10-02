@@ -5,6 +5,7 @@ import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 
 import { LanguageSwitcher } from "./language-switcher";
+import { MobileMenu } from "./mobile-menu";
 
 export function SiteHeader({
   dictionary,
@@ -30,23 +31,23 @@ export function SiteHeader({
         <nav aria-label={dictionary.navigation} className="primary-nav">
           <Link href={`/${locale}`}>{dictionary.home}</Link>
           <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
+          <Link href={`/${locale}/how-to-order`}>{dictionary.howToOrder}</Link>
+          <Link href={`/${locale}/contact`}>{dictionary.contact}</Link>
         </nav>
-
-        <LanguageSwitcher currentLocale={locale} label={dictionary.language} />
-
-        <details className="mobile-navigation">
-          <summary aria-label={dictionary.navigation}>
-            {dictionary.mobileMenu}
-          </summary>
-          <nav aria-label={dictionary.navigation}>
-            <Link href={`/${locale}`}>{dictionary.home}</Link>
-            <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
-            <LanguageSwitcher
-              currentLocale={locale}
-              label={dictionary.language}
-            />
-          </nav>
-        </details>
+        <div className="header-actions">
+          <Link
+            aria-label={dictionary.search}
+            className="header-search"
+            href={`/${locale}/catalog#catalog-controls`}
+          >
+            {dictionary.search}
+          </Link>
+          <LanguageSwitcher
+            currentLocale={locale}
+            label={dictionary.language}
+          />
+        </div>
+        <MobileMenu dictionary={dictionary} locale={locale} />
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { localePath, locales } from "@/config/locales";
+import { infoPageSlugs } from "@/i18n/info-content";
 import { getPublicCatalog } from "@/lib/catalog/public-query";
 import { getServerConfig } from "@/lib/env";
 
@@ -16,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const paths = new Set([
         localePath(locale),
         localePath(locale, "catalog"),
+        ...infoPageSlugs.map((slug) => localePath(locale, slug)),
         ...products.map((product) =>
           localePath(locale, `catalog/${product.category.slug}`),
         ),

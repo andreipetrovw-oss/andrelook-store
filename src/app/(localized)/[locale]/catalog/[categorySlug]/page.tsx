@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CategoryNavigation } from "@/components/category-navigation";
-import { ProductCard } from "@/components/product-card";
+import {
+  CatalogExperience,
+  type CatalogParams,
+} from "@/components/catalog-experience";
+import Link from "next/link";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import {
@@ -17,6 +21,7 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ categorySlug: string; locale: string }>;
+  searchParams: Promise<CatalogParams>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -41,10 +46,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { categorySlug, locale } = await params;
   if (!isLocale(locale)) notFound();
   const dictionary = getDictionary(locale);
+  const filters = await searchParams;
   const scope = storefrontScope();
   const [products, categories] = isDatabaseConfigured()
     ? await Promise.all([
@@ -61,8 +67,14 @@ export default async function CategoryPage({ params }: Props) {
     <>
       <header className="catalog-hero compact">
         <div className="container">
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
+            <span aria-hidden="true">/</span>
+            <span>{category?.name ?? categorySlug}</span>
+          </nav>
           <span className="eyebrow">{dictionary.catalog}</span>
           <h1>{category?.name ?? categorySlug}</h1>
+          <p>{dictionary.categoryContext}</p>
         </div>
       </header>
       <div className="container">
@@ -73,22 +85,13 @@ export default async function CategoryPage({ params }: Props) {
           locale={locale}
         />
       </div>
-      <section aria-label={category?.name} className="container catalog-grid">
-        {products.length ? (
-          products.map((product) => (
-            <ProductCard
-              dictionary={dictionary}
-              key={product.id}
-              locale={locale}
-              product={product}
-            />
-          ))
-        ) : (
-          <div className="empty-state">
-            <p>{dictionary.noProductsInCategory}</p>
-          </div>
-        )}
-      </section>
+      <CatalogExperience
+        basePath={`/${locale}/catalog/${categorySlug}`}
+        dictionary={dictionary}
+        locale={locale}
+        params={filters}
+        products={products}
+      />
     </>
   );
 }

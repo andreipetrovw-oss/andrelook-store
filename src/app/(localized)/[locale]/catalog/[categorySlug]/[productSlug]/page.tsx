@@ -1,18 +1,23 @@
 import { randomUUID } from "node:crypto";
 
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ProductCard } from "@/components/product-card";
+import { ProductGallery } from "@/components/product-gallery";
 import { RequestForm } from "@/components/request-form";
 import { SizeGuide } from "@/components/size-guide";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getPublicProduct } from "@/lib/catalog/public-query";
+import {
+  getPublicCategoryProducts,
+  getPublicProduct,
+} from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
 import { parseSizeChart } from "@/lib/catalog/size-chart";
 import { indexingRobots, localizedAlternates } from "@/lib/seo";
+import { getServerConfig } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -40,12 +45,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: localizedAlternates(resolved.locale, path),
     description: product.shortDescription ?? undefined,
     openGraph: {
+      description: product.shortDescription ?? undefined,
       images: product.images[0]?.url ? [product.images[0].url] : undefined,
       title: product.name,
       type: "website",
     },
     robots: indexingRobots(),
     title: product.name,
+    twitter: {
+      card: product.images[0] ? "summary_large_image" : "summary",
+      description: product.shortDescription ?? undefined,
+      images: product.images[0]?.url ? [product.images[0].url] : undefined,
+      title: product.name,
+    },
   };
 }
 
@@ -96,9 +108,19 @@ function ProductStructuredData({
 export default async function ProductPage({ params }: Props) {
   const resolved = await params;
   if (!isLocale(resolved.locale)) notFound();
-  const dictionary = getDictionary(resolved.locale);
+  const locale = resolved.locale;
+  const dictionary = getDictionary(locale);
   const product = await resolveProduct(Promise.resolve(resolved));
   if (!product) notFound();
+  const related = (
+    await getPublicCategoryProducts(
+      locale,
+      resolved.categorySlug,
+      storefrontScope(),
+    )
+  )
+    .filter((item) => item.id !== product.id)
+    .slice(0, 3);
   const formattedPrice =
     product.currency && product.retailPriceMinor !== null
       ? new Intl.NumberFormat(resolved.locale, {
@@ -110,7 +132,8 @@ export default async function ProductPage({ params }: Props) {
     ? parseSizeChart(product.sizeChart.data)
     : null;
   const sizes = chart?.sizes ?? [];
-  const url = `/${resolved.locale}/catalog/${resolved.categorySlug}/${resolved.productSlug}`;
+  const path = `/${resolved.locale}/catalog/${resolved.categorySlug}/${resolved.productSlug}`;
+  const url = new URL(path, getServerConfig().siteUrl).toString();
   const availability = product.availability
     ? {
         IN_STOCK: dictionary.availabilityInStock,
@@ -122,6 +145,41 @@ export default async function ProductPage({ params }: Props) {
   return (
     <>
       <ProductStructuredData product={product} url={url} />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                item: new URL(
+                  `/${resolved.locale}/catalog`,
+                  getServerConfig().siteUrl,
+                ).toString(),
+                name: dictionary.catalog,
+                position: 1,
+              },
+              {
+                "@type": "ListItem",
+                item: new URL(
+                  `/${resolved.locale}/catalog/${resolved.categorySlug}`,
+                  getServerConfig().siteUrl,
+                ).toString(),
+                name: product.category.name,
+                position: 2,
+              },
+              {
+                "@type": "ListItem",
+                item: url,
+                name: product.name,
+                position: 3,
+              },
+            ],
+          }).replaceAll("<", "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
       <article className="container product-detail">
         <nav aria-label="Breadcrumb" className="breadcrumb">
           <Link href={`/${resolved.locale}/catalog`}>{dictionary.catalog}</Link>
@@ -131,26 +189,7 @@ export default async function ProductPage({ params }: Props) {
           </Link>
         </nav>
         <div className="product-detail-grid">
-          <div className="product-detail-gallery">
-            {product.images.length ? (
-              product.images.map((image, index) => (
-                <div className="gallery-frame" key={`${image.url}-${index}`}>
-                  <Image
-                    alt={image.alt}
-                    fill
-                    priority={index === 0}
-                    sizes="(max-width: 1024px) 100vw, 58vw"
-                    src={image.url}
-                  />
-                </div>
-              ))
-            ) : (
-              <div className="gallery-placeholder">
-                <span>ANDRELOOK STUDIO</span>
-                <p>{dictionary.galleryPending}</p>
-              </div>
-            )}
-          </div>
+          <ProductGallery dictionary={dictionary} images={product.images} />
           <div className="product-summary">
             <span className="eyebrow">{product.category.name}</span>
             <h1>{product.name}</h1>
@@ -169,23 +208,61 @@ export default async function ProductPage({ params }: Props) {
                 </dd>
               </div>
             </dl>
-            {chart && product.sizeChart ? (
-              <SizeGuide
-                chart={chart}
-                dictionary={dictionary}
-                locale={resolved.locale}
-                units={product.sizeChart.units}
-              />
-            ) : (
-              <p className="pending-note">{dictionary.sizeGuidePending}</p>
-            )}
             <a className="primary-action" href="#request">
               {dictionary.requestAction}
             </a>
-            <section className="product-copy">
-              <h2>{dictionary.details}</h2>
-              <p>{product.description ?? dictionary.descriptionPending}</p>
-            </section>
+            <p className="assistance-note">
+              <Link href={`/${resolved.locale}/contact`}>
+                {dictionary.personalSizing} →
+              </Link>
+            </p>
+            <div className="product-content">
+              <section>
+                <h2>{dictionary.overview}</h2>
+                <p>
+                  {product.description ??
+                    product.shortDescription ??
+                    dictionary.descriptionPending}
+                </p>
+              </section>
+              {chart && product.sizeChart ? (
+                <SizeGuide
+                  chart={chart}
+                  dictionary={dictionary}
+                  locale={resolved.locale}
+                  units={product.sizeChart.units}
+                />
+              ) : (
+                <section>
+                  <h2>{dictionary.sizeGuide}</h2>
+                  <p className="pending-note">{dictionary.sizeGuidePending}</p>
+                </section>
+              )}
+              <details>
+                <summary>{dictionary.delivery}</summary>
+                <p>{dictionary.requestIntro}</p>
+                <Link href={`/${resolved.locale}/delivery-payment`}>
+                  {dictionary.deliveryPayment} →
+                </Link>
+              </details>
+              {product.availability === "PRE_ORDER" ? (
+                <details>
+                  <summary>{dictionary.preorder}</summary>
+                  <p>
+                    {product.preorderEstimate ?? dictionary.availabilityPending}
+                  </p>
+                  <Link href={`/${resolved.locale}/pre-order`}>
+                    {dictionary.howItWorks} →
+                  </Link>
+                </details>
+              ) : null}
+              <details>
+                <summary>{dictionary.returnsExchanges}</summary>
+                <Link href={`/${resolved.locale}/returns-exchanges`}>
+                  {dictionary.returnsExchanges} →
+                </Link>
+              </details>
+            </div>
             <RequestForm
               availability={product.availability}
               colours={product.colors}
@@ -199,6 +276,24 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </article>
+      {related.length ? (
+        <section className="container related-section">
+          <header className="section-heading">
+            <span className="eyebrow">Andrelook</span>
+            <h2>{dictionary.relatedProducts}</h2>
+          </header>
+          <div className="catalog-grid compact-grid">
+            {related.map((item) => (
+              <ProductCard
+                dictionary={dictionary}
+                key={item.id}
+                locale={locale}
+                product={item}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }
