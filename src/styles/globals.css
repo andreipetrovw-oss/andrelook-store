@@ -2885,3 +2885,15 @@ button:disabled {
     letter-spacing: 0.06em;
   }
 }
+
+@media (max-width: 360px) {
+  .home-hero-inner,
+  .home-hero-inner > * {
+    min-width: 0;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(3rem, 14vw, 3.5rem);
+    letter-spacing: 0.04em;
+  }
+}
