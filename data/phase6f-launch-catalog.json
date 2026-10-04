@@ -1,0 +1,3169 @@
+{
+  "approvedPhase5Sha256": "5cd48ecb73f0480604adb0607fef78590a6b8a50a091001df30584b88c03ce21",
+  "artifactType": "andrelook-phase6f-legacy-launch-catalog",
+  "products": [
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Warm Jackets",
+          "ru": "Тёплые куртки",
+          "et": "Soojad jakid"
+        },
+        "slug": "warm-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#F5F5F5"
+        },
+        {
+          "code": "sky-blue",
+          "names": {
+            "ru": "Голубой",
+            "en": "Sky Blue",
+            "et": "Taevassinine"
+          },
+          "sortOrder": 3,
+          "swatchHex": "#7ABFDB"
+        },
+        {
+          "code": "grey",
+          "names": {
+            "ru": "Серый",
+            "en": "Grey",
+            "et": "Hall"
+          },
+          "sortOrder": 4,
+          "swatchHex": "#9A9A9A"
+        },
+        {
+          "code": "khaki",
+          "names": {
+            "ru": "Хаки",
+            "en": "Khaki",
+            "et": "Khaki"
+          },
+          "sortOrder": 5,
+          "swatchHex": "#5C6B3A"
+        },
+        {
+          "code": "bright-orange",
+          "names": {
+            "ru": "Ярко-оранжевый",
+            "en": "Bright Orange",
+            "et": "Erkoranž"
+          },
+          "sortOrder": 6,
+          "swatchHex": "#E85B1A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Maya Down Jacket, view 1",
+            "et": "Moncler Maya Down Jacket, vaade 1",
+            "ru": "Moncler Maya Down Jacket, вид 1"
+          },
+          "height": 1143,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-maya-1.jpg",
+          "masterSha256": "0fcbe5ec45a4f0b1f6f46821f069533bde087d085c0d61371c97332f1eee9ec5",
+          "optimizedSha256": "51ad079acfe3ca83d35bff80c78d037527265549a2328e8cf2d7c83644be7619",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-maya-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Maya Down Jacket, view 2",
+            "et": "Moncler Maya Down Jacket, vaade 2",
+            "ru": "Moncler Maya Down Jacket, вид 2"
+          },
+          "height": 1126,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-maya-2.jpg",
+          "masterSha256": "cc207122665715847bb728d2b50a78925f4155387803e63bef2d2b6b88ab817e",
+          "optimizedSha256": "492ff0e8cac373d156ade7a4582279945ee80969028c75f94078d0ba2c769dc7",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-maya-2.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Maya Down Jacket, view 3",
+            "et": "Moncler Maya Down Jacket, vaade 3",
+            "ru": "Moncler Maya Down Jacket, вид 3"
+          },
+          "height": 1127,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-maya-3.jpg",
+          "masterSha256": "8812c0e0ac9daade206a1a51f669ddd42e26b6c2f7b1ecf2ebaa384be8705e26",
+          "optimizedSha256": "6f4fcfb4764ab47e68e62bed3f1895c313ccdd03c2f29189934e22a66d94811e",
+          "role": "GALLERY",
+          "sortOrder": 2,
+          "url": "/products/legacy/moncler-maya-3.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Maya Down Jacket, view 4",
+            "et": "Moncler Maya Down Jacket, vaade 4",
+            "ru": "Moncler Maya Down Jacket, вид 4"
+          },
+          "height": 670,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-maya-4.jpg",
+          "masterSha256": "a4c03b2b747c7a4b13e72feda92f0962d7be0f8e4f9e8c2844055e18c2fd0489",
+          "optimizedSha256": "73e49d93099aee6b2d7fa86b797409b3188c9abd118e71330faf92618191de2d",
+          "role": "GALLERY",
+          "sortOrder": 3,
+          "url": "/products/legacy/moncler-maya-4.webp",
+          "width": 1200
+        },
+        {
+          "alt": {
+            "en": "Moncler Maya Down Jacket, view 5",
+            "et": "Moncler Maya Down Jacket, vaade 5",
+            "ru": "Moncler Maya Down Jacket, вид 5"
+          },
+          "height": 1233,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-maya-5.jpg",
+          "masterSha256": "37badc03062c3789924930c532815205599b72c06ef9b4bb890e9f12afb0a91c",
+          "optimizedSha256": "adc3169b55252e285bad9b1506ef7ee9c0b4d9e3c93c38f60ccd66c206880039",
+          "role": "GALLERY",
+          "sortOrder": 4,
+          "url": "/products/legacy/moncler-maya-5.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Maya Down Jacket, view 6",
+            "et": "Moncler Maya Down Jacket, vaade 6",
+            "ru": "Moncler Maya Down Jacket, вид 6"
+          },
+          "height": 1162,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-maya-6.jpg",
+          "masterSha256": "6f5cdbaba0f79b6c80b73aadbc02981bfc176a24f221cf2935722d5819ea9bd5",
+          "optimizedSha256": "eb065451ccd07bd987e4b643fa0493dd57ea0c51076b671cad9d6528d2d79d9a",
+          "role": "GALLERY",
+          "sortOrder": 5,
+          "url": "/products/legacy/moncler-maya-6.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-001",
+      "isFeatured": true,
+      "legacyId": 1,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196543"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [65, 67, 69, 71, 73]
+            },
+            {
+              "name": "Shoulder",
+              "values": [44, 46, 48, 50, 52]
+            },
+            {
+              "name": "Bust",
+              "values": [54.5, 57, 59.5, 62, 64.5]
+            },
+            {
+              "name": "Sleeve",
+              "values": [65, 66, 67, 68, 69]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": [
+            "Chart prints MAAY; associated with Maya source album. Unit is not printed clearly."
+          ],
+          "sourceAlbumId": "209196543",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/3f3a306b/70986d88.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-maya-down-jacket",
+      "sortOrder": 1,
+      "translations": [
+        {
+          "description": "Культовая пуховая куртка Moncler Maya, сочетающая премиальное качество, тепло и современный городской стиль. Модель создана для холодной погоды и повседневного комфорта.\n• натуральный гусиный пух — отлично сохраняет тепло\n• прочный и лёгкий глянцевый материал\n• аккуратные фирменные швы и высокая износостойкость\n• удобные карманы и надёжная молния\n• культовый логотип Moncler\nКуртка отлично подходит для повседневного стиля и городских образов.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Maya Down Jacket",
+          "shortDescription": "Культовая пуховая куртка Moncler Maya, сочетающая премиальное качество, тепло и современный городской стиль. Модель создана для холодной погоды и повседневного комфорта."
+        },
+        {
+          "description": "Ikoonilne Moncler Maya sulejope, mis ühendab premium kvaliteeti, soojust ja kaasaegset linnalikku stiili.\n• looduslik hanesuled — suurepärane soojuse säilitamine\n• vastupidav ja kerge läikiv materjal\n• täpsed firmamärgised õmblused\n• praktilised taskud ja usaldusväärne tõmblukk\n• ikooniline Moncler logo\nSobib igapäevaseks stiiliks ja linnavaatamiseks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Maya Down Jacket",
+          "shortDescription": "Ikoonilne Moncler Maya sulejope, mis ühendab premium kvaliteeti, soojust ja kaasaegset linnalikku stiili."
+        },
+        {
+          "description": "Iconic Moncler Maya down jacket combining premium quality, warmth and modern urban style. Designed for cold weather and everyday comfort.\n• natural goose down — excellent heat retention\n• durable and lightweight glossy shell\n• precise branded stitching and high durability\n• practical pockets and reliable zip\n• iconic Moncler logo\nPerfect for everyday style and city looks.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Maya Down Jacket",
+          "shortDescription": "Iconic Moncler Maya down jacket combining premium quality, warmth and modern urban style. Designed for cold weather and everyday comfort."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Parajumpers",
+      "category": {
+        "names": {
+          "en": "Warm Jackets",
+          "ru": "Тёплые куртки",
+          "et": "Soojad jakid"
+        },
+        "slug": "warm-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Parajumpers Tyrik Hooded Puffer Jacket, view 1",
+            "et": "Parajumpers Tyrik Hooded Puffer Jacket, vaade 1",
+            "ru": "Parajumpers Tyrik Hooded Puffer Jacket, вид 1"
+          },
+          "height": 1343,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-tyrik-1.jpg",
+          "masterSha256": "d7c6e7296bc4f48eb6bcd013538d34174cfac7040a070c7869a764b1267ba049",
+          "optimizedSha256": "be8f944602b9c85b982429efea445aa748b462fbc3d80e43b513f04c46e786b5",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/parajumpers-tyrik-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Parajumpers Tyrik Hooded Puffer Jacket, view 2",
+            "et": "Parajumpers Tyrik Hooded Puffer Jacket, vaade 2",
+            "ru": "Parajumpers Tyrik Hooded Puffer Jacket, вид 2"
+          },
+          "height": 1313,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-tyrik-2.jpg",
+          "masterSha256": "54ce430be7fdf85051686a6015df919f78f45e4764ea941f0b36ee34add0661c",
+          "optimizedSha256": "6c205bdc56b0d79ff571f536fa4e3eefd9b91a0bd3e831e4521bf0a4712c2b84",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/parajumpers-tyrik-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-002",
+      "isFeatured": true,
+      "legacyId": 2,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-CPREPSCN-218168827"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Bust",
+              "values": [56, 58, 60, 62, 64]
+            },
+            {
+              "name": "Clothes length",
+              "values": [67, 69, 71, 73, 75]
+            },
+            {
+              "name": "Sleeve",
+              "values": [62, 63.5, 65, 66.5, 68]
+            },
+            {
+              "name": "Shoulder",
+              "values": [47, 49, 51, 53, 55]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "218168827",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/cprepscn/1ed8bb96/d5770354.png",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "parajumpers-tyrik-hooded-puffer-jacket",
+      "sortOrder": 2,
+      "translations": [
+        {
+          "description": "Тёплая зимняя куртка Parajumpers, созданная для холодной погоды и повседневного комфорта. Модель сочетает функциональность, премиальные материалы и современный городской стиль.\n• тёплый и качественный пуховый наполнитель\n• прочный и износостойкий внешний материал\n• удобный капюшон для дополнительной защиты от ветра\n• практичные карманы на молнии\n• фирменные элементы и логотип Parajumpers\nИдеально подходит для холодной зимней погоды и ежедневного ношения.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Parajumpers Tyrik Hooded Puffer Jacket",
+          "shortDescription": "Тёплая зимняя куртка Parajumpers, созданная для холодной погоды и повседневного комфорта. Модель сочетает функциональность, премиальные материалы и современный городской стиль."
+        },
+        {
+          "description": "Soe talvejope Parajumpers, loodud külma ilma ja igapäevase mugavuse jaoks.\n• soe ja kvaliteetne suletäidis\n• vastupidav välismaterjal\n• mugav kapuuts lisatuulekaitseks\n• praktilised tõmblukuga taskud\n• Parajumpers logo ja detailid\nSobib ideaalselt külmaks talveilmaks ja igapäevaseks kandmiseks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Parajumpers Tyrik Hooded Puffer Jacket",
+          "shortDescription": "Soe talvejope Parajumpers, loodud külma ilma ja igapäevase mugavuse jaoks."
+        },
+        {
+          "description": "Warm winter jacket by Parajumpers, designed for cold weather and everyday comfort.\n• warm and high-quality down fill\n• durable and wear-resistant outer material\n• comfortable hood for extra wind protection\n• practical zip pockets\n• signature Parajumpers elements and logo\nPerfect for cold winter weather and daily wear.\nUnisex model",
+          "locale": "en",
+          "name": "Parajumpers Tyrik Hooded Puffer Jacket",
+          "shortDescription": "Warm winter jacket by Parajumpers, designed for cold weather and everyday comfort."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Warm Jackets",
+          "ru": "Тёплые куртки",
+          "et": "Soojad jakid"
+        },
+        "slug": "warm-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Vezere Down Jacket, view 1",
+            "et": "Moncler Vezere Down Jacket, vaade 1",
+            "ru": "Moncler Vezere Down Jacket, вид 1"
+          },
+          "height": 1399,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-vezere-1.jpg",
+          "masterSha256": "35e5dbb3dc2489713798d0a9c958c05070f7fccaa213f62cfd39a9d1b7fffad7",
+          "optimizedSha256": "906c6e06280ba0401d9e42012e707204f3fc010e11cb6943547b5bf687b84cc3",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-vezere-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Vezere Down Jacket, view 2",
+            "et": "Moncler Vezere Down Jacket, vaade 2",
+            "ru": "Moncler Vezere Down Jacket, вид 2"
+          },
+          "height": 1533,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-vezere-2.jpg",
+          "masterSha256": "68e7bbc45c87f96b6cf147ef5dbdf3f39967070d6d86dce51fcbae094b46e638",
+          "optimizedSha256": "9f34f39b05ffeb57df0c3389d362c128a64addc44be5e1e804d2d242e36d6a55",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-vezere-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-003",
+      "isFeatured": true,
+      "legacyId": 3,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196423"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [64, 66, 68, 70, 72]
+            },
+            {
+              "name": "Shoulder",
+              "values": [44, 46, 48, 50, 52]
+            },
+            {
+              "name": "Bust",
+              "values": [53.5, 56, 58.5, 61, 63.5]
+            },
+            {
+              "name": "Sleeve",
+              "values": [65, 66, 67, 68, 69]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": [
+            "Chart title is absent in crop; association comes from the source album. Unit is not printed clearly."
+          ],
+          "sourceAlbumId": "209196423",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/9d7845e8/63c1c16b.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-vezere-down-jacket",
+      "sortOrder": 3,
+      "translations": [
+        {
+          "description": "Премиальная пуховая куртка Moncler Vezere, сочетающая тепло, комфорт и современный минималистичный стиль.\n• натуральный гусиный пух — лёгкий и очень тёплый\n• прочный и качественный внешний материал\n• аккуратные фирменные швы\n• удобные карманы и надёжная фурнитура\n• фирменный логотип Moncler на рукаве\nКуртка идеально подходит для повседневного ношения в холодное время года.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Vezere Down Jacket",
+          "shortDescription": "Премиальная пуховая куртка Moncler Vezere, сочетающая тепло, комфорт и современный минималистичный стиль."
+        },
+        {
+          "description": "Premium Moncler Vezere sulejope, mis ühendab soojuse, mugavuse ja kaasaegse minimalistliku stiili.\n• looduslik hanesuled — kerge ja väga soe\n• vastupidav välismaterjal\n• täpsed õmblused\n• praktilised taskud\n• Moncler logo varrukal\nSobib igapäevaseks kandmiseks külmal aastaajal.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Vezere Down Jacket",
+          "shortDescription": "Premium Moncler Vezere sulejope, mis ühendab soojuse, mugavuse ja kaasaegse minimalistliku stiili."
+        },
+        {
+          "description": "Premium Moncler Vezere down jacket combining warmth, comfort and modern minimalist style.\n• natural goose down — light and very warm\n• durable and high-quality outer shell\n• precise branded stitching\n• practical pockets and reliable hardware\n• Moncler logo on sleeve\nIdeal for everyday wear in cold weather.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Vezere Down Jacket",
+          "shortDescription": "Premium Moncler Vezere down jacket combining warmth, comfort and modern minimalist style."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Vests",
+          "ru": "Жилетки",
+          "et": "Vestid"
+        },
+        "slug": "vests"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#F5F5F5"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Bormes Down Vest, view 1",
+            "et": "Moncler Bormes Down Vest, vaade 1",
+            "ru": "Moncler Bormes Down Vest, вид 1"
+          },
+          "height": 1024,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-bormes-1.jpg",
+          "masterSha256": "492b179dda1aaff03605cd754c8f416ab261cab2e9dec814d482d0603b8fc687",
+          "optimizedSha256": "f412ea18d5dce3899891ccf6bf87a0b4a79a0cf9fa8a9e495a5c38bdecb9cf96",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-bormes-1.webp",
+          "width": 1024
+        },
+        {
+          "alt": {
+            "en": "Moncler Bormes Down Vest, view 2",
+            "et": "Moncler Bormes Down Vest, vaade 2",
+            "ru": "Moncler Bormes Down Vest, вид 2"
+          },
+          "height": 769,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-bormes-2.jpg",
+          "masterSha256": "24b6c071c98f8afe9acdb924fc6dae9680b7c23472bf2c6bb16ab58f9cc989ae",
+          "optimizedSha256": "98f74c9ebce86197a56bcb629b7d4c03f0a678f07fc4438e176ca889bfddbc11",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-bormes-2.webp",
+          "width": 768
+        },
+        {
+          "alt": {
+            "en": "Moncler Bormes Down Vest, view 3",
+            "et": "Moncler Bormes Down Vest, vaade 3",
+            "ru": "Moncler Bormes Down Vest, вид 3"
+          },
+          "height": 1600,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-bormes-3.jpg",
+          "masterSha256": "48f0270f3f193cfebaa739412c435138c58ab46fac50692d99b958184decece1",
+          "optimizedSha256": "afcf3dbeefd2ad25839642bcfad4410cb7a269bb4c39d208c973e32512b974a5",
+          "role": "GALLERY",
+          "sortOrder": 2,
+          "url": "/products/legacy/moncler-bormes-3.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-004",
+      "isFeatured": true,
+      "legacyId": 4,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-250472868"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Clothes Length",
+              "values": [64, 66, 68, 70, 72]
+            },
+            {
+              "name": "Back Length",
+              "values": [61, 63, 65, 67, 69]
+            },
+            {
+              "name": "Shoulder",
+              "values": [41.5, 43, 44.5, 46, 47.5]
+            },
+            {
+              "name": "Bust",
+              "values": [54.5, 57, 59.5, 62, 64.5]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "250472868",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "73c704896028019abe452f9af0065d0da8f7bb8a458dde94eb65705aa16a3884",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/3097824bc8/dfbb4ca6.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-bormes-down-vest",
+      "sortOrder": 4,
+      "translations": [
+        {
+          "description": "Стильная пуховая жилетка Moncler для комфорта в прохладную погоду.\n• лёгкий и тёплый пуховый наполнитель\n• фирменный логотип Moncler\n• удобные карманы на молнии\n• современный минималистичный силуэт\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Bormes Down Vest",
+          "shortDescription": "Стильная пуховая жилетка Moncler для комфорта в прохладную погоду."
+        },
+        {
+          "description": "Stiilne Moncler sulevest mugavuseks jahedas ilmas.\n• kerge ja soe suletäidis\n• Moncler logo\n• praktilised tõmblukuga taskud\n• kaasaegne minimalistlik siluett\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Bormes Down Vest",
+          "shortDescription": "Stiilne Moncler sulevest mugavuseks jahedas ilmas."
+        },
+        {
+          "description": "Stylish Moncler down vest for comfort in cool weather.\n• light and warm down fill\n• Moncler signature logo\n• practical zip pockets\n• modern minimalist silhouette\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Bormes Down Vest",
+          "shortDescription": "Stylish Moncler down vest for comfort in cool weather."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Parajumpers",
+      "category": {
+        "names": {
+          "en": "Vests",
+          "ru": "Жилетки",
+          "et": "Vestid"
+        },
+        "slug": "vests"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Parajumpers Jeordie Down Vest, view 1",
+            "et": "Parajumpers Jeordie Down Vest, vaade 1",
+            "ru": "Parajumpers Jeordie Down Vest, вид 1"
+          },
+          "height": 2062,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-jeordie-1.jpg",
+          "masterSha256": "503f6bb93ab086dcf9e4666b23979e40229c949bfd8499b231679523fcf611a4",
+          "optimizedSha256": "3f256fc2e7775d330aca1310b405068cbaa4fbdad6031b99d6de537a3bbb8b20",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/parajumpers-jeordie-1.webp",
+          "width": 1536
+        },
+        {
+          "alt": {
+            "en": "Parajumpers Jeordie Down Vest, view 2",
+            "et": "Parajumpers Jeordie Down Vest, vaade 2",
+            "ru": "Parajumpers Jeordie Down Vest, вид 2"
+          },
+          "height": 2200,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-jeordie-2.jpg",
+          "masterSha256": "3d8451eac09e28e08e29d7035b86652db111edf6dd03bad8723d700eeaddbf33",
+          "optimizedSha256": "8942488ee2f7b2eb00945fe5e5939adc9b27ac26594b97724d635956c1dc0fef",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/parajumpers-jeordie-2.webp",
+          "width": 1457
+        }
+      ],
+      "internalCode": "AL-LEGACY-005",
+      "isFeatured": false,
+      "legacyId": 5,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-CPREPSCN-200087445"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Shoulder",
+              "values": [41, 43, 45, 47, 49]
+            },
+            {
+              "name": "Clothes length",
+              "values": [62, 64, 66, 68, 70]
+            },
+            {
+              "name": "Sleeve",
+              "values": [null, null, null, null, null]
+            },
+            {
+              "name": "Bust",
+              "values": [52, 54, 56, 58, 60]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": [
+            "Sleeve row contains dashes, represented as null. Unit is not printed clearly."
+          ],
+          "sourceAlbumId": "200087445",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/cprepscn/03d9b78f/93ca7f56.png",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "parajumpers-jeordie-down-vest",
+      "sortOrder": 5,
+      "translations": [
+        {
+          "description": "Функциональная пуховая жилетка Parajumpers для комфорта в прохладную погоду.\n• качественный тёплый пуховый наполнитель\n• прочный и лёгкий внешний материал\n• аккуратные фирменные швы\n• удобные карманы на молнии\n• узнаваемый стиль Parajumpers\nОтлично подходит для многослойных образов поверх худи или свитера.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Parajumpers Jeordie Down Vest",
+          "shortDescription": "Функциональная пуховая жилетка Parajumpers для комфорта в прохладную погоду."
+        },
+        {
+          "description": "Funktsionaalne Parajumpers sulevest mugavuseks jahedas ilmas.\n• kvaliteetne soe suletäidis\n• vastupidav ja kerge välismaterjal\n• täpsed õmblused\n• praktilised tõmblukuga taskud\n• Parajumpers stiil\nSobib kihistatud väljanägemisteks peale hoodied või kampsuni.\nUnisex mudel",
+          "locale": "et",
+          "name": "Parajumpers Jeordie Down Vest",
+          "shortDescription": "Funktsionaalne Parajumpers sulevest mugavuseks jahedas ilmas."
+        },
+        {
+          "description": "Functional Parajumpers down vest for comfort in cool weather.\n• high-quality warm down fill\n• durable and lightweight outer shell\n• precise branded stitching\n• practical zip pockets\n• signature Parajumpers style\nGreat for layered looks over a hoodie or sweater.\nUnisex model",
+          "locale": "en",
+          "name": "Parajumpers Jeordie Down Vest",
+          "shortDescription": "Functional Parajumpers down vest for comfort in cool weather."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Vests",
+          "ru": "Жилетки",
+          "et": "Vestid"
+        },
+        "slug": "vests"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "khaki",
+          "names": {
+            "ru": "Хаки",
+            "en": "Khaki",
+            "et": "Khaki"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#5C6B3A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Tibb Logo-Patch Padded Gilet, view 1",
+            "et": "Moncler Tibb Logo-Patch Padded Gilet, vaade 1",
+            "ru": "Moncler Tibb Logo-Patch Padded Gilet, вид 1"
+          },
+          "height": 1443,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-tibb-1.jpg",
+          "masterSha256": "507a32a648aece025fba5cdfca790e5b82c49efa3b0813991cdea216f39bda48",
+          "optimizedSha256": "634756d6764f7e31eea0f549dc6d6fa8f4180394cd56fc3473ac7445495a112b",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-tibb-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Tibb Logo-Patch Padded Gilet, view 2",
+            "et": "Moncler Tibb Logo-Patch Padded Gilet, vaade 2",
+            "ru": "Moncler Tibb Logo-Patch Padded Gilet, вид 2"
+          },
+          "height": 1455,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-tibb-2.jpg",
+          "masterSha256": "6a5f650dc6b4f8c0951d018196c3bbe01d611b29df53c8dcd28166ff2a3d3c5e",
+          "optimizedSha256": "6d7fdf24abff2055e1dede8efbde2583c0c318490f7b11ae625cce1f494f0484",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-tibb-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-006",
+      "isFeatured": false,
+      "legacyId": 6,
+      "phase5Mapping": null,
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": null,
+      "slug": "moncler-tibb-logo-patch-padded-gilet",
+      "sortOrder": 6,
+      "translations": [
+        {
+          "description": "Классическая пуховая жилетка Moncler — лёгкость, тепло и современный городской стиль.\n• качественный тёплый пуховый наполнитель\n• лёгкий и прочный внешний материал\n• аккуратные фирменные швы\n• удобные карманы на молнии\n• культовый логотип Moncler\nОтлично подходит для многослойных образов — поверх худи или свитера.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Tibb Logo-Patch Padded Gilet",
+          "shortDescription": "Классическая пуховая жилетка Moncler — лёгкость, тепло и современный городской стиль."
+        },
+        {
+          "description": "Klassikaline Moncler sulevest — kergus, soojus ja kaasaegne linnastiil.\n• kvaliteetne soe suletäidis\n• kerge ja vastupidav välismaterjal\n• täpsed õmblused\n• praktilised tõmblukuga taskud\n• ikooniline Moncler logo\nSobib kihistatud väljanägemisteks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Tibb Logo-Patch Padded Gilet",
+          "shortDescription": "Klassikaline Moncler sulevest — kergus, soojus ja kaasaegne linnastiil."
+        },
+        {
+          "description": "Classic Moncler down vest — lightness, warmth and modern urban style.\n• high-quality warm down fill\n• light and durable outer shell\n• precise branded stitching\n• practical zip pockets\n• iconic Moncler logo\nPerfect for layered looks over a hoodie or sweater.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Tibb Logo-Patch Padded Gilet",
+          "shortDescription": "Classic Moncler down vest — lightness, warmth and modern urban style."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "grey",
+          "names": {
+            "ru": "Серый",
+            "en": "Grey",
+            "et": "Hall"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#9A9A9A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Galion Hooded Jacket, view 1",
+            "et": "Moncler Galion Hooded Jacket, vaade 1",
+            "ru": "Moncler Galion Hooded Jacket, вид 1"
+          },
+          "height": 1455,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-galion-1.jpg",
+          "masterSha256": "b8d884afe80ac77d33163b1f750f463f3d2ccfeaa9713f402e9d42ea3368962a",
+          "optimizedSha256": "04d61d05ab3f94a0c693e8ca8eb4b21e9e714e7058ff5bdc58ef580676680cad",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-galion-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Galion Hooded Jacket, view 2",
+            "et": "Moncler Galion Hooded Jacket, vaade 2",
+            "ru": "Moncler Galion Hooded Jacket, вид 2"
+          },
+          "height": 1365,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-galion-2.jpg",
+          "masterSha256": "18dd94b1c1c706aa84d312774d160b70b611cfcaad709aecf9487151adb92ed1",
+          "optimizedSha256": "d37b5095512698c8a220ee0943b10aa6a168740c8fed674d0d1a678cb325b466",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-galion-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-007",
+      "isFeatured": false,
+      "legacyId": 7,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196317"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Bust",
+              "values": [55, 57.5, 60, 62.5, 65]
+            },
+            {
+              "name": "Clothes length",
+              "values": [65, 67, 69, 71, 73]
+            },
+            {
+              "name": "Sleeve",
+              "values": [66, 67, 68, 69, 70]
+            },
+            {
+              "name": "Shoulder",
+              "values": [41, 43, 45, 47, 49]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196317",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/ed0bc4e7/765fa5c5.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-galion-hooded-jacket",
+      "sortOrder": 7,
+      "translations": [
+        {
+          "description": "Лёгкая пуховая куртка Moncler с капюшоном — для повседневного городского стиля и прохладной погоды.\n• лёгкий и качественный пуховый наполнитель\n• прочный и лёгкий внешний материал\n• аккуратные фирменные швы\n• удобные карманы на молнии\n• культовый логотип Moncler\nОтлично сочетается с худи, свитерами и повседневными образами.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Galion Hooded Jacket",
+          "shortDescription": "Лёгкая пуховая куртка Moncler с капюшоном — для повседневного городского стиля и прохладной погоды."
+        },
+        {
+          "description": "Kerge Moncler kapuutsiga jope igapäevaseks linnastiiliks ja jahedaks ilmaks.\n• kerge ja kvaliteetne suletäidis\n• vastupidav välismaterjal\n• täpsed õmblused\n• praktilised tõmblukuga taskud\n• ikooniline Moncler logo\nSobib hoodiedega, kampsunitega ja igapäevaste riietega.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Galion Hooded Jacket",
+          "shortDescription": "Kerge Moncler kapuutsiga jope igapäevaseks linnastiiliks ja jahedaks ilmaks."
+        },
+        {
+          "description": "Lightweight Moncler hooded jacket for everyday urban style and cool weather.\n• light and high-quality down fill\n• durable and lightweight outer shell\n• precise branded stitching\n• practical zip pockets\n• iconic Moncler logo\nPairs perfectly with hoodies, sweaters and everyday outfits.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Galion Hooded Jacket",
+          "shortDescription": "Lightweight Moncler hooded jacket for everyday urban style and cool weather."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Etiache Rain Jacket, view 1",
+            "et": "Moncler Etiache Rain Jacket, vaade 1",
+            "ru": "Moncler Etiache Rain Jacket, вид 1"
+          },
+          "height": 1450,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-etiache-1.jpg",
+          "masterSha256": "b810ead44d81d2a10fe700cfc73030b35df1012c51f1b781b332f35080c918cc",
+          "optimizedSha256": "1ad09787389e76c995a1a8b094704d952ce49547a4e746465b01ee761a94970e",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-etiache-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Etiache Rain Jacket, view 2",
+            "et": "Moncler Etiache Rain Jacket, vaade 2",
+            "ru": "Moncler Etiache Rain Jacket, вид 2"
+          },
+          "height": 1416,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-etiache-2.jpg",
+          "masterSha256": "2029756c34c9ce723f0791e542a13136b4e28df2c695fd58a8b1f04b3597ac82",
+          "optimizedSha256": "db656386d9ca711c3e6fd5d313b66a81b1c7ebd8191d5e4229c941f2fc457efe",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-etiache-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-008",
+      "isFeatured": false,
+      "legacyId": 8,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196488"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Clothes Length",
+              "values": [68, 70, 72, 74, 76]
+            },
+            {
+              "name": "Shoulder",
+              "values": [46, 47.5, 49, 50.5, 52]
+            },
+            {
+              "name": "Bust",
+              "values": [53, 55, 57, 59, 61]
+            },
+            {
+              "name": "Sleeve",
+              "values": [65, 66, 67, 68, 69]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196488",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "7be0284434708930b7c5b359213aefe3abbd76cb818a248be17e35ab9789448c",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/28c8b3da/cab7d337.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-etiache-rain-jacket",
+      "sortOrder": 8,
+      "translations": [
+        {
+          "description": "Лёгкая ветровка Moncler, созданная для комфорта в тёплую и ветреную погоду. Практичная модель, сочетающая минималистичный дизайн и функциональность для повседневного городского стиля.\n• лёгкий и прочный материал\n• защита от ветра и лёгкой влаги\n• удобный капюшон с регулировкой\n• практичные карманы\n• фирменный логотип Moncler\nИдеально подходит для весенней и летней погоды.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Etiache Rain Jacket",
+          "shortDescription": "Лёгкая ветровка Moncler, созданная для комфорта в тёплую и ветреную погоду. Практичная модель, сочетающая минималистичный дизайн и функциональность для повседневного городского стиля."
+        },
+        {
+          "description": "Kerge Moncler tuulejope, loodud mugavuseks soojal ja tuulisel ilmal. Praktiline mudel, mis ühendab minimalistliku disaini ja funktsionaalsuse igapäevaseks linnastiiliks.\n• kerge ja vastupidav materjal\n• tuule- ja kerge niiskuskaitse\n• reguleeritav kapuuts\n• praktilised taskud\n• Moncler logo\nSobib ideaalselt kevadiseks ja suvisteks ilmadeks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Etiache Rain Jacket",
+          "shortDescription": "Kerge Moncler tuulejope, loodud mugavuseks soojal ja tuulisel ilmal. Praktiline mudel, mis ühendab minimalistliku disaini ja funktsionaalsuse igapäevaseks linnastiiliks."
+        },
+        {
+          "description": "Lightweight Moncler windbreaker designed for comfort in warm and windy weather. A practical model combining minimalist design and functionality for everyday urban style.\n• lightweight and durable material\n• wind and light moisture protection\n• adjustable hood\n• practical pockets\n• Moncler logo\nPerfect for spring and summer weather.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Etiache Rain Jacket",
+          "shortDescription": "Lightweight Moncler windbreaker designed for comfort in warm and windy weather. A practical model combining minimalist design and functionality for everyday urban style."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Cardigan Wool, view 1",
+            "et": "Moncler Cardigan Wool, vaade 1",
+            "ru": "Moncler Cardigan Wool, вид 1"
+          },
+          "height": 1405,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-cardigan-1.jpg",
+          "masterSha256": "6129c8feeb84cdff795103caac9a7ee9426cd4be8b4c793449e49d4225c7bfe5",
+          "optimizedSha256": "6c2f4bd5308d87070c9d1525af1dc326093ef518fd155d6d7d444f8c00cd9b4a",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-cardigan-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Cardigan Wool, view 2",
+            "et": "Moncler Cardigan Wool, vaade 2",
+            "ru": "Moncler Cardigan Wool, вид 2"
+          },
+          "height": 1451,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-cardigan-2.jpg",
+          "masterSha256": "cd504ecfa477a16164ac6d5d974ff66bd2f8699a2e5db8271452c396a131734d",
+          "optimizedSha256": "494155afe17d0e46375c73b8f7da773a805420841add852c3d0bf28cf8ad4a61",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-cardigan-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-009",
+      "isFeatured": false,
+      "legacyId": 9,
+      "phase5Mapping": null,
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": null,
+      "slug": "moncler-cardigan-wool",
+      "sortOrder": 9,
+      "translations": [
+        {
+          "description": "Стильный Moncler кардиган-куртка, сочетающий комфорт вязаного трикотажа и тепло лёгкого утеплённого переда. Идеальный вариант для межсезонья и повседневного городского образа.\n• комбинированный дизайн: трикотаж + лёгкий утеплённый перед\n• мягкий и комфортный материал\n• удобные карманы на молнии\n• фирменный логотип Moncler\n• стильный и универсальный силуэт\nОтлично подходит для весны, осени и прохладных вечеров.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Cardigan Wool",
+          "shortDescription": "Стильный Moncler кардиган-куртка, сочетающий комфорт вязаного трикотажа и тепло лёгкого утеплённого переда. Идеальный вариант для межсезонья и повседневного городского образа."
+        },
+        {
+          "description": "Stiilne Moncler kardigan-jope, mis ühendab kootud kanga mugavuse ja kerge soojustatud esiosa soojuse. Ideaalne valik hooaegade vahetuseks ja igapäevaseks linnastiiliks.\n• kombineeritud disain: kudumine + kerge soojustatud esiosa\n• pehme ja mugav materjal\n• praktilised tõmblukuga taskud\n• Moncler logo\n• stiilne ja mitmekülgne siluett\nSobib suurepäraselt kevadeks, sügiseks ja jahedateks õhtuteks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Cardigan Wool",
+          "shortDescription": "Stiilne Moncler kardigan-jope, mis ühendab kootud kanga mugavuse ja kerge soojustatud esiosa soojuse. Ideaalne valik hooaegade vahetuseks ja igapäevaseks linnastiiliks."
+        },
+        {
+          "description": "Stylish Moncler cardigan-jacket combining the comfort of knit fabric and the warmth of a lightly padded front. The perfect option for between seasons and everyday urban style.\n• combined design: knit + lightly padded front\n• soft and comfortable material\n• practical zip pockets\n• Moncler logo\n• stylish and versatile silhouette\nPerfect for spring, autumn and cool evenings.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Cardigan Wool",
+          "shortDescription": "Stylish Moncler cardigan-jacket combining the comfort of knit fabric and the warmth of a lightly padded front. The perfect option for between seasons and everyday urban style."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Vests",
+          "ru": "Жилетки",
+          "et": "Vestid"
+        },
+        "slug": "vests"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#F5F5F5"
+        },
+        {
+          "code": "sky-blue",
+          "names": {
+            "ru": "Голубой",
+            "en": "Sky Blue",
+            "et": "Taevassinine"
+          },
+          "sortOrder": 3,
+          "swatchHex": "#7ABFDB"
+        },
+        {
+          "code": "khaki",
+          "names": {
+            "ru": "Хаки",
+            "en": "Khaki",
+            "et": "Khaki"
+          },
+          "sortOrder": 4,
+          "swatchHex": "#5C6B3A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Gui Gilet, view 1",
+            "et": "Moncler Gui Gilet, vaade 1",
+            "ru": "Moncler Gui Gilet, вид 1"
+          },
+          "height": 1362,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-gui-1.jpg",
+          "masterSha256": "8d08af47366506011c96f40912a6d9bc27676255279fc0bbc1a67b424082f39e",
+          "optimizedSha256": "f94d2e2d26d62d0afbb0d5af2eaf7625543e7084bd1a5ff9da22724f9e6a3987",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-gui-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Gui Gilet, view 2",
+            "et": "Moncler Gui Gilet, vaade 2",
+            "ru": "Moncler Gui Gilet, вид 2"
+          },
+          "height": 1533,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-gui-2.jpg",
+          "masterSha256": "9e87ecdf1b1e3b1f5356636b25bc879538293f78cb1c16f756af1f785d054370",
+          "optimizedSha256": "0a64a2f4d4528042b0284817cdfe1be77411c09c6ad68fd0af26285c73de7a9e",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-gui-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-010",
+      "isFeatured": false,
+      "legacyId": 10,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196467"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [63, 65, 67, 69, 71]
+            },
+            {
+              "name": "Shoulder",
+              "values": [42, 44, 46, 48, 50]
+            },
+            {
+              "name": "Bust",
+              "values": [52, 54.5, 57, 59.5, 62]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196467",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "682788ff47338996a38db9485bc7b008e2eb09a046634dcd35a9b1a0634ff5fb",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/56b2305d/ee574403.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-gui-gilet",
+      "sortOrder": 10,
+      "translations": [
+        {
+          "description": "Лёгкая пуховая жилетка Moncler, идеально подходящая для повседневного городского стиля и прохладной погоды. Тонкая, комфортная и практичная модель, которая отлично подходит для многослойных образов.\n• лёгкий и качественный пуховый наполнитель\n• прочный и лёгкий внешний материал\n• аккуратные фирменные швы\n• удобные карманы на молнии\n• культовый логотип Moncler\nЖилетка отлично сочетается с худи, свитерами и лёгкими куртками.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Gui Gilet",
+          "shortDescription": "Лёгкая пуховая жилетка Moncler, идеально подходящая для повседневного городского стиля и прохладной погоды. Тонкая, комфортная и практичная модель, которая отлично подходит для многослойных образов."
+        },
+        {
+          "description": "Kerge Moncler sulevest, mis sobib ideaalselt igapäevaseks linnastiiliks ja jahedaks ilmaks. Õhuke, mugav ja praktiline mudel kihistatud väljanägemisteks.\n• kerge ja kvaliteetne suletäidis\n• vastupidav ja kerge välismaterjal\n• täpsed firmamärgised õmblused\n• praktilised tõmblukuga taskud\n• ikooniline Moncler logo\nSobib suurepäraselt hoodiedega, kampsunitega ja kergete jopedega.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Gui Gilet",
+          "shortDescription": "Kerge Moncler sulevest, mis sobib ideaalselt igapäevaseks linnastiiliks ja jahedaks ilmaks. Õhuke, mugav ja praktiline mudel kihistatud väljanägemisteks."
+        },
+        {
+          "description": "Lightweight Moncler down vest, perfect for everyday urban style and cool weather. A slim, comfortable and practical model ideal for layered looks.\n• light and high-quality down fill\n• durable and lightweight outer shell\n• precise branded stitching\n• practical zip pockets\n• iconic Moncler logo\nPairs perfectly with hoodies, sweaters and light jackets.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Gui Gilet",
+          "shortDescription": "Lightweight Moncler down vest, perfect for everyday urban style and cool weather. A slim, comfortable and practical model ideal for layered looks."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Detachable Hood Cardigan, view 1",
+            "et": "Moncler Detachable Hood Cardigan, vaade 1",
+            "ru": "Moncler Detachable Hood Cardigan, вид 1"
+          },
+          "height": 1873,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-hood-cardigan-1.jpg",
+          "masterSha256": "f69aa5e2f44cd1ab54b7086beacf0eee6e7817ae6dd5a0ebc7b604a01f0ea491",
+          "optimizedSha256": "fe21121b1089c9a75e34136e0fb5c120944151d5dfa0296035f54c7083574375",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-hood-cardigan-1.webp",
+          "width": 1346
+        },
+        {
+          "alt": {
+            "en": "Moncler Detachable Hood Cardigan, view 2",
+            "et": "Moncler Detachable Hood Cardigan, vaade 2",
+            "ru": "Moncler Detachable Hood Cardigan, вид 2"
+          },
+          "height": 2200,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-hood-cardigan-2.jpg",
+          "masterSha256": "e69ffe5413390090d795d71b6c3c41d1dd4e83f5b9bbeb1abdf9a40a33727bfc",
+          "optimizedSha256": "0c248ae843c907e986c19570e04d6f977150965b2bf61207307247a3813a39a2",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-hood-cardigan-2.webp",
+          "width": 1489
+        }
+      ],
+      "internalCode": "AL-LEGACY-011",
+      "isFeatured": false,
+      "legacyId": 11,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209208469"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Clothes Length",
+              "values": [59, 61, 63, 65, 67]
+            },
+            {
+              "name": "Shoulder",
+              "values": [39, 41, 43, 45, 47]
+            },
+            {
+              "name": "Bust",
+              "values": [45, 47.5, 50, 52.5, 55]
+            },
+            {
+              "name": "Sleeve",
+              "values": [63, 64, 65, 66, 67]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209208469",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/ff2ce08f/0822954a.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-detachable-hood-cardigan",
+      "sortOrder": 11,
+      "translations": [
+        {
+          "description": "Стильная кофта-куртка Moncler с капюшоном — комфорт трикотажа и тепло лёгкого утеплённого жилета.\n• комбинированный дизайн: трикотаж + утеплённая передняя часть\n• мягкий и комфортный материал\n• удобный капюшон\n• карманы на молнии\n• фирменный логотип Moncler\nОтличный вариант для весны, осени и прохладных дней.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Detachable Hood Cardigan",
+          "shortDescription": "Стильная кофта-куртка Moncler с капюшоном — комфорт трикотажа и тепло лёгкого утеплённого жилета."
+        },
+        {
+          "description": "Stiilne Moncler kapuutsiga kardigan, mis ühendab kudumise mugavuse ja kerge soojustatud vesti soojuse.\n• kombineeritud disain: kudumine + soojustatud esiosa\n• pehme materjal\n• eemaldatav kapuuts\n• tõmblukuga taskud\n• Moncler logo\nSobib kevadeks, sügiseks ja jahedateks päevadeks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Detachable Hood Cardigan",
+          "shortDescription": "Stiilne Moncler kapuutsiga kardigan, mis ühendab kudumise mugavuse ja kerge soojustatud vesti soojuse."
+        },
+        {
+          "description": "Stylish Moncler hooded cardigan combining knit comfort and warmth of a lightly padded vest.\n• combined design: knit + padded front\n• soft and comfortable material\n• detachable hood\n• zip pockets\n• Moncler logo\nGreat for spring, autumn and cool days.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Detachable Hood Cardigan",
+          "shortDescription": "Stylish Moncler hooded cardigan combining knit comfort and warmth of a lightly padded vest."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Parajumpers",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Parajumpers Pharrell Hooded Bomber, view 1",
+            "et": "Parajumpers Pharrell Hooded Bomber, vaade 1",
+            "ru": "Parajumpers Pharrell Hooded Bomber, вид 1"
+          },
+          "height": 1444,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-pharrell-1.jpg",
+          "masterSha256": "66da62fe6e99f4aa32359f841163989908e9f686cee186c0705902af4f7fc705",
+          "optimizedSha256": "9f3758209157085c4d01eb10ce40fbfdefbad183f27ab8fe3ad0c9ebc9e43dab",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/parajumpers-pharrell-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Parajumpers Pharrell Hooded Bomber, view 2",
+            "et": "Parajumpers Pharrell Hooded Bomber, vaade 2",
+            "ru": "Parajumpers Pharrell Hooded Bomber, вид 2"
+          },
+          "height": 1486,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-pharrell-2.jpg",
+          "masterSha256": "40f0aa1c36f831084a7791bd1824c5bdd1c975ec5f6164e33272d428702193b6",
+          "optimizedSha256": "73805072c4573806ba681a77842fc3af4a5413c42097be6e66fe7b25b94e1389",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/parajumpers-pharrell-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-012",
+      "isFeatured": false,
+      "legacyId": 12,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-CPREPSCN-179204523"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Bust",
+              "values": [58, 60, 62, 64, 66]
+            },
+            {
+              "name": "Clothes length",
+              "values": [67, 69, 71, 73, 75]
+            },
+            {
+              "name": "Sleeve",
+              "values": [69.5, 71, 72.5, 74, 75.5]
+            },
+            {
+              "name": "Shoulder",
+              "values": [44.5, 46, 47.5, 49, 50.5]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "179204523",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "5ea37fe142fcfba16eb8b14cf0a3ccdd5cb0d9f7db751e61bc1d3e17d99c94f7",
+          "sourceImageUrl": "https://photo.yupoo.com/cprepscn/8a5d6386/084cc170.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "parajumpers-pharrell-hooded-bomber",
+      "sortOrder": 12,
+      "translations": [
+        {
+          "description": "Лёгкая пуховая куртка Parajumpers с капюшоном для комфорта в прохладную и межсезонную погоду.\n• качественное тёплое пуховое наполнение\n• лёгкий и прочный внешний материал\n• удобный капюшон для защиты от ветра\n• практичные карманы на молнии\n• фирменные элементы Parajumpers\nОтлично подходит для повседневных образов весной и осенью.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Parajumpers Pharrell Hooded Bomber",
+          "shortDescription": "Лёгкая пуховая куртка Parajumpers с капюшоном для комфорта в прохладную и межсезонную погоду."
+        },
+        {
+          "description": "Kerge Parajumpers kapuutsiga sulejope mugavuseks jahedal ja hooaegade vahetusel.\n• kvaliteetne soe suletäidis\n• kerge ja vastupidav välismaterjal\n• mugav kapuuts tuulekaitseks\n• praktilised tõmblukuga taskud\n• Parajumpers detailid\nSobib igapäevaseks kandmiseks kevadel ja sügisel.\nUnisex mudel",
+          "locale": "et",
+          "name": "Parajumpers Pharrell Hooded Bomber",
+          "shortDescription": "Kerge Parajumpers kapuutsiga sulejope mugavuseks jahedal ja hooaegade vahetusel."
+        },
+        {
+          "description": "Lightweight Parajumpers hooded down jacket for comfort in cool and between-season weather.\n• high-quality warm down fill\n• light and durable outer shell\n• comfortable hood for wind protection\n• practical zip pockets\n• Parajumpers signature details\nPerfect for everyday looks in spring and autumn.\nUnisex model",
+          "locale": "en",
+          "name": "Parajumpers Pharrell Hooded Bomber",
+          "shortDescription": "Lightweight Parajumpers hooded down jacket for comfort in cool and between-season weather."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Après Ski Knit Sleeves Puffer Jacket, view 1",
+            "et": "Moncler Après Ski Knit Sleeves Puffer Jacket, vaade 1",
+            "ru": "Moncler Après Ski Knit Sleeves Puffer Jacket, вид 1"
+          },
+          "height": 2200,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-apres-ski-1.jpg",
+          "masterSha256": "01a302cc73956d0813ac93e09af8e1b853321d78c33645c885096442c98b71d4",
+          "optimizedSha256": "1c735048951aa50b82355b931db18cffdcd596c937ca58d2147754ba239bd0a7",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-apres-ski-1.webp",
+          "width": 1516
+        },
+        {
+          "alt": {
+            "en": "Moncler Après Ski Knit Sleeves Puffer Jacket, view 2",
+            "et": "Moncler Après Ski Knit Sleeves Puffer Jacket, vaade 2",
+            "ru": "Moncler Après Ski Knit Sleeves Puffer Jacket, вид 2"
+          },
+          "height": 2099,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-apres-ski-2.jpg",
+          "masterSha256": "772a0a045735873fe463be35cc39ea14f8ac7b5e3450d6fbe611909729c22d29",
+          "optimizedSha256": "459437fbbcb89e512c7ebe32a7a18dd1cf1476664dbb22233cff54c1a60a9533",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-apres-ski-2.webp",
+          "width": 1536
+        }
+      ],
+      "internalCode": "AL-LEGACY-013",
+      "isFeatured": false,
+      "legacyId": 13,
+      "phase5Mapping": null,
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": null,
+      "slug": "moncler-apres-ski-knit-sleeves-puffer-jacket",
+      "sortOrder": 13,
+      "translations": [
+        {
+          "description": "Лёгкая Moncler куртка в спортивном alpine-стиле с вязаными рукавами.\n• лёгкий утеплённый корпус\n• вязаные рукава из мягкого трикотажа\n• спортивный горнолыжный дизайн\n• функциональные карманы на молнии\n• фирменный логотип Moncler\nПодходит как для активного отдыха, так и для стильного городского образа.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Après Ski Knit Sleeves Puffer Jacket",
+          "shortDescription": "Лёгкая Moncler куртка в спортивном alpine-стиле с вязаными рукавами."
+        },
+        {
+          "description": "Kerge Moncler jope sportlikus alpine stiilis kootud varrukatega.\n• kerge soojustatud korpus\n• pehmed kootud varrukad\n• sportilik suusadisain\n• funktsionaalsed tõmblukuga taskud\n• Moncler logo\nSobib nii aktiivseks tegevuseks kui linnastiiliks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Après Ski Knit Sleeves Puffer Jacket",
+          "shortDescription": "Kerge Moncler jope sportlikus alpine stiilis kootud varrukatega."
+        },
+        {
+          "description": "Lightweight Moncler jacket in sporty alpine style with knit sleeves.\n• lightweight padded body\n• soft knit sleeves\n• sporty ski design\n• functional zip pockets\n• Moncler logo\nSuitable for active outdoor activities and stylish city looks.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Après Ski Knit Sleeves Puffer Jacket",
+          "shortDescription": "Lightweight Moncler jacket in sporty alpine style with knit sleeves."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Retro Knit Wool Cardigan, view 1",
+            "et": "Moncler Retro Knit Wool Cardigan, vaade 1",
+            "ru": "Moncler Retro Knit Wool Cardigan, вид 1"
+          },
+          "height": 2122,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-retro-knit-1.jpg",
+          "masterSha256": "0809fa390bc68daa6b06e9a156c5923cbffaaff388ea1f9fcd91edc018176cb9",
+          "optimizedSha256": "6ef5d18b7adc713d2f4554ee1f723eb3938ac2c37fa2ef526c905b62e72ce2e9",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-retro-knit-1.webp",
+          "width": 1536
+        },
+        {
+          "alt": {
+            "en": "Moncler Retro Knit Wool Cardigan, view 2",
+            "et": "Moncler Retro Knit Wool Cardigan, vaade 2",
+            "ru": "Moncler Retro Knit Wool Cardigan, вид 2"
+          },
+          "height": 2100,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-retro-knit-2.jpg",
+          "masterSha256": "98cda038daa1659baf270c854b5d22474c3cec066b1d23739d62e47487eccf8d",
+          "optimizedSha256": "98d7957d5fd624106bb0f2bf1d7d5089da403df1ba20e82b911d86d6af6e475a",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-retro-knit-2.webp",
+          "width": 1536
+        },
+        {
+          "alt": {
+            "en": "Moncler Retro Knit Wool Cardigan, view 3",
+            "et": "Moncler Retro Knit Wool Cardigan, vaade 3",
+            "ru": "Moncler Retro Knit Wool Cardigan, вид 3"
+          },
+          "height": 1569,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-retro-knit-3.jpg",
+          "masterSha256": "a8b76376827cfdd8af083d913d615829f41eb93ab0980d638079d1cc8096e28d",
+          "optimizedSha256": "a69259c018925223415e789ce1aaf68d3546913267fe5221a27d3d3905eda4be",
+          "role": "GALLERY",
+          "sortOrder": 2,
+          "url": "/products/legacy/moncler-retro-knit-3.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Retro Knit Wool Cardigan, view 4",
+            "et": "Moncler Retro Knit Wool Cardigan, vaade 4",
+            "ru": "Moncler Retro Knit Wool Cardigan, вид 4"
+          },
+          "height": 1553,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-retro-knit-4.jpg",
+          "masterSha256": "05c0027ff55b408fc260bab8552ff81543e8cde9cf0e661ec96796887ba37fef",
+          "optimizedSha256": "ca8dc94ab27b9f892c184db62050d9981ed067c0b178cb5e257a771d34bc6d78",
+          "role": "GALLERY",
+          "sortOrder": 3,
+          "url": "/products/legacy/moncler-retro-knit-4.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-014",
+      "isFeatured": true,
+      "legacyId": 14,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209195406"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Bust",
+              "values": [51, 53.5, 56, 58.5, 61]
+            },
+            {
+              "name": "Clothes length",
+              "values": [61.5, 63.5, 65.5, 66.5, 68.5]
+            },
+            {
+              "name": "Sleeve",
+              "values": [63, 64, 65, 66, 67]
+            },
+            {
+              "name": "Shoulder",
+              "values": [40, 42, 44, 46, 48]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209195406",
+          "sourceImagePosition": 2,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/9d3cb150/f7bf069e.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-retro-knit-wool-cardigan",
+      "sortOrder": 14,
+      "translations": [
+        {
+          "description": "Куртка-кардиган Moncler — вязаный премиальный трикотаж и лёгкая пуховая конструкция с капюшоном.\n• комбинированная конструкция: вязаный трикотаж + пуховая верхняя часть\n• качественное тёплое наполнение\n• прочный и комфортный материал\n• удобные карманы на молнии\n• фирменный логотип Moncler на рукаве\nИдеальный вариант для повседневных образов в прохладную погоду.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Retro Knit Wool Cardigan",
+          "shortDescription": "Куртка-кардиган Moncler — вязаный премиальный трикотаж и лёгкая пуховая конструкция с капюшоном."
+        },
+        {
+          "description": "Moncler kardigan-jope, mis ühendab premium kootud villa ja kerge sulejope konstruktsiooni kapuutsiga.\n• kombineeritud konstruktsioon: kudumine + suled\n• kvaliteetne soe täidis\n• vastupidav materjal\n• praktilised tõmblukuga taskud\n• Moncler logo varrukal\nIdeaalne igapäevaseks kandmiseks jahedas ilmas.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Retro Knit Wool Cardigan",
+          "shortDescription": "Moncler kardigan-jope, mis ühendab premium kootud villa ja kerge sulejope konstruktsiooni kapuutsiga."
+        },
+        {
+          "description": "Moncler cardigan-jacket combining premium knit wool and a lightweight down construction with hood.\n• combined construction: knit + down upper section\n• high-quality warm fill\n• durable and comfortable material\n• practical zip pockets\n• Moncler logo on sleeve\nIdeal for everyday looks in cool weather.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Retro Knit Wool Cardigan",
+          "shortDescription": "Moncler cardigan-jacket combining premium knit wool and a lightweight down construction with hood."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Parajumpers",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "ghiaccio",
+          "names": {
+            "ru": "Льдистый",
+            "en": "Ghiaccio",
+            "et": "Jääsinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#C8D8E4"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Parajumpers Jayden Hybrid Cardigan, view 1",
+            "et": "Parajumpers Jayden Hybrid Cardigan, vaade 1",
+            "ru": "Parajumpers Jayden Hybrid Cardigan, вид 1"
+          },
+          "height": 1409,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-jayden-1.jpg",
+          "masterSha256": "8b0d7ca521463c4408670b586ad0ca090cadfc961fbfdd659dc3955b6c8317d1",
+          "optimizedSha256": "933d9245c5e068b882f4906ae72817f5dc4d5cbb053e0a8cae3adf8a6e062bec",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/parajumpers-jayden-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Parajumpers Jayden Hybrid Cardigan, view 2",
+            "et": "Parajumpers Jayden Hybrid Cardigan, vaade 2",
+            "ru": "Parajumpers Jayden Hybrid Cardigan, вид 2"
+          },
+          "height": 1473,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/parajumpers-jayden-2.jpg",
+          "masterSha256": "070d310a3847bdde8935e8a413e4275a92dd4ac3d5d222936ec745eed8f3cba4",
+          "optimizedSha256": "0ab80bd88ee44a4c0ea8d6172e03fb33c32896cdd4a517b8fcb685b77cbfa6f5",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/parajumpers-jayden-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-015",
+      "isFeatured": false,
+      "legacyId": 15,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-CPREPSCN-190253977"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Bust",
+              "values": [52.5, 55, 57.5, 60, 62.5]
+            },
+            {
+              "name": "Clothes length",
+              "values": [65, 67, 79, 71, 73]
+            },
+            {
+              "name": "Sleeve",
+              "values": [65.5, 67, 68.5, 70, 71.5]
+            },
+            {
+              "name": "Shoulder",
+              "values": [43.5, 45, 46.5, 48, 49.5]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": [
+            "L Clothes length is visibly printed as 79 between M=67 and XL=71; preserved exactly and flagged SOURCE INCONSISTENCY.",
+            "Unit is not printed clearly; no unit inferred."
+          ],
+          "sourceAlbumId": "190253977",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "eabc074b3ce47ef639ed11ded7b9057701d4f4dec54e94dba48d9a2a7d53dc38",
+          "sourceImageUrl": "https://photo.yupoo.com/cprepscn/582d7999/ae6cd9bd.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "parajumpers-jayden-hybrid-cardigan",
+      "sortOrder": 15,
+      "translations": [
+        {
+          "description": "Лёгкая гибридная куртка Parajumpers — пуховая передняя часть и эластичные трикотажные рукава.\n• комбинированная конструкция: пуховая передняя часть + эластичные рукава\n• лёгкое и тёплое наполнение\n• прочный и комфортный материал\n• удобные карманы на молнии\n• фирменные элементы Parajumpers\nОтлично подходит для прохладной погоды и многослойных образов.\nМужская модель",
+          "locale": "ru",
+          "name": "Parajumpers Jayden Hybrid Cardigan",
+          "shortDescription": "Лёгкая гибридная куртка Parajumpers — пуховая передняя часть и эластичные трикотажные рукава."
+        },
+        {
+          "description": "Kerge hübriid Parajumpers jope, mis ühendab sulejope esiosa ja elastsed kootud varrukad.\n• kombineeritud konstruktsioon: suled esiosas + elastsed varrukad\n• kerge ja soe täidis\n• vastupidav materjal\n• praktilised tõmblukuga taskud\n• Parajumpers detailid\nSobib jahedaks ilmaks ja kihistatud väljanägemisteks.\nMeeste mudel",
+          "locale": "et",
+          "name": "Parajumpers Jayden Hybrid Cardigan",
+          "shortDescription": "Kerge hübriid Parajumpers jope, mis ühendab sulejope esiosa ja elastsed kootud varrukad."
+        },
+        {
+          "description": "Lightweight hybrid Parajumpers jacket combining a down front and elastic knit sleeves.\n• combined construction: down front + elastic sleeves\n• light and warm fill\n• durable and comfortable material\n• practical zip pockets\n• Parajumpers signature details\nGreat for cool weather and layered looks.\nMen's model",
+          "locale": "en",
+          "name": "Parajumpers Jayden Hybrid Cardigan",
+          "shortDescription": "Lightweight hybrid Parajumpers jacket combining a down front and elastic knit sleeves."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Light Jackets",
+          "ru": "Лёгкие куртки",
+          "et": "Kerged jakid"
+        },
+        "slug": "light-jackets"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "khaki",
+          "names": {
+            "ru": "Хаки",
+            "en": "Khaki",
+            "et": "Khaki"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#5C6B3A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Hooded Wool Cardigan, view 1",
+            "et": "Moncler Hooded Wool Cardigan, vaade 1",
+            "ru": "Moncler Hooded Wool Cardigan, вид 1"
+          },
+          "height": 1480,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-hooded-wool-1.jpg",
+          "masterSha256": "6bbdb78dec4002f65d4734d773902df69c90bfe437f2f85f92c47b3cc3189776",
+          "optimizedSha256": "e8f1d610b53aa27b3a15248670c8e872e6c6326f224209746e55d49b28039a52",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-hooded-wool-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Hooded Wool Cardigan, view 2",
+            "et": "Moncler Hooded Wool Cardigan, vaade 2",
+            "ru": "Moncler Hooded Wool Cardigan, вид 2"
+          },
+          "height": 1471,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-hooded-wool-2.jpg",
+          "masterSha256": "a09e685d611b3c30a7b9e79a0a3863373a9da2fe6770f293db80fe7edb961bd3",
+          "optimizedSha256": "54af22936a1d49da1f7fcb7a73eb93fcd5a7d8f8374b8baff38baffd222edd87",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-hooded-wool-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-016",
+      "isFeatured": false,
+      "legacyId": 16,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196612"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [59, 61, 63, 65, 67]
+            },
+            {
+              "name": "Clothes Length",
+              "values": [62, 64, 66, 68, 70]
+            },
+            {
+              "name": "Shoulder",
+              "values": [42, 44, 46, 48, 50]
+            },
+            {
+              "name": "Bust",
+              "values": [52, 54.5, 57, 59.5, 62]
+            },
+            {
+              "name": "Sleeve",
+              "values": [62, 63, 64, 65, 66]
+            }
+          ],
+          "sizes": ["S/1", "M/2", "L/3", "XL/4", "XXL/5"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196612",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "3a0974af0d678d743a168ac3f60d83dca2ac2991787300f3f6363fde9d7b7040",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/72b95fe1/ddd27e0b.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-hooded-wool-cardigan",
+      "sortOrder": 16,
+      "translations": [
+        {
+          "description": "Стильная гибридная куртка Moncler с капюшоном — тепло пухового жилета и комфорт трикотажных рукавов.\n• комбинированный дизайн: трикотаж + утеплённый перед\n• лёгкий и тёплый наполнитель\n• удобный капюшон\n• функциональные карманы\n• фирменный логотип Moncler\nОтличный вариант для весны, осени и прохладной погоды.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Hooded Wool Cardigan",
+          "shortDescription": "Стильная гибридная куртка Moncler с капюшоном — тепло пухового жилета и комфорт трикотажных рукавов."
+        },
+        {
+          "description": "Stiilne Moncler kapuutsiga hübriidjope, mis ühendab sulevesti soojuse ja kootud varrukatest mugavuse.\n• kombineeritud disain: kudumine + soojustatud esiosa\n• kerge ja soe täidis\n• mugav kapuuts\n• funktsionaalsed taskud\n• Moncler logo\nSobib kevadeks, sügiseks ja jahedaks ilmaks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Hooded Wool Cardigan",
+          "shortDescription": "Stiilne Moncler kapuutsiga hübriidjope, mis ühendab sulevesti soojuse ja kootud varrukatest mugavuse."
+        },
+        {
+          "description": "Stylish Moncler hooded hybrid jacket combining the warmth of a down vest and comfort of knit sleeves.\n• combined design: knit + padded front\n• light and warm fill\n• comfortable hood\n• functional pockets\n• Moncler logo\nGreat for spring, autumn and cool weather.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Hooded Wool Cardigan",
+          "shortDescription": "Stylish Moncler hooded hybrid jacket combining the warmth of a down vest and comfort of knit sleeves."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "T-Shirts",
+          "ru": "Футболки",
+          "et": "T-särgid"
+        },
+        "slug": "t-shirts"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "grey",
+          "names": {
+            "ru": "Серый",
+            "en": "Grey",
+            "et": "Hall"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#9A9A9A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#F5F5F5"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Basic T-Shirt, view 1",
+            "et": "Moncler Basic T-Shirt, vaade 1",
+            "ru": "Moncler Basic T-Shirt, вид 1"
+          },
+          "height": 1417,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-basic-tshirt-1.jpg",
+          "masterSha256": "7bcb6b06757de1d432226c2f2dab773c79a191a3a140fbcb752460212dcf5f82",
+          "optimizedSha256": "42485bc0ae79c0d7717c67dd1a6d5b754caf731a4dd12c86db0aa2f0d169c331",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-basic-tshirt-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Basic T-Shirt, view 2",
+            "et": "Moncler Basic T-Shirt, vaade 2",
+            "ru": "Moncler Basic T-Shirt, вид 2"
+          },
+          "height": 1455,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-basic-tshirt-2.jpg",
+          "masterSha256": "cd1ccf206fdd85892efcd30fc293fca21cef4c47104444516fcc7fa0db8d32cb",
+          "optimizedSha256": "936fc66ee712b68f49af2dc8a7cd45fb1581e416f79bff239733979366475d54",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-basic-tshirt-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-017",
+      "isFeatured": false,
+      "legacyId": 17,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196441"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [69, 71, 73, 75, 77]
+            },
+            {
+              "name": "Shoulder",
+              "values": [41.5, 43.5, 45.5, 47.5, 49.5]
+            },
+            {
+              "name": "Bust",
+              "values": [51.5, 53.5, 55.5, 57.5, 59.5]
+            },
+            {
+              "name": "Sleeve",
+              "values": [22, 23, 24, 25, 26]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196441",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "b157aa1e0114eb207119346449b251b26f78ee785749395d69519f4d08038b70",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/d91a83d4/680afc1f.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-basic-t-shirt",
+      "sortOrder": 17,
+      "translations": [
+        {
+          "description": "Классическая футболка Moncler из премиального хлопка с фирменным логотипом на груди.\n• мягкий премиальный хлопок\n• прямой крой, комфортная посадка\n• фирменный логотип Moncler на груди\n• устойчивость к деформации после стирки\nИдеальная базовая вещь для любого повседневного образа.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Basic T-Shirt",
+          "shortDescription": "Классическая футболка Moncler из премиального хлопка с фирменным логотипом на груди."
+        },
+        {
+          "description": "Klassikaline Moncler T-särk premium puuvillast firma logoga rinnal.\n• pehme premium puuvill\n• sirge lõige, mugav istuvus\n• Moncler logo rinnal\n• vormi säilitav pärast pesemist\nIdeaalne baasese igale igapäevasele riietusele.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Basic T-Shirt",
+          "shortDescription": "Klassikaline Moncler T-särk premium puuvillast firma logoga rinnal."
+        },
+        {
+          "description": "Classic Moncler T-shirt made from premium cotton with signature logo on the chest.\n• soft premium cotton\n• straight cut, comfortable fit\n• Moncler logo on chest\n• shape-retaining after washing\nThe perfect base layer for any everyday look.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Basic T-Shirt",
+          "shortDescription": "Classic Moncler T-shirt made from premium cotton with signature logo on the chest."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "T-Shirts",
+          "ru": "Футболки",
+          "et": "T-särgid"
+        },
+        "slug": "t-shirts"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Leather Badge T-Shirt, view 1",
+            "et": "Moncler Leather Badge T-Shirt, vaade 1",
+            "ru": "Moncler Leather Badge T-Shirt, вид 1"
+          },
+          "height": 1451,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-leather-badge-1.jpg",
+          "masterSha256": "f5ed933639788fef53205ae560d8053499f76c4dd851485b1b95efa285afbd7f",
+          "optimizedSha256": "8e5e254f0f663efd1266c6f9ed515a94deb0d2bd2fd2640d840532df442a8b21",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-leather-badge-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Leather Badge T-Shirt, view 2",
+            "et": "Moncler Leather Badge T-Shirt, vaade 2",
+            "ru": "Moncler Leather Badge T-Shirt, вид 2"
+          },
+          "height": 1442,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-leather-badge-2.jpg",
+          "masterSha256": "c4a7780a30d48d171fdccc7a80fda38b762c2a35f9197f47a5e72f7573a8a6bb",
+          "optimizedSha256": "ea5364910f3c096a17c828da565d14a88b154d0b3aa3e1f4c17085dce6b37277",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-leather-badge-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-018",
+      "isFeatured": false,
+      "legacyId": 18,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196300"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [66.5, 68.5, 70.5, 72.5, 74.5]
+            },
+            {
+              "name": "Shoulder",
+              "values": [41, 42.5, 44, 45.5, 47]
+            },
+            {
+              "name": "Bust",
+              "values": [52, 54, 56, 58, 60]
+            },
+            {
+              "name": "Sleeve",
+              "values": [23, 24, 25, 26, 27]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5A BASELINE / VERIFIED IN PHASE 5B",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196300",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": null,
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/23d424ee/3e439814.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-leather-badge-t-shirt",
+      "sortOrder": 18,
+      "translations": [
+        {
+          "description": "Стильная футболка Moncler с кожаным нашивным логотипом — характерная деталь, выделяющая её среди базовых вещей.\n• мягкий премиальный хлопок\n• кожаный нашивной логотип Moncler\n• прямой крой, комфортная посадка\n• деталь, которая делает образ завершённым\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Leather Badge T-Shirt",
+          "shortDescription": "Стильная футболка Moncler с кожаным нашивным логотипом — характерная деталь, выделяющая её среди базовых вещей."
+        },
+        {
+          "description": "Stiilne Moncler T-särk nahast pääsme logoga — iseloomulik detail, mis eristab seda tavalistest põhitoodetest.\n• pehme premium puuvill\n• nahast Moncler logo pääsme\n• sirge lõige, mugav istuvus\n• detail, mis viimistleb iga välimuse\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Leather Badge T-Shirt",
+          "shortDescription": "Stiilne Moncler T-särk nahast pääsme logoga — iseloomulik detail, mis eristab seda tavalistest põhitoodetest."
+        },
+        {
+          "description": "Stylish Moncler T-shirt with a leather badge logo — a signature detail that sets it apart from standard basics.\n• soft premium cotton\n• leather Moncler badge logo\n• straight cut, comfortable fit\n• detail that completes any look\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Leather Badge T-Shirt",
+          "shortDescription": "Stylish Moncler T-shirt with a leather badge logo — a signature detail that sets it apart from standard basics."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "T-Shirts",
+          "ru": "Футболки",
+          "et": "T-särgid"
+        },
+        "slug": "t-shirts"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#F5F5F5"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Blurred Logo T-Shirt, view 1",
+            "et": "Moncler Blurred Logo T-Shirt, vaade 1",
+            "ru": "Moncler Blurred Logo T-Shirt, вид 1"
+          },
+          "height": 1442,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-blurred-logo-1.jpg",
+          "masterSha256": "7a19b07ab02c3a0593cd9a87188f983661781ccff8e01abd3e171148584433a6",
+          "optimizedSha256": "ef8cfb95a2d871c62ad179a31926aa4f1d16b08e512b9c187e1087c295a0c3af",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-blurred-logo-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Blurred Logo T-Shirt, view 2",
+            "et": "Moncler Blurred Logo T-Shirt, vaade 2",
+            "ru": "Moncler Blurred Logo T-Shirt, вид 2"
+          },
+          "height": 1451,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-blurred-logo-2.jpg",
+          "masterSha256": "cf094a78039c9448ad587f670a9d28848996cd33dad4f756d720d9d55edcdac8",
+          "optimizedSha256": "edee266ec4d2a5d890fc0a7fb8fbb4be8745817bff0d2ade91d72f63ca9c7d98",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-blurred-logo-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-019",
+      "isFeatured": false,
+      "legacyId": 19,
+      "phase5Mapping": null,
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": null,
+      "slug": "moncler-blurred-logo-t-shirt",
+      "sortOrder": 19,
+      "translations": [
+        {
+          "description": "Футболка Moncler с графическим размытым принтом логотипа — смелое прочтение классического фирменного стиля.\n• мягкий премиальный хлопок\n• графический принт с размытым логотипом Moncler\n• прямой крой, комфортная посадка\n• актуальный streetwear-образ\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Blurred Logo T-Shirt",
+          "shortDescription": "Футболка Moncler с графическим размытым принтом логотипа — смелое прочтение классического фирменного стиля."
+        },
+        {
+          "description": "Moncler T-särk graafilise hägustatud logo trükiga — julge tõlgendus klassikalisest brändingust.\n• pehme premium puuvill\n• graafiline hägustatud Moncler logo trükk\n• sirge lõige, mugav istuvus\n• trendikas streetwear välimus\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Blurred Logo T-Shirt",
+          "shortDescription": "Moncler T-särk graafilise hägustatud logo trükiga — julge tõlgendus klassikalisest brändingust."
+        },
+        {
+          "description": "Moncler T-shirt with a graphic blurred logo print — a bold take on classic branding.\n• soft premium cotton\n• graphic blurred Moncler logo print\n• straight cut, comfortable fit\n• on-trend streetwear look\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Blurred Logo T-Shirt",
+          "shortDescription": "Moncler T-shirt with a graphic blurred logo print — a bold take on classic branding."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Hoodies",
+          "ru": "Худи",
+          "et": "Kapuutsiga pusad"
+        },
+        "slug": "hoodies"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "grey",
+          "names": {
+            "ru": "Серый",
+            "en": "Grey",
+            "et": "Hall"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#9A9A9A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#F5F5F5"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Stripe Trim Zip Hoodie, view 1",
+            "et": "Moncler Stripe Trim Zip Hoodie, vaade 1",
+            "ru": "Moncler Stripe Trim Zip Hoodie, вид 1"
+          },
+          "height": 1456,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-stripe-hoodie-1.jpg",
+          "masterSha256": "7fa91f83018266964348dbc587a4bc9a9ef33dac5b4d5029b0477a04202611ca",
+          "optimizedSha256": "c29d2f6f8c947b610886c15df8594795990423203c1bfb7f8b4ea2dbda97e148",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-stripe-hoodie-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Stripe Trim Zip Hoodie, view 2",
+            "et": "Moncler Stripe Trim Zip Hoodie, vaade 2",
+            "ru": "Moncler Stripe Trim Zip Hoodie, вид 2"
+          },
+          "height": 1454,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-stripe-hoodie-2.jpg",
+          "masterSha256": "46e928a2dec549de2e6ba427b0d67864a3bd90ba10f8886e1fa5164c38b496ca",
+          "optimizedSha256": "ec4988e52b184791f8490be7a65627cd5bf5f6b981a6d0d959cae3a23057667a",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-stripe-hoodie-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-020",
+      "isFeatured": true,
+      "legacyId": 20,
+      "phase5Mapping": null,
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": null,
+      "slug": "moncler-stripe-trim-zip-hoodie",
+      "sortOrder": 20,
+      "translations": [
+        {
+          "description": "Спортивное худи Moncler на молнии с контрастными полосками на рукавах.\n• мягкий флисовый материал\n• молния по всей длине\n• контрастные полоски на рукавах\n• капюшон с регулировкой\n• фирменный логотип Moncler\nОтлично подходит для спортивного и casual-стиля.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Stripe Trim Zip Hoodie",
+          "shortDescription": "Спортивное худи Moncler на молнии с контрастными полосками на рукавах."
+        },
+        {
+          "description": "Sportilik Moncler tõmblukuga kapuutsiga pusa kontrastsete triipudega varrukatest.\n• pehme fliismaterjal\n• täispikk tõmblukk\n• kontrastsed triibud varrukatest\n• reguleeritav kapuuts\n• Moncler logo\nSobib sportlikuks ja casual stiiliks.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Stripe Trim Zip Hoodie",
+          "shortDescription": "Sportilik Moncler tõmblukuga kapuutsiga pusa kontrastsete triipudega varrukatest."
+        },
+        {
+          "description": "Sporty Moncler zip hoodie with contrast stripe trim on the sleeves.\n• soft fleece material\n• full-length zip\n• contrast stripes on sleeves\n• adjustable hood\n• Moncler logo\nGreat for sporty and casual looks.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Stripe Trim Zip Hoodie",
+          "shortDescription": "Sporty Moncler zip hoodie with contrast stripe trim on the sleeves."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Hoodies",
+          "ru": "Худи",
+          "et": "Kapuutsiga pusad"
+        },
+        "slug": "hoodies"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "khaki",
+          "names": {
+            "ru": "Хаки",
+            "en": "Khaki",
+            "et": "Khaki"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#5C6B3A"
+        },
+        {
+          "code": "grey",
+          "names": {
+            "ru": "Серый",
+            "en": "Grey",
+            "et": "Hall"
+          },
+          "sortOrder": 3,
+          "swatchHex": "#9A9A9A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 4,
+          "swatchHex": "#F5F5F5"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Hera Logo Patch Sweatshirt, view 1",
+            "et": "Moncler Hera Logo Patch Sweatshirt, vaade 1",
+            "ru": "Moncler Hera Logo Patch Sweatshirt, вид 1"
+          },
+          "height": 1494,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-hera-sweatshirt-1.jpg",
+          "masterSha256": "97f39ab5d350c5bac8ba1d485e52d4bd68f2c3245b00671e5953840680608510",
+          "optimizedSha256": "db1665d8fd8476f0024a906ca47780eacd6ab10b855b9c35552fca54b5ca2f13",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-hera-sweatshirt-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Hera Logo Patch Sweatshirt, view 2",
+            "et": "Moncler Hera Logo Patch Sweatshirt, vaade 2",
+            "ru": "Moncler Hera Logo Patch Sweatshirt, вид 2"
+          },
+          "height": 1475,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-hera-sweatshirt-2.jpg",
+          "masterSha256": "1c05f29058989a27896c80b0a976e4575d3ef6a2c5c6096b5784c9f15e199779",
+          "optimizedSha256": "6ded1c545e2533ea204c6ea641bc32e08d865711d048f9ba5c51ce559a1eb685",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-hera-sweatshirt-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-021",
+      "isFeatured": false,
+      "legacyId": 21,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196561"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "Back Length",
+              "values": [67, 69, 71, 73, 75]
+            },
+            {
+              "name": "Shoulder",
+              "values": [42.5, 44.5, 46.5, 48.5, 50.5]
+            },
+            {
+              "name": "Bust",
+              "values": [52, 54, 56, 58, 60]
+            },
+            {
+              "name": "Sleeve",
+              "values": [65, 66, 67, 68, 69]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196561",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "a7c5b9f3492a4a2b5c98c5158161ea7b477927baae3479633f39ccd2ab2e4a5b",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/4a7fb840/c6e46e4d.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-hera-logo-patch-sweatshirt",
+      "sortOrder": 21,
+      "translations": [
+        {
+          "description": "Классический свитшот Moncler с нашивным логотипом — комфортная, тёплая и стильная базовая вещь.\n• мягкий хлопково-флисовый материал\n• нашивной логотип Moncler на груди\n• рибана на манжетах и внизу\n• удобный крой\nОтлично сочетается с джинсами, брюками и верхней одеждой.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Hera Logo Patch Sweatshirt",
+          "shortDescription": "Классический свитшот Moncler с нашивным логотипом — комфортная, тёплая и стильная базовая вещь."
+        },
+        {
+          "description": "Klassikaline Moncler dressipluus logo pääsmega — mugav, soe ja stiilne.\n• pehme puuvill-fliis materjal\n• Moncler logo pääsme rinnal\n• riblõng käistele ja alläärele\n• mugav lõige\nSobib teksade, pükste ja pealisrõivastega.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Hera Logo Patch Sweatshirt",
+          "shortDescription": "Klassikaline Moncler dressipluus logo pääsmega — mugav, soe ja stiilne."
+        },
+        {
+          "description": "Classic Moncler sweatshirt with logo patch — comfortable, warm and stylish.\n• soft cotton-fleece material\n• Moncler logo patch on chest\n• ribbed cuffs and hem\n• comfortable cut\nPairs well with jeans, trousers and outerwear.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Hera Logo Patch Sweatshirt",
+          "shortDescription": "Classic Moncler sweatshirt with logo patch — comfortable, warm and stylish."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "T-Shirts",
+          "ru": "Футболки",
+          "et": "T-särgid"
+        },
+        "slug": "t-shirts"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "white",
+          "names": {
+            "ru": "Белый",
+            "en": "White",
+            "et": "Valge"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#F5F5F5"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Polo Shirt, view 1",
+            "et": "Moncler Polo Shirt, vaade 1",
+            "ru": "Moncler Polo Shirt, вид 1"
+          },
+          "height": 1478,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-polo-1.jpg",
+          "masterSha256": "940828d1ad3da6e815acbae94a59b763c58f23a748c67074a587c9db6773bb57",
+          "optimizedSha256": "9f459468cf5e4da26d8f198839e5bbf1074a72f81d39fb174848aa4195603fd3",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-polo-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Polo Shirt, view 2",
+            "et": "Moncler Polo Shirt, vaade 2",
+            "ru": "Moncler Polo Shirt, вид 2"
+          },
+          "height": 1467,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-polo-2.jpg",
+          "masterSha256": "33e09f72c4e662f3b6b356d3b4309aaf94914da66fc89dad65e578b608096d96",
+          "optimizedSha256": "6bc7806df27ad50c96e3e40e884d1a77496026cbba9dbf8066249425c823f923",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-polo-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-022",
+      "isFeatured": false,
+      "legacyId": 22,
+      "phase5Mapping": null,
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": null,
+      "slug": "moncler-polo-shirt",
+      "sortOrder": 22,
+      "translations": [
+        {
+          "description": "Классическое поло Moncler из премиального пике — элегантная и универсальная вещь для повседневного и smart-casual образа.\n• премиальный хлопок пике\n• воротник с пуговицами\n• фирменный логотип Moncler на груди\n• комфортный прямой крой\nОтлично сочетается с брюками, шортами и лёгкими куртками.\nУнисекс модель",
+          "locale": "ru",
+          "name": "Moncler Polo Shirt",
+          "shortDescription": "Классическое поло Moncler из премиального пике — элегантная и универсальная вещь для повседневного и smart-casual образа."
+        },
+        {
+          "description": "Klassikaline Moncler polo premium pikeest — elegantne ja mitmekülgne igapäevaseks ja smart-casual stiiliks.\n• premium piqué puuvill\n• nuppkraega\n• Moncler logo rinnal\n• mugav sirge lõige\nSobib pükste, lühikeste pükste ja kergete jopedega.\nUnisex mudel",
+          "locale": "et",
+          "name": "Moncler Polo Shirt",
+          "shortDescription": "Klassikaline Moncler polo premium pikeest — elegantne ja mitmekülgne igapäevaseks ja smart-casual stiiliks."
+        },
+        {
+          "description": "Classic Moncler polo shirt made from premium piqué — elegant and versatile for everyday and smart-casual looks.\n• premium piqué cotton\n• button collar\n• Moncler logo on chest\n• comfortable straight cut\nPairs well with trousers, shorts and light jackets.\nUnisex model",
+          "locale": "en",
+          "name": "Moncler Polo Shirt",
+          "shortDescription": "Classic Moncler polo shirt made from premium piqué — elegant and versatile for everyday and smart-casual looks."
+        }
+      ]
+    },
+    {
+      "availabilityType": "PRE_ORDER",
+      "brand": "Moncler",
+      "category": {
+        "names": {
+          "en": "Bottoms",
+          "ru": "Низ",
+          "et": "Alaosal"
+        },
+        "slug": "bottoms"
+      },
+      "colors": [
+        {
+          "code": "black",
+          "names": {
+            "ru": "Чёрный",
+            "en": "Black",
+            "et": "Must"
+          },
+          "sortOrder": 0,
+          "swatchHex": "#1A1A1A"
+        },
+        {
+          "code": "navy",
+          "names": {
+            "ru": "Тёмно-синий",
+            "en": "Navy",
+            "et": "Tumesinine"
+          },
+          "sortOrder": 1,
+          "swatchHex": "#1B2A4A"
+        },
+        {
+          "code": "blue",
+          "names": {
+            "ru": "Синий",
+            "en": "Blue",
+            "et": "Sinine"
+          },
+          "sortOrder": 2,
+          "swatchHex": "#2B5FBF"
+        },
+        {
+          "code": "red",
+          "names": {
+            "ru": "Красный",
+            "en": "Red",
+            "et": "Punane"
+          },
+          "sortOrder": 3,
+          "swatchHex": "#C0242B"
+        },
+        {
+          "code": "orange",
+          "names": {
+            "ru": "Оранжевый",
+            "en": "Orange",
+            "et": "Oranž"
+          },
+          "sortOrder": 4,
+          "swatchHex": "#E8651A"
+        }
+      ],
+      "images": [
+        {
+          "alt": {
+            "en": "Moncler Logo Patch Swimming Shorts, view 1",
+            "et": "Moncler Logo Patch Swimming Shorts, vaade 1",
+            "ru": "Moncler Logo Patch Swimming Shorts, вид 1"
+          },
+          "height": 1600,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-swim-shorts-1.jpg",
+          "masterSha256": "8a2addbf56f02c67d1d0cf088d9b4a653add81a71bf3f49092a7725d2c06b5ea",
+          "optimizedSha256": "debe88820ff0a6c0258f9598c90fa5717b76aa36c6a216609ec71fa5e38e38e6",
+          "role": "PRIMARY",
+          "sortOrder": 0,
+          "url": "/products/legacy/moncler-swim-shorts-1.webp",
+          "width": 893
+        },
+        {
+          "alt": {
+            "en": "Moncler Logo Patch Swimming Shorts, view 2",
+            "et": "Moncler Logo Patch Swimming Shorts, vaade 2",
+            "ru": "Moncler Logo Patch Swimming Shorts, вид 2"
+          },
+          "height": 1600,
+          "masterExtension": "jpg",
+          "masterFile": "assets/legacy-products/original/moncler-swim-shorts-2.jpg",
+          "masterSha256": "069385cf22cf4f31e11f5d128709aae01b6b889d62fcef7e24ca90127fa966e7",
+          "optimizedSha256": "3b6504717e73858acb22363d3d4c1226964fc41cf405994fbd8e44b2a4737192",
+          "role": "GALLERY",
+          "sortOrder": 1,
+          "url": "/products/legacy/moncler-swim-shorts-2.webp",
+          "width": 893
+        }
+      ],
+      "internalCode": "AL-LEGACY-023",
+      "isFeatured": false,
+      "legacyId": 23,
+      "phase5Mapping": {
+        "confidence": "EXPLICIT_MODEL_NAME",
+        "sourceInternalId": "AL-SRC-KINGCN-209196496"
+      },
+      "preorderEstimateText": "2–3 weeks",
+      "publicationStatus": "READY",
+      "retailPriceMinor": null,
+      "currency": "EUR",
+      "sizeChart": {
+        "chartData": {
+          "measurements": [
+            {
+              "name": "1/2 Waist",
+              "values": [38, 40, 42, 44, 46]
+            },
+            {
+              "name": "Length",
+              "values": [37, 38, 39, 40, 41]
+            },
+            {
+              "name": "Hip Width",
+              "values": [52, 54, 56, 58, 60]
+            }
+          ],
+          "sizes": ["S", "M", "L", "XL", "XXL"]
+        },
+        "evidence": {
+          "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
+          "notes": ["Unit is not printed clearly; no unit inferred."],
+          "sourceAlbumId": "209196496",
+          "sourceImagePosition": 1,
+          "sourceImageSha256": "d63be21946b83cba36c64921505fe1c987099b221cdadb68655fe0b079897e21",
+          "sourceImageUrl": "https://photo.yupoo.com/kingcn/3570922e/39040430.jpeg",
+          "verification": "VISUALLY VERIFIED",
+          "verificationDate": "2026-09-25"
+        },
+        "units": null
+      },
+      "slug": "moncler-logo-patch-swimming-shorts",
+      "sortOrder": 23,
+      "translations": [
+        {
+          "description": "Плавательные шорты Moncler с фирменным логотипом — стиль и функциональность для пляжа и повседневного лета.\n• быстросохнущий материал\n• подкладка из сетки\n• фирменный логотип Moncler\n• боковые карманы\n• эластичный пояс с завязками\nОтлично подходит для активного отдыха и летних образов.\nМужская модель",
+          "locale": "ru",
+          "name": "Moncler Logo Patch Swimming Shorts",
+          "shortDescription": "Плавательные шорты Moncler с фирменным логотипом — стиль и функциональность для пляжа и повседневного лета."
+        },
+        {
+          "description": "Moncler ujumislühikesed püksid firma logo pääsmega — stiil ja funktsionaalsus rannaks ja suvisteks riieteks.\n• kiirkuivav materjal\n• võrguvoodri\n• Moncler logo pääsme\n• külgtaskud\n• elastne vööpael paeltega\nSobib aktiivseks puhkuseks ja suviseks stiiliks.\nMeeste mudel",
+          "locale": "et",
+          "name": "Moncler Logo Patch Swimming Shorts",
+          "shortDescription": "Moncler ujumislühikesed püksid firma logo pääsmega — stiil ja funktsionaalsus rannaks ja suvisteks riieteks."
+        },
+        {
+          "description": "Moncler swimming shorts with signature logo patch — style and functionality for the beach and summer everyday wear.\n• quick-dry material\n• mesh lining\n• Moncler logo patch\n• side pockets\n• elastic waistband with drawstring\nPerfect for active leisure and summer looks.\nMen's model",
+          "locale": "en",
+          "name": "Moncler Logo Patch Swimming Shorts",
+          "shortDescription": "Moncler swimming shorts with signature logo patch — style and functionality for the beach and summer everyday wear."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "imageCount": 53,
+    "mappedSizeChartCount": 17,
+    "productCount": 23,
+    "unresolvedSizeChartCount": 6
+  },
+  "version": 1
+}
