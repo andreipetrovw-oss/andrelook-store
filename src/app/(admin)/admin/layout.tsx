@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getOwnerAccess } from "@/lib/auth/server";
+import { getServerConfig } from "@/lib/env";
 import { andrelookFontVariables } from "@/lib/fonts";
 import "@/styles/globals.css";
 
@@ -20,23 +22,26 @@ export default async function AdminLayout({
   if (access.status !== "granted") {
     redirect(`/sign-in?reason=${access.status}`);
   }
+  const publishableKey = getServerConfig().clerkPublishableKey;
 
   return (
-    <html className={andrelookFontVariables} lang="en">
-      <body>
-        <div className="admin-shell">
-          <aside className="admin-sidebar">
-            <strong>ANDRELOOK CRM</strong>
-            <nav aria-label="Owner navigation">
-              <Link href="/admin">Overview</Link>
-              <Link href="/admin/orders">Orders</Link>
-              <Link href="/admin/catalog">Catalog</Link>
-            </nav>
-            <small>{access.identity.email}</small>
-          </aside>
-          <main className="admin-main">{children}</main>
-        </div>
-      </body>
-    </html>
+    <ClerkProvider publishableKey={publishableKey ?? undefined}>
+      <html className={andrelookFontVariables} lang="en">
+        <body>
+          <div className="admin-shell">
+            <aside className="admin-sidebar">
+              <strong>ANDRELOOK CRM</strong>
+              <nav aria-label="Owner navigation">
+                <Link href="/admin">Overview</Link>
+                <Link href="/admin/orders">Orders</Link>
+                <Link href="/admin/catalog">Catalog</Link>
+              </nav>
+              <small>{access.identity.email}</small>
+            </aside>
+            <main className="admin-main">{children}</main>
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
