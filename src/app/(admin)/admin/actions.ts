@@ -11,6 +11,7 @@ import { z } from "zod";
 
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
+import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
 
 const statusSchema = z.object({
   note: z.string().trim().max(500).optional(),
@@ -106,6 +107,13 @@ export async function recordPayment(formData: FormData) {
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
+}
+
+export async function retryOrderNotification(formData: FormData) {
+  await requireOwner();
+  const orderId = z.string().min(1).parse(formData.get("orderId"));
+  await sendNewOrderNotification(orderId);
+  revalidatePath(`/admin/orders/${orderId}`);
 }
 
 export async function updateProductCommercialState(formData: FormData) {

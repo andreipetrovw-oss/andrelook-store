@@ -8,6 +8,7 @@ import { databaseLocale } from "@/config/locales";
 import { getPrisma } from "@/lib/db";
 import { getServerConfig } from "@/lib/env";
 
+import { SIZE_HELP_VALUE } from "./request-constants";
 import type { RequestOrderInput } from "./request-schema";
 import { assessRequestEligibility } from "./eligibility";
 
@@ -40,10 +41,35 @@ export type RequestContext = {
   landingPath: string | null;
 };
 
+function acquisitionChannel(input: RequestOrderInput, referrer: string | null) {
+  const source = input.utmSource?.toLowerCase() ?? "";
+  const medium = input.utmMedium?.toLowerCase() ?? "";
+  const referringHost = (() => {
+    try {
+      return referrer ? new URL(referrer).hostname.toLowerCase() : "";
+    } catch {
+      return "";
+    }
+  })();
+  if (
+    input.utmCampaign ||
+    ["cpc", "paid", "paid_social", "social_paid"].includes(medium) ||
+    ["meta", "facebook_ads", "instagram_ads"].includes(source)
+  ) {
+    return "ADVERTISING" as const;
+  }
+  if (source.includes("instagram") || referringHost.includes("instagram.com")) {
+    return "INSTAGRAM" as const;
+  }
+  if (source.includes("marketplace")) return "MARKETPLACE" as const;
+  if (source || referrer) return "REFERRAL" as const;
+  return "DIRECT" as const;
+}
+
 export async function createOrderRequest(
   input: RequestOrderInput,
   context: RequestContext,
-): Promise<{ duplicate: boolean; reference: string }> {
+): Promise<{ duplicate: boolean; orderId: string; reference: string }> {
   const prisma = getPrisma();
   const reviewMode = getServerConfig().storefrontReviewMode;
   const product = await prisma.product.findFirst({
@@ -95,18 +121,29 @@ export async function createOrderRequest(
       sizes: availableSizes,
       version: product.updatedAt.toISOString(),
     },
-    input,
+    {
+      ...input,
+      sizeHelpRequested: input.size === SIZE_HELP_VALUE,
+    },
     reviewMode,
   );
   if (rejection) throw new RequestRejectedError(rejection);
 
+  const socialHandle = input.socialHandle ?? null;
+  const contactValue = {
+    EMAIL: input.email,
+    INSTAGRAM: socialHandle,
+    PHONE: input.phone,
+    TELEGRAM: socialHandle,
+  }[input.contactMethod];
+  if (!contactValue) throw new RequestRejectedError("selection");
   const contactFields = {
-    email: input.contactMethod === "EMAIL" ? input.contactValue : null,
-    instagramHandle:
-      input.contactMethod === "INSTAGRAM" ? input.contactValue : null,
-    phone: input.contactMethod === "PHONE" ? input.contactValue : null,
-    telegramHandle:
-      input.contactMethod === "TELEGRAM" ? input.contactValue : null,
+    email: input.email,
+    firstName: input.firstName,
+    instagramHandle: input.contactMethod === "INSTAGRAM" ? socialHandle : null,
+    lastName: input.lastName,
+    phone: input.phone,
+    telegramHandle: input.contactMethod === "TELEGRAM" ? socialHandle : null,
   };
 
   try {
@@ -114,56 +151,97 @@ export async function createOrderRequest(
       const customer = await tx.customer.create({
         data: {
           ...contactFields,
-          name: input.name,
+          name: `${input.firstName} ${input.lastName}`,
           preferredContactMethod: input.contactMethod,
-          preferredContactValue: input.contactValue,
-          preferredLocale: databaseLocale[input.locale],
+          preferredContactValue: contactValue,
+          preferredLocale: databaseLocale[input.preferredLocale],
         },
       });
       const created = await tx.order.create({
         data: {
+          acquisitionChannel: acquisitionChannel(
+            input,
+            input.initialReferrer ?? context.initialReferrer,
+          ),
+          addressLine1:
+            input.fulfilmentMethod === "DELIVERY"
+              ? (input.addressLine1 ?? null)
+              : null,
+          addressLine2:
+            input.fulfilmentMethod === "DELIVERY"
+              ? (input.addressLine2 ?? null)
+              : null,
+          city:
+            input.fulfilmentMethod === "PERSONAL_HANDOVER"
+              ? "Tallinn"
+              : input.city,
           consentAt: new Date(),
-          consentVersion: "assisted-request-v1",
+          consentVersion: "commercial-preorder-v1",
+          countryCode:
+            input.fulfilmentMethod === "PERSONAL_HANDOVER"
+              ? "EE"
+              : input.countryCode,
           currency: product.currency,
           customerId: customer.id,
           displayNumber: displayNumber(),
-          initialReferrer: context.initialReferrer,
+          fulfilmentMethod: input.fulfilmentMethod,
+          initialReferrer: input.initialReferrer ?? context.initialReferrer,
           internalNotes: input.comment ?? null,
-          landingPath: context.landingPath,
+          landingPath: input.landingPath ?? context.landingPath,
+          paymentPreference: input.paymentPreference,
+          postalCode:
+            input.fulfilmentMethod === "DELIVERY"
+              ? (input.postalCode ?? null)
+              : null,
           requestKey: input.requestKey,
-          requestedLocale: databaseLocale[input.locale],
+          requestedLocale: databaseLocale[input.preferredLocale],
           items: {
             create: {
               availabilityTypeSnapshot: product.availabilityType,
               colorSnapshot: input.colour || null,
+              measurementsNote: input.measurements ?? null,
               productId: product.id,
               productInternalCodeSnapshot: product.internalCode,
               productNameSnapshot: translation.name,
               productSlugSnapshot: product.slug,
-              quantity: 1,
-              sizeSnapshot: input.size || null,
+              quantity: input.quantity,
+              sizeHelpRequested: input.size === SIZE_HELP_VALUE,
+              sizeSnapshot: input.size === SIZE_HELP_VALUE ? null : input.size,
               unitLandedCostMinorSnapshot: product.privateData?.landedCostMinor,
               unitPriceMinor: product.retailPriceMinor,
             },
           },
           statusHistory: { create: { toStatus: "NEW" } },
+          utmCampaign: input.utmCampaign ?? null,
+          utmContent: input.utmContent ?? null,
+          utmMedium: input.utmMedium ?? null,
+          utmSource: input.utmSource ?? null,
+          utmTerm: input.utmTerm ?? null,
         },
-        select: { displayNumber: true },
+        select: { displayNumber: true, id: true },
       });
       return created;
     });
-    return { duplicate: false, reference: order.displayNumber };
+    return {
+      duplicate: false,
+      orderId: order.id,
+      reference: order.displayNumber,
+    };
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
       const existing = await prisma.order.findUnique({
-        select: { displayNumber: true },
+        select: { displayNumber: true, id: true },
         where: { requestKey: input.requestKey },
       });
       if (existing)
-        return { duplicate: true, reference: existing.displayNumber };
+        return {
+          duplicate: true,
+          orderId: existing.id,
+          reference: existing.displayNumber,
+        };
     }
     throw error;
   }

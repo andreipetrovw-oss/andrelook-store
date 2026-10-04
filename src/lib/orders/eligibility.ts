@@ -10,7 +10,12 @@ export type RequestEligibilityProduct = {
 
 export function assessRequestEligibility(
   product: RequestEligibilityProduct | null,
-  request: { colour: string; productVersion: string; size: string },
+  request: {
+    colour: string;
+    productVersion: string;
+    size: string;
+    sizeHelpRequested?: boolean;
+  },
   reviewMode: boolean,
 ): "not-found" | "unavailable" | "selection" | null {
   if (
@@ -30,10 +35,17 @@ export function assessRequestEligibility(
   }
   if (product.version !== request.productVersion) return "selection";
   if (product.availability === "UNAVAILABLE") return "unavailable";
-  if (product.sizes.length && !product.sizes.includes(request.size)) {
+  if (
+    product.sizes.length &&
+    !request.sizeHelpRequested &&
+    !product.sizes.includes(request.size)
+  ) {
     return "selection";
   }
-  if (request.colour && !product.colours.includes(request.colour)) {
+  if (
+    product.colours.length &&
+    (!request.colour || !product.colours.includes(request.colour))
+  ) {
     return "selection";
   }
   return null;

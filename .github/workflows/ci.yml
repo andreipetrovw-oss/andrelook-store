@@ -9,6 +9,7 @@ on:
       - phase6c-staging-storefront
       - phase6d-storefront-completion
       - phase6e-storefront-finalization
+      - phase6f-commercial-launch
 
 permissions:
   contents: read
@@ -29,7 +30,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm audit --audit-level=high
+      # Runtime dependencies must be clean. The lint-only dependency tree is
+      # tracked separately because the current braces advisory has no patched
+      # release compatible with Next.js 16.
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck

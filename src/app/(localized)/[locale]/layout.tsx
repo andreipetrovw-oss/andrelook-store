@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { CampaignCapture } from "@/components/campaign-capture";
 import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localizedAlternates, indexingRobots } from "@/lib/seo";
@@ -75,6 +76,7 @@ export default async function LocalizedLayout({
   return (
     <html className={andrelookFontVariables} lang={locale}>
       <body>
+        <CampaignCapture />
         <a className="skip-link" href="#main-content">
           {dictionary.skipToContent}
         </a>

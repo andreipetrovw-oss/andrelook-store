@@ -66,6 +66,7 @@ export async function getAdminOrders(filters: {
       id: true,
       items: { select: { productNameSnapshot: true }, take: 1 },
       nextActionAt: true,
+      notification: { select: { status: true } },
       orderDate: true,
       payments: { select: { amountMinor: true, kind: true } },
       status: true,
@@ -85,6 +86,7 @@ export async function getAdminOrder(id: string) {
     include: {
       customer: true,
       items: true,
+      notification: true,
       payments: { orderBy: { receivedAt: "desc" } },
       statusHistory: { orderBy: { createdAt: "desc" } },
     },

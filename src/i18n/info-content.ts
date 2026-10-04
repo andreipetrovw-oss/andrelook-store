@@ -49,18 +49,18 @@ const supplementalContent: Record<
     ],
     "delivery-payment": [
       {
-        title: "Что ещё требуется",
-        body: "До публикации владелец должен утвердить способы оплаты, географию, стоимость и сроки доставки.",
+        title: "Оплата в Эстонии",
+        body: "При личной передаче в Таллинне можно внести 30% предоплаты, а остаток оплатить при получении, либо выбрать полную предоплату.",
       },
       {
-        title: "Для конкретного запроса",
-        body: "Применимые условия сообщаются напрямую после уточнения модели, статуса и места назначения.",
+        title: "Доставка по Европе",
+        body: "Для доставки по Эстонии и в другие страны Европы используется полная предоплата. Стоимость и способ доставки подтверждаются для конкретного адреса до оплаты.",
       },
     ],
     "pre-order": [
       {
-        title: "Без выдуманных сроков",
-        body: "Если срок не подтверждён, сайт его не показывает. Актуальная оценка сообщается до оформления.",
+        title: "Ожидаемый срок",
+        body: "Для моделей запуска ожидаемый срок предзаказа составляет около 2–3 недель. Мы подтверждаем актуальную оценку лично до оплаты.",
       },
       {
         title: "Следующий шаг",
@@ -141,18 +141,18 @@ const supplementalContent: Record<
     ],
     "delivery-payment": [
       {
-        title: "Mis vajab veel kinnitamist",
-        body: "Enne avaldamist peab omanik kinnitama makseviisid, piirkonnad, tarnekulu ja ajad.",
+        title: "Maksmine Eestis",
+        body: "Tallinnas isikliku üleandmise korral saab tasuda 30% ette ja ülejäänu kättesaamisel või valida täieliku ettemaksu.",
       },
       {
-        title: "Konkreetse päringu jaoks",
-        body: "Kehtivad tingimused antakse otse pärast mudeli, oleku ja sihtkoha täpsustamist.",
+        title: "Tarne Euroopas",
+        body: "Eestis kohaletoimetamisel ja teistesse Euroopa riikidesse tarnimisel kasutatakse täielikku ettemaksu. Tarnekulu ja -viis kinnitatakse aadressi alusel enne makset.",
       },
     ],
     "pre-order": [
       {
-        title: "Väljamõeldud aegu ei kuvata",
-        body: "Kui tähtaega pole kinnitatud, veebileht seda ei luba. Hetkehinnang antakse enne tellimist.",
+        title: "Eeldatav aeg",
+        body: "Stardikollektsiooni eeltellimuse eeldatav aeg on umbes 2–3 nädalat. Kinnitame hetkehinnangu isiklikult enne makset.",
       },
       {
         title: "Järgmine samm",
@@ -233,18 +233,18 @@ const supplementalContent: Record<
     ],
     "delivery-payment": [
       {
-        title: "Still to be approved",
-        body: "Payment methods, service areas, delivery costs and delivery times require owner approval before publication.",
+        title: "Payment in Estonia",
+        body: "For personal handover in Tallinn, you may pay a 30% advance and the balance on receipt, or choose full advance payment.",
       },
       {
-        title: "For a specific request",
-        body: "Applicable details are shared directly after the piece, status and destination are confirmed.",
+        title: "Delivery across Europe",
+        body: "Delivery in Estonia and to other European countries uses full advance payment. The delivery method and cost are confirmed for the address before payment.",
       },
     ],
     "pre-order": [
       {
-        title: "No invented timing",
-        body: "When timing is not confirmed, the website does not promise it. A current estimate is shared before ordering.",
+        title: "Expected timeframe",
+        body: "The expected pre-order timeframe for the launch collection is approximately 2–3 weeks. We personally confirm the current estimate before payment.",
       },
       {
         title: "The next step",
@@ -314,7 +314,7 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Спокойный выбор",
-          body: "В каталоге показаны только модели и сведения, подготовленные для публичного просмотра.",
+          body: "В каталоге собрана стартовая коллекция Andrelook с реальными фотографиями и понятным способом предзаказа.",
         },
         {
           title: "Личный контакт",
@@ -346,24 +346,23 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Покупателям",
       title: "Доставка и оплата",
       introduction:
-        "Условия доставки, сроки и способ оплаты подтверждаются лично до оформления заказа.",
+        "Доставка доступна по Европе. Способ оплаты зависит от личной передачи или доставки и ясно подтверждается до оплаты.",
       sections: [
         {
-          title: "До подтверждения",
-          body: "Мы сообщим применимые к вашему заказу условия после уточнения модели, наличия и места доставки.",
+          title: "Понятный следующий шаг",
+          body: "После запроса мы подтвердим модель, размер, сумму, адрес или место личной передачи и только затем сообщим реквизиты для предоплаты.",
         },
       ],
-      requiresApproval: true,
     },
     "pre-order": {
       eyebrow: "Покупателям",
       title: "Как работает предзаказ",
       introduction:
-        "Статус «Предзаказ» означает, что модель не обещана к немедленной выдаче.",
+        "Все модели запуска доступны по предзаказу с ожидаемым сроком около 2–3 недель.",
       sections: [
         {
           title: "Личное подтверждение",
-          body: "Срок, доступность, цена и условия подтверждаются до того, как запрос станет заказом.",
+          body: "Актуальный срок, размер, цена и условия подтверждаются до оплаты и оформления заказа.",
         },
       ],
     },
@@ -446,7 +445,7 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Rahulik valik",
-          body: "Kataloogis kuvatakse ainult avalikuks ülevaatuseks ette valmistatud mudeleid ja andmeid.",
+          body: "Kataloogis on Andrelooki stardikollektsioon päris fotode ja selge eeltellimisteekonnaga.",
         },
         {
           title: "Isiklik kontakt",
@@ -478,24 +477,23 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Tarne ja maksmine",
       introduction:
-        "Tarneviis, aeg ja makseviis kinnitatakse isiklikult enne tellimust.",
+        "Tarne on saadaval üle Euroopa. Makseviis sõltub isiklikust üleandmisest või tarnest ning kinnitatakse selgelt enne makset.",
       sections: [
         {
-          title: "Enne kinnitamist",
-          body: "Anname konkreetse tellimuse tingimused pärast mudeli, saadavuse ja sihtkoha täpsustamist.",
+          title: "Selge järgmine samm",
+          body: "Pärast päringut kinnitame mudeli, suuruse, summa, aadressi või üleandmiskoha ning alles siis anname ettemakse andmed.",
         },
       ],
-      requiresApproval: true,
     },
     "pre-order": {
       eyebrow: "Kliendile",
       title: "Kuidas eeltellimus toimib",
       introduction:
-        "Märge „Eeltellimus” tähendab, et mudelit ei lubata kohe väljastamiseks.",
+        "Kõik stardikollektsiooni mudelid on eeltellitavad eeldatava ajaga umbes 2–3 nädalat.",
       sections: [
         {
           title: "Isiklik kinnitus",
-          body: "Aeg, saadavus, hind ja tingimused kinnitatakse enne, kui päringust saab tellimus.",
+          body: "Hetkeaeg, suurus, hind ja tingimused kinnitatakse enne makset ja tellimuse vormistamist.",
         },
       ],
     },
@@ -578,7 +576,7 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "A considered selection",
-          body: "The catalog shows only pieces and information prepared for public review.",
+          body: "The catalog presents Andrelook’s launch collection with real photography and a clear pre-order path.",
         },
         {
           title: "Personal contact",
@@ -610,24 +608,23 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "Delivery & payment",
       introduction:
-        "Delivery method, timing and payment method are confirmed personally before an order.",
+        "Delivery is available across Europe. Payment depends on personal handover or delivery and is clearly confirmed before payment.",
       sections: [
         {
-          title: "Before confirmation",
-          body: "We provide the terms that apply to your request after confirming the piece, availability and destination.",
+          title: "A clear next step",
+          body: "After your request, we confirm the piece, size, total, address or handover location before sharing advance-payment details.",
         },
       ],
-      requiresApproval: true,
     },
     "pre-order": {
       eyebrow: "Customer care",
       title: "How pre-order works",
       introduction:
-        "A “Pre-order” status means the piece is not promised for immediate collection or dispatch.",
+        "Every launch piece is available by pre-order with an expected timeframe of approximately 2–3 weeks.",
       sections: [
         {
           title: "Personal confirmation",
-          body: "Timing, availability, price and terms are confirmed before a request becomes an order.",
+          body: "Current timing, size, price and terms are confirmed before payment and order placement.",
         },
       ],
     },

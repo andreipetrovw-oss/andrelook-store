@@ -21,16 +21,25 @@ vi.mock("@/lib/env", () => ({
 import { createOrderRequest } from "./service";
 
 const input = {
+  city: "Tallinn",
   colour: "black",
   consent: "accepted" as const,
   contactMethod: "TELEGRAM" as const,
-  contactValue: "@customer",
+  countryCode: "EE",
+  email: "customer@example.com",
+  firstName: "Test",
+  fulfilmentMethod: "PERSONAL_HANDOVER" as const,
+  lastName: "Customer",
   locale: "en" as const,
-  name: "Customer",
+  paymentPreference: "DEPOSIT_30_BALANCE_ON_HANDOVER" as const,
+  phone: "+3725555555",
+  preferredLocale: "en" as const,
   productId: "product_1",
   productVersion: "2026-09-26T12:00:00.000Z",
+  quantity: 1,
   requestKey: "11111111-1111-4111-8111-111111111111",
   size: "M",
+  socialHandle: "@customer",
 };
 
 const databaseProduct = {
@@ -59,7 +68,9 @@ describe("transactional assisted-order service", () => {
   });
 
   it("writes server-resolved product, price and initial history in one transaction", async () => {
-    const createOrder = vi.fn().mockResolvedValue({ displayNumber: "AL-REF" });
+    const createOrder = vi
+      .fn()
+      .mockResolvedValue({ displayNumber: "AL-REF", id: "order_1" });
     transaction.mockImplementation(async (callback) =>
       callback({
         customer: { create: vi.fn().mockResolvedValue({ id: "customer_1" }) },
@@ -69,7 +80,11 @@ describe("transactional assisted-order service", () => {
 
     await expect(
       createOrderRequest(input, { initialReferrer: null, landingPath: "/en" }),
-    ).resolves.toEqual({ duplicate: false, reference: "AL-REF" });
+    ).resolves.toEqual({
+      duplicate: false,
+      orderId: "order_1",
+      reference: "AL-REF",
+    });
     const data = createOrder.mock.calls[0]![0].data;
     expect(data.items.create).toMatchObject({
       productInternalCodeSnapshot: "AL-SRC-TEST",
@@ -87,9 +102,16 @@ describe("transactional assisted-order service", () => {
         code: "P2002",
       }),
     );
-    findDuplicate.mockResolvedValue({ displayNumber: "AL-ORIGINAL" });
+    findDuplicate.mockResolvedValue({
+      displayNumber: "AL-ORIGINAL",
+      id: "order_original",
+    });
     await expect(
       createOrderRequest(input, { initialReferrer: null, landingPath: null }),
-    ).resolves.toEqual({ duplicate: true, reference: "AL-ORIGINAL" });
+    ).resolves.toEqual({
+      duplicate: true,
+      orderId: "order_original",
+      reference: "AL-ORIGINAL",
+    });
   });
 });

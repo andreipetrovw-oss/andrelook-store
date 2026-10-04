@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 
 import { getAdminOrder } from "@/lib/admin/query";
 
-import { recordPayment, updateOrderStatus } from "../../actions";
+import {
+  recordPayment,
+  retryOrderNotification,
+  updateOrderStatus,
+} from "../../actions";
 
 export default async function AdminOrderPage({
   params,
@@ -30,6 +34,14 @@ export default async function AdminOrderPage({
               <dd>{order.customer.preferredContactValue}</dd>
             </div>
             <div>
+              <dt>Phone</dt>
+              <dd>{order.customer.phone ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd>{order.customer.email ?? "—"}</dd>
+            </div>
+            <div>
               <dt>Locale</dt>
               <dd>{order.requestedLocale}</dd>
             </div>
@@ -49,7 +61,15 @@ export default async function AdminOrderPage({
               </div>
               <div>
                 <dt>Size</dt>
-                <dd>{item.sizeSnapshot ?? "Pending"}</dd>
+                <dd>
+                  {item.sizeHelpRequested
+                    ? "Sizing help requested"
+                    : (item.sizeSnapshot ?? "Pending")}
+                </dd>
+              </div>
+              <div>
+                <dt>Quantity</dt>
+                <dd>{item.quantity}</dd>
               </div>
               <div>
                 <dt>Colour</dt>
@@ -63,8 +83,101 @@ export default async function AdminOrderPage({
                     : `${(item.unitPriceMinor / 100).toFixed(2)} ${order.currency}`}
                 </dd>
               </div>
+              <div>
+                <dt>Measurements / sizing note</dt>
+                <dd>{item.measurementsNote ?? "—"}</dd>
+              </div>
             </dl>
           ))}
+        </section>
+        <section className="admin-panel">
+          <h2>Fulfilment & payment</h2>
+          <dl>
+            <div>
+              <dt>Method</dt>
+              <dd>{order.fulfilmentMethod?.replaceAll("_", " ") ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Payment preference</dt>
+              <dd>{order.paymentPreference?.replaceAll("_", " ") ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Country / city</dt>
+              <dd>
+                {order.countryCode ?? "—"} · {order.city ?? "—"}
+              </dd>
+            </div>
+            <div>
+              <dt>Address</dt>
+              <dd>
+                {[order.addressLine1, order.addressLine2, order.postalCode]
+                  .filter(Boolean)
+                  .join(", ") || "Personal handover"}
+              </dd>
+            </div>
+          </dl>
+        </section>
+        <section className="admin-panel">
+          <h2>Attribution</h2>
+          <dl>
+            <div>
+              <dt>Channel</dt>
+              <dd>{order.acquisitionChannel}</dd>
+            </div>
+            <div>
+              <dt>UTM</dt>
+              <dd>
+                {[
+                  order.utmSource,
+                  order.utmMedium,
+                  order.utmCampaign,
+                  order.utmContent,
+                  order.utmTerm,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "Direct / none"}
+              </dd>
+            </div>
+            <div>
+              <dt>Landing path</dt>
+              <dd>{order.landingPath ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Initial referrer</dt>
+              <dd>{order.initialReferrer ?? "—"}</dd>
+            </div>
+          </dl>
+        </section>
+        <section className="admin-panel">
+          <h2>Owner notification</h2>
+          <dl>
+            <div>
+              <dt>Status</dt>
+              <dd>{order.notification?.status ?? "Not attempted"}</dd>
+            </div>
+            <div>
+              <dt>Recipient</dt>
+              <dd>{order.notification?.recipient ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Attempts</dt>
+              <dd>{order.notification?.attempts ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Provider ID</dt>
+              <dd>{order.notification?.providerMessageId ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Last error</dt>
+              <dd>{order.notification?.lastError ?? "—"}</dd>
+            </div>
+          </dl>
+          {order.notification?.status !== "SENT" ? (
+            <form action={retryOrderNotification} className="admin-stack-form">
+              <input name="orderId" type="hidden" value={order.id} />
+              <button type="submit">Retry owner notification</button>
+            </form>
+          ) : null}
         </section>
         <section className="admin-panel">
           <h2>Operations</h2>

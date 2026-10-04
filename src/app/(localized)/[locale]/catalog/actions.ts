@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 
 import { RequestRejectedError, createOrderRequest } from "@/lib/orders/service";
 import { requestOrderInput } from "@/lib/orders/request-schema";
+import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
 
 export type RequestFormState = {
   errors?: Record<string, string[]>;
@@ -40,6 +41,13 @@ export async function submitOrderRequest(
       initialReferrer: referrer?.slice(0, 1000) ?? null,
       landingPath,
     });
+    if (!result.duplicate) {
+      try {
+        await sendNewOrderNotification(result.orderId);
+      } catch {
+        console.error("Order notification audit failed after order creation.");
+      }
+    }
     return { reference: result.reference, status: "success" };
   } catch (error) {
     if (error instanceof RequestRejectedError) {

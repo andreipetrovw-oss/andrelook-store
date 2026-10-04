@@ -43,11 +43,13 @@ export type StorefrontContent = {
   product: {
     assistanceBody: string;
     commercialIntro: string;
+    deliverySummary: string;
     detailsLabel: string;
     helpLabel: string;
     learnMoreLabel: string;
     orderContext: string;
     requestLabel: string;
+    returnsSummary: string;
     sizeGuideAvailable: string;
     sizingLabel: string;
   };
@@ -68,7 +70,7 @@ const content: Record<Locale, StorefrontContent> = {
       inStockExplanation:
         "Модель отмечается «В наличии» только после проверки текущего статуса Andrelook.",
       preorderExplanation:
-        "Предзаказ означает, что срок, цена и доступность подтверждаются до оформления.",
+        "Все модели запуска доступны по предзаказу. Ожидаемый срок — около 2–3 недель; детали подтверждаются лично.",
       priceOnRequest: "Цена по запросу",
       unavailableExplanation:
         "Недоступную модель нельзя запросить, пока её статус не изменится.",
@@ -78,10 +80,10 @@ const content: Record<Locale, StorefrontContent> = {
         "Проверенная таблица остаётся рядом с моделью. Если данных недостаточно, поможем разобраться лично до оформления запроса.",
       assistanceTitle: "Размер без догадок",
       categoriesIntro:
-        "Переходите сразу к нужному типу вещи. Количество отражает модели, подготовленные для текущего просмотра.",
+        "Переходите сразу к нужному типу вещи. Количество отражает модели текущей стартовой коллекции.",
       categoriesTitle: "Найдите свой раздел",
       collectionIntro:
-        "Отобранные модели с ясной структурой размеров и запроса. Факты о цене, наличии и вариантах появляются только после подтверждения.",
+        "Реальные модели Andrelook с фотографиями, цветами, размерной информацией и личным сопровождением предзаказа.",
       collectionTitle: "Выбранные модели",
       contactBody:
         "Напишите в Telegram, Instagram или по электронной почте. Ответим на русском, эстонском или английском.",
@@ -107,7 +109,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Короткие ответы о выборе и запросе. Полная информация собрана в разделе помощи.",
       faqTitle: "Перед запросом",
       heroBody:
-        "Выбирайте модель в спокойном темпе — с понятной информацией, проверенными таблицами размеров и личной помощью.",
+        "Тщательно отобранные модели по предзаказу с доставкой по Европе, проверенными таблицами размеров и личной помощью из Таллинна.",
       heroMeta: "Таллинн · Эстония · Личная поддержка",
       heroTitle: "ANDRELOOK",
       orderIntro:
@@ -123,7 +125,7 @@ const content: Record<Locale, StorefrontContent> = {
         },
         {
           title: "Получите подтверждение",
-          body: "Andrelook лично сверит цену, доступность и дальнейшие шаги.",
+          body: "Andrelook лично подтвердит цену, размер, оплату и ожидаемый срок 2–3 недели.",
         },
       ],
       orderTitle: "Как начинается заказ",
@@ -150,19 +152,23 @@ const content: Record<Locale, StorefrontContent> = {
         "Можно запросить личную помощь",
       ],
       stateIntro:
-        "Статусы помогают понять следующий шаг ещё до того, как вы оставите контакт.",
-      stateTitle: "В наличии или предзаказ",
+        "Каждую модель можно запросить сейчас; ожидаемый срок и следующий шаг понятны до отправки формы.",
+      stateTitle: "Стартовая коллекция по предзаказу",
     },
     product: {
       assistanceBody:
         "Не уверены в размере или параметрах? Укажите вопрос в форме — подтверждение будет до оформления заказа.",
       commercialIntro:
-        "Цена и доступность фиксируются только после проверки. Запрос не является оплатой или подтверждённым заказом.",
+        "Предзаказ с ожидаемым сроком около 2–3 недель. Запрос не списывает оплату: мы сначала лично подтверждаем цену и детали.",
+      deliverySummary:
+        "Личная передача в Таллинне или доставка по Европе. Способ оплаты зависит от получения и подтверждается до оплаты.",
       detailsLabel: "Информация о модели",
       helpLabel: "Помощь перед запросом",
       learnMoreLabel: "Подробнее",
       orderContext: "Как оформить запрос",
       requestLabel: "Перейти к запросу",
+      returnsSummary:
+        "Применимые условия возврата или обмена сообщаются до подтверждения заказа.",
       sizeGuideAvailable: "Проверенная таблица",
       sizingLabel: "Размер и посадка",
     },
@@ -181,7 +187,7 @@ const content: Record<Locale, StorefrontContent> = {
       inStockExplanation:
         "Märge „Laos” kuvatakse ainult pärast seda, kui Andrelook on hetkeseisu kontrollinud.",
       preorderExplanation:
-        "Eeltellimuse puhul kinnitatakse aeg, hind ja saadavus enne vormistamist.",
+        "Kõik stardikollektsiooni mudelid on eeltellitavad. Eeldatav aeg on umbes 2–3 nädalat; üksikasjad kinnitatakse isiklikult.",
       priceOnRequest: "Hind päringu alusel",
       unavailableExplanation:
         "Mittesaadava mudeli kohta ei saa päringut saata enne oleku muutmist.",
@@ -191,10 +197,10 @@ const content: Record<Locale, StorefrontContent> = {
         "Kontrollitud suurustabel asub alati mudeli juures. Kui andmeid on vähe, aitame enne päringut isiklikult.",
       assistanceTitle: "Suurus ilma oletusteta",
       categoriesIntro:
-        "Liigu kohe sobiva tootetüübi juurde. Arv näitab praeguseks ülevaatuseks ettevalmistatud mudeleid.",
+        "Liigu kohe sobiva tootetüübi juurde. Arv näitab praeguse stardikollektsiooni mudeleid.",
       categoriesTitle: "Leia õige kategooria",
       collectionIntro:
-        "Valitud mudelid selge suuruse- ja päringuteekonnaga. Hind, saadavus ja valikud ilmuvad alles pärast kinnitamist.",
+        "Andrelooki päris mudelid koos fotode, värvide, suurusinfo ja personaalse eeltellimustoega.",
       collectionTitle: "Valitud mudelid",
       contactBody:
         "Kirjuta Telegramis, Instagramis või e-posti teel. Vastame eesti, vene või inglise keeles.",
@@ -220,7 +226,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Lühivastused valiku ja päringu kohta. Täielik teave on abilehel.",
       faqTitle: "Enne päringut",
       heroBody:
-        "Vali mudel rahulikus tempos — selge teabe, kontrollitud suurustabelite ja personaalse abiga.",
+        "Hoolikalt valitud eeltellimusmudelid, tarne üle Euroopa, kontrollitud suurustabelid ja personaalne abi Tallinnast.",
       heroMeta: "Tallinn · Eesti · Personaalne tugi",
       heroTitle: "ANDRELOOK",
       orderIntro:
@@ -236,7 +242,7 @@ const content: Record<Locale, StorefrontContent> = {
         },
         {
           title: "Saa kinnitus",
-          body: "Andrelook kontrollib isiklikult hinna, saadavuse ja järgmised sammud.",
+          body: "Andrelook kinnitab isiklikult hinna, suuruse, makse ja eeldatava 2–3-nädalase aja.",
         },
       ],
       orderTitle: "Kuidas tellimus algab",
@@ -263,19 +269,23 @@ const content: Record<Locale, StorefrontContent> = {
         "Saad küsida personaalset abi",
       ],
       stateIntro:
-        "Olekud näitavad järgmist sammu juba enne kontaktandmete jätmist.",
-      stateTitle: "Laos või eeltellimus",
+        "Iga mudelit saab kohe küsida; eeldatav aeg ja järgmine samm on selged enne vormi saatmist.",
+      stateTitle: "Stardikollektsioon eeltellimisel",
     },
     product: {
       assistanceBody:
         "Kas suurus või detailid tekitavad küsimusi? Lisa küsimus vormi — kõik kinnitatakse enne tellimist.",
       commercialIntro:
-        "Hind ja saadavus fikseeritakse alles pärast kontrolli. Päring ei ole makse ega kinnitatud tellimus.",
+        "Eeltellimuse eeldatav aeg on umbes 2–3 nädalat. Päring ei võta makset — esmalt kinnitame hinna ja detailid isiklikult.",
+      deliverySummary:
+        "Isiklik üleandmine Tallinnas või tarne üle Euroopa. Makseviis sõltub kättesaamisest ja kinnitatakse enne makset.",
       detailsLabel: "Mudeli info",
       helpLabel: "Abi enne päringut",
       learnMoreLabel: "Loe lähemalt",
       orderContext: "Kuidas päringut esitada",
       requestLabel: "Liigu päringu juurde",
+      returnsSummary:
+        "Kohaldatavad tagastus- või vahetustingimused antakse enne tellimuse kinnitamist.",
       sizeGuideAvailable: "Kontrollitud tabel",
       sizingLabel: "Suurus ja istuvus",
     },
@@ -294,7 +304,7 @@ const content: Record<Locale, StorefrontContent> = {
       inStockExplanation:
         "A piece is marked In stock only after Andrelook checks its current status.",
       preorderExplanation:
-        "Pre-order means timing, price and availability are confirmed before an order is placed.",
+        "Every launch piece is available by pre-order. The expected timeframe is approximately 2–3 weeks, with details confirmed personally.",
       priceOnRequest: "Price on request",
       unavailableExplanation:
         "An unavailable piece cannot be requested until its status changes.",
@@ -304,10 +314,10 @@ const content: Record<Locale, StorefrontContent> = {
         "A verified size chart stays beside each supported piece. If the evidence is incomplete, we help personally before a request is placed.",
       assistanceTitle: "Sizing without guesswork",
       categoriesIntro:
-        "Go straight to the type of piece you need. Counts reflect models prepared for the current review.",
+        "Go straight to the type of piece you need. Counts reflect the current launch collection.",
       categoriesTitle: "Find your category",
       collectionIntro:
-        "A considered selection with clear sizing and request paths. Price, availability and option facts appear only after confirmation.",
+        "Real Andrelook pieces with photography, colours, sizing information and personal pre-order support.",
       collectionTitle: "Selected pieces",
       contactBody:
         "Message us on Telegram, Instagram or email. We can respond in English, Estonian or Russian.",
@@ -334,7 +344,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Short answers about choosing and requesting. Full guidance is available in the help section.",
       faqTitle: "Before you request",
       heroBody:
-        "Choose at your own pace — with clear information, verified size charts and personal support.",
+        "A considered pre-order edit with delivery across Europe, verified size guides and personal support from Tallinn.",
       heroMeta: "Tallinn · Estonia · Personal support",
       heroTitle: "ANDRELOOK",
       orderIntro:
@@ -350,7 +360,7 @@ const content: Record<Locale, StorefrontContent> = {
         },
         {
           title: "Receive confirmation",
-          body: "Andrelook personally checks price, availability and the next steps.",
+          body: "Andrelook personally confirms price, size, payment and the expected 2–3 week timeframe.",
         },
       ],
       orderTitle: "How an order begins",
@@ -377,19 +387,23 @@ const content: Record<Locale, StorefrontContent> = {
         "Personal sizing help is available",
       ],
       stateIntro:
-        "Clear states explain the next step before you share any contact details.",
-      stateTitle: "In stock or pre-order",
+        "Every piece can be requested now, with the expected timing and next step clear before you submit.",
+      stateTitle: "The launch collection, by pre-order",
     },
     product: {
       assistanceBody:
         "Unsure about sizing or another detail? Add the question to your request — confirmation comes before ordering.",
       commercialIntro:
-        "Price and availability are fixed only after review. A request is not a payment or a confirmed order.",
+        "Pre-order with an expected timeframe of approximately 2–3 weeks. A request takes no payment; we first confirm price and details personally.",
+      deliverySummary:
+        "Personal handover in Tallinn or delivery across Europe. Payment depends on fulfilment and is confirmed before payment.",
       detailsLabel: "Product information",
       helpLabel: "Help before requesting",
       learnMoreLabel: "Learn more",
       orderContext: "How to make a request",
       requestLabel: "Go to request",
+      returnsSummary:
+        "The return or exchange terms that apply are shared before your order is confirmed.",
       sizeGuideAvailable: "Verified chart",
       sizingLabel: "Size and fit",
     },

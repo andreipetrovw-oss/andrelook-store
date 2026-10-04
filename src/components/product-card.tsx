@@ -77,6 +77,11 @@ export function ProductCard({
             {product.colors.map((colour) => colour.name).join(", ")}
           </p>
         ) : null}
+        {product.availability === "PRE_ORDER" && product.preorderEstimate ? (
+          <p className="product-card-options">
+            {dictionary.preorder}: {product.preorderEstimate}
+          </p>
+        ) : null}
         <div className="product-card-footer">
           <span>{formattedPrice}</span>
           <span className="product-card-cta">{dictionary.viewProduct} ↗</span>

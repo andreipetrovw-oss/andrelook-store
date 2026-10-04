@@ -14,6 +14,9 @@ export type ServerConfig = {
   indexingEnabled: boolean;
   storefrontReviewMode: boolean;
   ownerEmails: string[];
+  orderNotificationFrom: string | null;
+  orderNotificationTo: string;
+  resendApiKey: string | null;
   siteUrl: URL;
 };
 
@@ -68,6 +71,11 @@ export function getServerConfig(): ServerConfig {
     storefrontReviewMode:
       requestedReviewMode && (isLocalReview || isBoundStagingProject),
     ownerEmails: parseOwnerEmails(process.env.OWNER_EMAILS),
+    orderNotificationFrom: optionalValue(process.env.ORDER_NOTIFICATION_FROM),
+    orderNotificationTo:
+      optionalValue(process.env.ORDER_NOTIFICATION_TO) ??
+      "info.andrelook@gmail.com",
+    resendApiKey: optionalValue(process.env.RESEND_API_KEY),
     siteUrl: new URL(rawSiteUrl),
   };
 

@@ -48,6 +48,7 @@ export default async function AdminOrdersPage({
               <th>Product</th>
               <th>Status</th>
               <th>Source</th>
+              <th>Notification</th>
               <th>Date</th>
               <th>Next action</th>
               <th>Balance</th>
@@ -65,6 +66,7 @@ export default async function AdminOrdersPage({
                 <td>{order.items[0]?.productNameSnapshot ?? "—"}</td>
                 <td>{order.status.replaceAll("_", " ")}</td>
                 <td>{order.acquisitionChannel}</td>
+                <td>{order.notification?.status ?? "—"}</td>
                 <td>{order.orderDate.toLocaleDateString("en-GB")}</td>
                 <td>
                   {order.nextActionAt?.toLocaleDateString("en-GB") ?? "—"}

@@ -640,6 +640,31 @@ button:disabled {
   margin-top: 1.5rem;
 }
 
+.request-form fieldset {
+  border: 1px solid var(--color-border);
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.request-form legend {
+  font-family: var(--font-editorial);
+  font-size: 1.1rem;
+  padding-inline: 0.35rem;
+}
+
+.request-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 540px) {
+  .request-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .request-form label,
 .admin-filters label {
   display: grid;
@@ -932,7 +957,20 @@ button:disabled {
   }
 
   .product-card-body {
+    overflow: hidden;
     padding: 0.85rem 0.7rem 1rem;
+  }
+
+  .product-card-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .product-card-brand {
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 
   .product-card h2 {

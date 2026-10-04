@@ -53,6 +53,38 @@ async function HomeDiscovery({
 
   return (
     <>
+      <section className="collection-preview home-product-section">
+        <div className="container">
+          <header className="editorial-heading split-heading">
+            <div>
+              <span className="eyebrow">Andrelook edit</span>
+              <h2>{copy.collectionTitle}</h2>
+            </div>
+            <p>{copy.collectionIntro}</p>
+          </header>
+          {products.length ? (
+            <div className="catalog-grid compact-grid home-product-grid">
+              {products.slice(0, 6).map((product) => (
+                <ProductCard
+                  dictionary={dictionary}
+                  key={product.id}
+                  locale={locale}
+                  product={product}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <p>{dictionary.catalogEmpty}</p>
+            </div>
+          )}
+          <div className="section-action section-action-left">
+            <Link className="secondary-button" href={`/${locale}/catalog`}>
+              {dictionary.viewCatalog}
+            </Link>
+          </div>
+        </div>
+      </section>
       <section className="container home-category-section">
         <header className="editorial-heading split-heading">
           <div>
@@ -85,38 +117,6 @@ async function HomeDiscovery({
             ))}
           </nav>
         ) : null}
-      </section>
-      <section className="collection-preview home-product-section">
-        <div className="container">
-          <header className="editorial-heading split-heading">
-            <div>
-              <span className="eyebrow">Andrelook edit</span>
-              <h2>{copy.collectionTitle}</h2>
-            </div>
-            <p>{copy.collectionIntro}</p>
-          </header>
-          {products.length ? (
-            <div className="catalog-grid compact-grid home-product-grid">
-              {products.slice(0, 4).map((product) => (
-                <ProductCard
-                  dictionary={dictionary}
-                  key={product.id}
-                  locale={locale}
-                  product={product}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <p>{dictionary.catalogEmpty}</p>
-            </div>
-          )}
-          <div className="section-action section-action-left">
-            <Link className="secondary-button" href={`/${locale}/catalog`}>
-              {dictionary.viewCatalog}
-            </Link>
-          </div>
-        </div>
       </section>
     </>
   );
@@ -181,24 +181,12 @@ export default async function LocalizedHome({
             <h2>{content.home.stateTitle}</h2>
             <p>{content.home.stateIntro}</p>
           </header>
-          <div className="state-explainer-list">
-            <article>
-              <span className="status-pill status-in-stock">
-                {dictionary.availabilityInStock}
-              </span>
-              <p>{content.commerce.inStockExplanation}</p>
-            </article>
+          <div className="state-explainer-list launch-preorder-story">
             <article>
               <span className="status-pill status-preorder">
                 {dictionary.availabilityPreOrder}
               </span>
               <p>{content.commerce.preorderExplanation}</p>
-            </article>
-            <article>
-              <span className="status-pill status-unavailable">
-                {dictionary.availabilityUnavailable}
-              </span>
-              <p>{content.commerce.unavailableExplanation}</p>
             </article>
           </div>
         </div>

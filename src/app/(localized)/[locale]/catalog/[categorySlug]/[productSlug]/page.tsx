@@ -286,6 +286,13 @@ export default async function ProductPage({ params }: Props) {
                 <dt>{dictionary.price}</dt>
                 <dd>{formattedPrice}</dd>
               </div>
+              {product.availability === "PRE_ORDER" &&
+              product.preorderEstimate ? (
+                <div>
+                  <dt>{dictionary.preorder}</dt>
+                  <dd>{product.preorderEstimate}</dd>
+                </div>
+              ) : null}
               <div>
                 <dt>{dictionary.sizeGuide}</dt>
                 <dd>
@@ -343,7 +350,7 @@ export default async function ProductPage({ params }: Props) {
               <article>
                 <span>01</span>
                 <h3>{dictionary.deliveryPayment}</h3>
-                <p>{dictionary.requestIntro}</p>
+                <p>{content.product.deliverySummary}</p>
                 <Link href={`/${locale}/delivery-payment`}>
                   {content.product.learnMoreLabel} →
                 </Link>
@@ -359,7 +366,7 @@ export default async function ProductPage({ params }: Props) {
               <article>
                 <span>03</span>
                 <h3>{dictionary.returnsExchanges}</h3>
-                <p>{content.product.commercialIntro}</p>
+                <p>{content.product.returnsSummary}</p>
                 <Link href={`/${locale}/returns-exchanges`}>
                   {content.product.learnMoreLabel} →
                 </Link>
