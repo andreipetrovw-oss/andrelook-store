@@ -3,17 +3,32 @@ import { PrismaClient } from "@prisma/client";
 const expected = {
   "f6000000-0000-4000-8000-000000000001": {
     countryCode: "EE",
+    finalStatus: "DELIVERED",
     fulfilmentMethod: "PERSONAL_HANDOVER",
     paymentPreference: "DEPOSIT_30_BALANCE_ON_HANDOVER",
   },
   "f6000000-0000-4000-8000-000000000002": {
     countryCode: "EE",
+    finalStatus: "CANCELLED",
     fulfilmentMethod: "DELIVERY",
+    history: ["NEW", "CANCELLED"],
     paymentPreference: "FULL_ADVANCE",
   },
   "f6000000-0000-4000-8000-000000000003": {
     countryCode: "FI",
+    finalStatus: "DELIVERED",
     fulfilmentMethod: "DELIVERY",
+    history: [
+      "NEW",
+      "CONTACTED",
+      "CONFIRMED",
+      "AWAITING_PAYMENT",
+      "PAID",
+      "ORDERED",
+      "IN_TRANSIT",
+      "READY",
+      "DELIVERED",
+    ],
     paymentPreference: "FULL_ADVANCE",
   },
 } as const;
@@ -53,7 +68,10 @@ async function main() {
         paymentPreference: true,
         requestKey: true,
         status: true,
-        statusHistory: { select: { toStatus: true } },
+        statusHistory: {
+          orderBy: { createdAt: "asc" },
+          select: { toStatus: true },
+        },
         utmCampaign: true,
         utmSource: true,
       },
@@ -69,6 +87,7 @@ async function main() {
       if (
         !target ||
         request.countryCode !== target.countryCode ||
+        request.status !== target.finalStatus ||
         request.fulfilmentMethod !== target.fulfilmentMethod ||
         request.paymentPreference !== target.paymentPreference ||
         request.customer.email !== "phase6f.acceptance@example.com" ||
@@ -83,6 +102,16 @@ async function main() {
       }
       if (target.fulfilmentMethod === "DELIVERY" && !request.addressLine1) {
         throw new Error(`${request.displayNumber}: delivery address missing.`);
+      }
+      if ("history" in target) {
+        const actualHistory = request.statusHistory.map(
+          ({ toStatus }) => toStatus,
+        );
+        if (actualHistory.join("|") !== target.history.join("|")) {
+          throw new Error(
+            `${request.displayNumber}: expected lifecycle ${target.history.join(" -> ")}, received ${actualHistory.join(" -> ")}.`,
+          );
+        }
       }
     }
     const [allOrders, customers, payments, admins] = await Promise.all([
@@ -101,6 +130,9 @@ async function main() {
             payment: request.paymentPreference,
             reference: request.displayNumber,
             status: request.status,
+            statusHistory: request.statusHistory.map(
+              ({ toStatus }) => toStatus,
+            ),
           })),
           stagingTotals: { admins, customers, orders: allOrders, payments },
         },

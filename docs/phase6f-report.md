@@ -54,7 +54,8 @@ Status: isolated staging candidate; production cutover is not authorized.
 - The CRM exposes customer identity and contacts, preferred channel/language, product, size or sizing-help request, quantity, colour, measurements, fulfilment, address, payment preference, attribution, notification audit data and timestamps.
 - Supported workflow: NEW → CONTACTED → CONFIRMED → AWAITING_PAYMENT → PAID → ORDERED → IN_TRANSIT → READY → DELIVERED; CANCELLED is available separately.
 - Every real status change writes an immutable history entry with the authenticated admin identity and optional note. Payment recording remains a separate authenticated action.
-- Final deployed transition-chain references and history counts are recorded in the final handoff after authenticated staging acceptance.
+- Authenticated staging acceptance verified the exact lifecycle `NEW → CONTACTED → CONFIRMED → AWAITING_PAYMENT → PAID → ORDERED → IN_TRANSIT → READY → DELIVERED` on Finland delivery reference `AL-20261004-F2A6C7` (nine immutable history entries).
+- The separate cancellation branch was verified on Estonia delivery reference `AL-20261004-74F6C8` as `NEW → CANCELLED` (two immutable history entries). The original Estonia handover reference `AL-20261004-EFA0D7` remains intact and finished at `DELIVERED`; its earlier auth-debug history includes one additional `NEW` entry and is intentionally preserved rather than rewritten.
 
 ## H. Notifications
 
@@ -68,12 +69,12 @@ Status: isolated staging candidate; production cutover is not authorized.
 
 - Database-backed product lookup is request-deduplicated between metadata and page rendering; product and related-category retrieval run in parallel.
 - Legacy masters are preserved, while storefront delivery uses optimized WebP derivatives and Next.js image sizing.
-- The production build succeeds with Next.js 16.3.6 and Node 24-compatible CI. Final deployed measurements for home, catalog and representative product are recorded in the final handoff.
+- The production build succeeds with Next.js 16.3.6 and Node 24-compatible CI. Warm protected-staging TTFB was approximately 0.30–0.59 s for information pages and 0.35–0.46 s for localized home pages; database-backed catalog/product responses were approximately 2.76–2.87 s in the final acceptance sample. These are protected preview measurements, not public-production benchmarks.
 
 ## J. Accessibility
 
 - Semantic headings, landmarks, labelled navigation, a skip link, labelled fieldsets, required input semantics, visible error/live regions and focus transfer to the success state are present.
-- Keyboard-sized controls, mobile navigation, gallery alternatives and 320–1440 px layouts were reviewed. Final deployed browser/accessibility verification is recorded in the final handoff.
+- Keyboard-sized controls, mobile navigation, gallery alternatives and 320–1440 px layouts were reviewed. The final deployed matrix covered home, catalog, representative product and delivery/payment at 320, 360, 375, 390, 414, 768, 1024 and 1440 px: no horizontal document overflow and no broken images were found. Visual inspection covered the mobile hero, catalog controls, product gallery/commercial hierarchy, request fields and support-page structure. Browser console inspection found no warnings or errors.
 
 ## K. Security / privacy
 
@@ -90,13 +91,14 @@ Status: isolated staging candidate; production cutover is not authorized.
 
 ## M. End-to-end tests
 
-- Estonia/personal handover: `AL-20261004-EFA0D7`, 30% advance/balance preference, CRM NEW, committed despite notification failure.
-- Estonia/delivery: `AL-20261004-74F6C8`, complete delivery address and full-advance preference, CRM NEW, committed despite notification failure.
-- Finland/delivery: `AL-20261004-F2A6C7`, complete address and full-advance preference, CRM NEW, committed despite notification failure.
+- Estonia/personal handover: `AL-20261004-EFA0D7`, 30% advance/balance preference, committed despite notification failure; final staging status `DELIVERED`.
+- Estonia/delivery: `AL-20261004-74F6C8`, complete delivery address and full-advance preference, committed despite notification failure; cancellation path verified as `NEW → CANCELLED`.
+- Finland/delivery: `AL-20261004-F2A6C7`, complete address and full-advance preference, committed despite notification failure; clean nine-step `NEW → DELIVERED` lifecycle verified through the protected CRM.
 - Mobile: complete request journey and responsive form reviewed at representative mobile widths.
 - Duplicate: resubmitting the fixed acceptance key returned the original record; total acceptance orders remained three.
 - Invalid input: schema and browser validation cover required size/colour/contact/consent, delivery address, Estonia-only handover, full advance outside Estonia and social handle requirements, with customer-safe errors.
 - Local runtime crawl: 124 routes, 121 unique internal links, 53 direct legacy images, correct 404, no leakage findings.
+- Deployed localized smoke matrix: RU, ET and EN home, catalog, representative product, all nine information/support routes, robots and empty sitemap returned the intended localized content. The deployed 404 remained correct, staging remained `noindex`, and browser logs contained no warnings or errors.
 
 ## N. Owner decisions
 
