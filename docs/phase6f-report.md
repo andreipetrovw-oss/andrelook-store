@@ -6,7 +6,10 @@ Status: isolated staging candidate; production cutover is not authorized.
 
 - Branch: `phase6f-commercial-launch`
 - Base Phase 6E SHA: `17664952381a36b9c87356feda0f3b351ec1b112`
-- Final branch SHA, commit list, CI run and deployed SHA are recorded in the final handoff after the report commit, because a commit cannot truthfully contain its own SHA.
+- Fully verified pre-report candidate: SHA `41f642c2ea16a7565ea2cc11eb75d27f42af96e2`; GitHub Actions run `37229717334` succeeded; isolated deployment `dpl_D9UgRDwYBzZJM2EBUcrUZhVL2Dht` reached Ready at immutable URL `https://andrelook-v1-staging-fae73fjj9-andreys-projects-a106cf89.vercel.app`.
+- Isolated project: `andrelook-v1-staging` (`prj_M6hDxQzBiShNOpWkWwSj3FOZmf1m`). Owner-review URL: `https://andrelook-v1-staging.vercel.app`.
+- Deployment Protection is configured for all non-custom domains. The project has only its `andrelook-v1-staging.vercel.app` domain and no Andrelook production/custom domain.
+- The final report-only commit necessarily changes its own containing SHA and produces a new deployment ID. The final handoff records the succeeding exact HEAD = green CI SHA = deployed `gitCommitSha` triplet; a commit cannot truthfully embed its own future object ID or deployment ID.
 - The work is a normal descendant of the verified Phase 6E head. No history rewrite, force push or merge to `main` is part of Phase 6F.
 
 ## B. Catalog migration
@@ -69,7 +72,7 @@ Status: isolated staging candidate; production cutover is not authorized.
 
 - Database-backed product lookup is request-deduplicated between metadata and page rendering; product and related-category retrieval run in parallel.
 - Legacy masters are preserved, while storefront delivery uses optimized WebP derivatives and Next.js image sizing.
-- The production build succeeds with Next.js 16.3.6 and Node 24-compatible CI. Warm protected-staging TTFB was approximately 0.30–0.59 s for information pages and 0.35–0.46 s for localized home pages; database-backed catalog/product responses were approximately 2.76–2.87 s in the final acceptance sample. These are protected preview measurements, not public-production benchmarks.
+- The production build succeeds with Next.js 16.3.6 and Node 24-compatible CI. Three-run protected-staging medians on the accepted candidate were: home **0.392 s TTFB / 3.047 s total**, catalog **3.012 s / 3.153 s**, and representative product **2.840 s / 2.997 s**. These include Vercel Authentication/protected dynamic delivery and are not public-production benchmarks.
 
 ## J. Accessibility
 
@@ -99,6 +102,7 @@ Status: isolated staging candidate; production cutover is not authorized.
 - Invalid input: schema and browser validation cover required size/colour/contact/consent, delivery address, Estonia-only handover, full advance outside Estonia and social handle requirements, with customer-safe errors.
 - Local runtime crawl: 124 routes, 121 unique internal links, 53 direct legacy images, correct 404, no leakage findings.
 - Deployed localized smoke matrix: RU, ET and EN home, catalog, representative product, all nine information/support routes, robots and empty sitemap returned the intended localized content. The deployed 404 remained correct, staging remained `noindex`, and browser logs contained no warnings or errors.
+- Final critical deployed smoke on `dpl_D9UgRDwYBzZJM2EBUcrUZhVL2Dht`: home, catalog, representative product, six-select request form, protected owner CRM, persisted synthetic orders and lifecycle history, 390 px mobile layout, product images, console, 404 and public leakage checks all passed.
 
 ## N. Owner decisions
 
@@ -113,7 +117,14 @@ Only genuine owner-authority inputs remain:
 
 ## O. Production
 
-Phase 6F has not modified or authorized modification of the live repository, Vercel production project, `andrelook.store` / `www.andrelook.store`, DNS, production database, production environment variables or production deployment. The Phase 6F branch is not merged to `main` and the isolated staging project has no production domain attached.
+Phase 6F has not modified or authorized modification of the live repository, Vercel production project, `andrelook.store` / `www.andrelook.store`, DNS, production database, production environment variables or production deployment. Final safety verification found:
+
+- `andreipetrovw-oss/andrelook` `main`: `2115502fbc104a9de433006831a70c2f09e983c3`.
+- `andrelook-store/main`: `1709a6a89372e9c07f1f2137acc65afc2626fc59`; `v1-foundation`: `8166ced8f3f718c57c35ff1c14f07c926f57597a`; Phase 6C: `2a42452359e7762e75092f37bb7fe235d2a3d527`; Phase 6E: `17664952381a36b9c87356feda0f3b351ec1b112`.
+- Archive branch/peeled tag: `1709a6a89372e9c07f1f2137acc65afc2626fc59`; annotated tag object: `8eb0e98de8d4c9b635c0018baf9a08f110eb1ccd`.
+- Public DNS remained apex A `76.76.21.21` and `www` CNAME `fdd5d99bf81c3aa7.vercel-dns-017.com.`.
+
+The Phase 6F branch is not merged to `main`, and the isolated staging project has no production domain attached.
 
 ## P. Cutover readiness
 
