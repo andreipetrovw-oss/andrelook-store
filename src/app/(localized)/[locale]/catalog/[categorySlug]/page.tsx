@@ -35,8 +35,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!category) notFound();
     return {
       alternates: localizedAlternates(locale, `catalog/${categorySlug}`),
+      description: getDictionary(locale).categoryContext,
+      openGraph: {
+        description: getDictionary(locale).categoryContext,
+        title: category.name,
+      },
       robots: indexingRobots(),
       title: category.name,
+      twitter: {
+        card: "summary_large_image",
+        description: getDictionary(locale).categoryContext,
+        title: category.name,
+      },
     };
   }
   return {

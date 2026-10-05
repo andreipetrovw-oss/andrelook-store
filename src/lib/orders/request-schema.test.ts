@@ -73,6 +73,19 @@ describe("assisted order request validation", () => {
     }
   });
 
+  it("keeps surname optional and only requires the selected contact channel", () => {
+    const telegram = validForm();
+    telegram.delete("lastName");
+    telegram.delete("email");
+    telegram.delete("phone");
+    expect(requestOrderInput(telegram).success).toBe(true);
+
+    const email = validForm();
+    email.set("contactMethod", "EMAIL");
+    email.delete("email");
+    expect(requestOrderInput(email).success).toBe(false);
+  });
+
   it("requires delivery details and full advance outside Estonia", () => {
     const form = validForm();
     form.set("fulfilmentMethod", "DELIVERY");

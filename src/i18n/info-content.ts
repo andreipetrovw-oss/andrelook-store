@@ -19,306 +19,27 @@ export type InfoPage = {
   title: string;
   introduction: string;
   sections: Array<{ title: string; body: string }>;
-  requiresApproval?: boolean;
 };
 
-const supplementalContent: Record<
-  Locale,
-  Record<InfoPageSlug, InfoPage["sections"]>
-> = {
-  ru: {
-    about: [
-      {
-        title: "Каталог с границами",
-        body: "Цена, наличие, цвета и другие коммерческие сведения появляются только после подтверждения. Непроверенные данные не выдаются за факты.",
-      },
-      {
-        title: "Три языка",
-        body: "Вы можете пройти весь путь и получить поддержку на русском, эстонском или английском языке.",
-      },
-    ],
-    "how-to-order": [
-      {
-        title: "Помощь с размером",
-        body: "Используйте проверенную таблицу на странице модели или добавьте вопрос в комментарий к запросу.",
-      },
-      {
-        title: "Запрос — не оплата",
-        body: "Отправка формы не списывает средства и не подтверждает покупку автоматически.",
-      },
-    ],
-    "delivery-payment": [
-      {
-        title: "Оплата в Эстонии",
-        body: "При личной передаче в Таллинне можно внести 30% предоплаты, а остаток оплатить при получении, либо выбрать полную предоплату.",
-      },
-      {
-        title: "Доставка по Европе",
-        body: "Для доставки по Эстонии и в другие страны Европы используется полная предоплата. Стоимость и способ доставки подтверждаются для конкретного адреса до оплаты.",
-      },
-    ],
-    "pre-order": [
-      {
-        title: "Ожидаемый срок",
-        body: "Для моделей запуска ожидаемый срок предзаказа составляет около 2–3 недель. Мы подтверждаем актуальную оценку лично до оплаты.",
-      },
-      {
-        title: "Следующий шаг",
-        body: "Оставьте запрос по модели; это позволит проверить доступность без автоматического обязательства купить.",
-      },
-    ],
-    "returns-exchanges": [
-      {
-        title: "Что должно быть утверждено",
-        body: "Владельцу и юридическому консультанту необходимо подтвердить сроки, исключения, процедуру и контакт для обращений.",
-      },
-      {
-        title: "До публикации политики",
-        body: "Не полагайтесь на эту страницу как на окончательные условия покупки; запросите применимые условия напрямую.",
-      },
-    ],
-    faq: [
-      {
-        title: "Почему цена может отсутствовать?",
-        body: "Цена показывается только после владельческого подтверждения. Если её нет, она будет уточнена в ответе на запрос.",
-      },
-      {
-        title: "Что означают статусы?",
-        body: "«В наличии», «Предзаказ» и «Недоступно» показываются только для моделей с подтверждённым коммерческим статусом.",
-      },
-    ],
-    contact: [
-      {
-        title: "Что указать",
-        body: "Пришлите название модели, желаемый размер и вопрос. Не отправляйте платёжные данные через форму запроса.",
-      },
-      {
-        title: "Язык общения",
-        body: "Можно написать на русском, эстонском или английском языке.",
-      },
-    ],
-    privacy: [
-      {
-        title: "Данные формы",
-        body: "Технически форма сохраняет имя, выбранный канал и контакт, выбранную модель и параметры, комментарий, язык и подтверждение согласия для обработки запроса.",
-      },
-      {
-        title: "Что ещё требуется",
-        body: "До публикации владелец и юридический консультант должны утвердить правовое основание, сроки хранения, права пользователя и контакты ответственного лица.",
-      },
-    ],
-    terms: [
-      {
-        title: "Статус каталога",
-        body: "Карточка модели сама по себе не является офертой; цена, наличие и применимые условия требуют подтверждения.",
-      },
-      {
-        title: "Что ещё требуется",
-        body: "До публикации должны быть утверждены сведения о продавце, порядок заключения договора, оплаты, доставки, возврата и разрешения споров.",
-      },
-    ],
-  },
-  et: {
-    about: [
-      {
-        title: "Selged piirid",
-        body: "Hind, saadavus, värvid ja muu müügiinfo kuvatakse alles pärast kinnitamist. Kontrollimata andmeid ei esitata faktina.",
-      },
-      {
-        title: "Kolm keelt",
-        body: "Kogu teekond ja personaalne tugi on saadaval eesti, vene või inglise keeles.",
-      },
-    ],
-    "how-to-order": [
-      {
-        title: "Suuruse valiku abi",
-        body: "Kasuta mudeli kontrollitud suurustabelit või lisa küsimus päringu kommentaari.",
-      },
-      {
-        title: "Päring ei ole makse",
-        body: "Vormi saatmine ei võta raha ega kinnita ostu automaatselt.",
-      },
-    ],
-    "delivery-payment": [
-      {
-        title: "Maksmine Eestis",
-        body: "Tallinnas isikliku üleandmise korral saab tasuda 30% ette ja ülejäänu kättesaamisel või valida täieliku ettemaksu.",
-      },
-      {
-        title: "Tarne Euroopas",
-        body: "Eestis kohaletoimetamisel ja teistesse Euroopa riikidesse tarnimisel kasutatakse täielikku ettemaksu. Tarnekulu ja -viis kinnitatakse aadressi alusel enne makset.",
-      },
-    ],
-    "pre-order": [
-      {
-        title: "Eeldatav aeg",
-        body: "Stardikollektsiooni eeltellimuse eeldatav aeg on umbes 2–3 nädalat. Kinnitame hetkehinnangu isiklikult enne makset.",
-      },
-      {
-        title: "Järgmine samm",
-        body: "Saada mudeli kohta päring, et saadavust kontrollida ilma automaatse ostukohustuseta.",
-      },
-    ],
-    "returns-exchanges": [
-      {
-        title: "Mis tuleb kinnitada",
-        body: "Omanik ja õigusnõustaja peavad kinnitama tähtajad, erandid, menetluse ja pöördumise kontakti.",
-      },
-      {
-        title: "Enne poliitika avaldamist",
-        body: "Ära käsitle seda lehte lõplike ostutingimustena; küsi kehtivad tingimused otse.",
-      },
-    ],
-    faq: [
-      {
-        title: "Miks võib hind puududa?",
-        body: "Hinda näidatakse ainult pärast omaniku kinnitust. Puuduv hind täpsustatakse päringule vastates.",
-      },
-      {
-        title: "Mida olekud tähendavad?",
-        body: "„Laos”, „Eeltellimus” ja „Pole saadaval” kuvatakse ainult kinnitatud müügiolekuga mudelitel.",
-      },
-    ],
-    contact: [
-      {
-        title: "Mida lisada",
-        body: "Kirjuta mudeli nimi, soovitud suurus ja küsimus. Ära saada päringuvormi kaudu makseandmeid.",
-      },
-      {
-        title: "Suhtluskeel",
-        body: "Kirjutada saab eesti, vene või inglise keeles.",
-      },
-    ],
-    privacy: [
-      {
-        title: "Vormi andmed",
-        body: "Vorm salvestab tehniliselt nime, valitud kontaktkanali ja kontakti, mudeli ja valikud, kommentaari, keele ning nõusoleku kinnituse päringu käsitlemiseks.",
-      },
-      {
-        title: "Mis vajab veel kinnitamist",
-        body: "Enne avaldamist peavad omanik ja õigusnõustaja kinnitama õigusliku aluse, säilitamisajad, kasutaja õigused ja vastutava isiku kontaktid.",
-      },
-    ],
-    terms: [
-      {
-        title: "Kataloogi staatus",
-        body: "Tooteleht ei ole iseenesest siduv pakkumus; hind, saadavus ja kohaldatavad tingimused vajavad kinnitamist.",
-      },
-      {
-        title: "Mis vajab veel kinnitamist",
-        body: "Enne avaldamist tuleb kinnitada müüja teave ning lepingu, makse, tarne, tagastuse ja vaidluste kord.",
-      },
-    ],
-  },
-  en: {
-    about: [
-      {
-        title: "Clear evidence boundaries",
-        body: "Price, availability, colours and other commercial details appear only after confirmation. Unreviewed information is never presented as fact.",
-      },
-      {
-        title: "Three languages",
-        body: "The complete journey and personal support are available in English, Estonian or Russian.",
-      },
-    ],
-    "how-to-order": [
-      {
-        title: "Sizing support",
-        body: "Use the verified chart on the product page or add a sizing question to your request.",
-      },
-      {
-        title: "A request is not payment",
-        body: "Submitting the form does not charge you or automatically complete a purchase.",
-      },
-    ],
-    "delivery-payment": [
-      {
-        title: "Payment in Estonia",
-        body: "For personal handover in Tallinn, you may pay a 30% advance and the balance on receipt, or choose full advance payment.",
-      },
-      {
-        title: "Delivery across Europe",
-        body: "Delivery in Estonia and to other European countries uses full advance payment. The delivery method and cost are confirmed for the address before payment.",
-      },
-    ],
-    "pre-order": [
-      {
-        title: "Expected timeframe",
-        body: "The expected pre-order timeframe for the launch collection is approximately 2–3 weeks. We personally confirm the current estimate before payment.",
-      },
-      {
-        title: "The next step",
-        body: "Send a request for the piece so availability can be checked without an automatic commitment to buy.",
-      },
-    ],
-    "returns-exchanges": [
-      {
-        title: "What must be approved",
-        body: "The owner and legal reviewer must confirm time limits, exceptions, the process and the contact for requests.",
-      },
-      {
-        title: "Before policy publication",
-        body: "Do not treat this page as final purchase terms; ask Andrelook for the terms that apply.",
-      },
-    ],
-    faq: [
-      {
-        title: "Why might a price be missing?",
-        body: "A price appears only after owner confirmation. If absent, it will be checked in the response to your request.",
-      },
-      {
-        title: "What do product states mean?",
-        body: "In stock, Pre-order and Unavailable are shown only for pieces with a confirmed commercial state.",
-      },
-    ],
-    contact: [
-      {
-        title: "What to include",
-        body: "Share the model name, preferred size and your question. Do not send payment information through the request form.",
-      },
-      {
-        title: "Language",
-        body: "You can write in English, Estonian or Russian.",
-      },
-    ],
-    privacy: [
-      {
-        title: "Request-form data",
-        body: "The form technically stores a name, selected contact method and contact, model and choices, comment, language and consent confirmation to handle the request.",
-      },
-      {
-        title: "Still to be approved",
-        body: "Before publication, the owner and legal reviewer must approve the legal basis, retention periods, user rights and controller contact details.",
-      },
-    ],
-    terms: [
-      {
-        title: "Catalog status",
-        body: "A product page is not by itself a binding offer; price, availability and applicable terms require confirmation.",
-      },
-      {
-        title: "Still to be approved",
-        body: "Seller details and the contracting, payment, delivery, returns and dispute processes must be approved before publication.",
-      },
-    ],
-  },
-};
-
-const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
+const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
   ru: {
     about: {
-      eyebrow: "Andrelook · Tallinn",
-      title: "Об Andrelook",
+      eyebrow: "Andrelook",
+      title: "О нас",
       introduction:
-        "Andrelook помогает выбрать модель, размер и удобный способ заказа с личной поддержкой.",
+        "Andrelook — персональный fashion-сервис из Таллинна с тщательно отобранной коллекцией Moncler и Parajumpers.",
       sections: [
         {
-          title: "Спокойный выбор",
-          body: "В каталоге собрана стартовая коллекция Andrelook с реальными фотографиями и понятным способом предзаказа.",
+          title: "Отобранная коллекция",
+          body: "Мы собрали компактный выбор верхней одежды, жилетов, кардиганов и повседневных моделей, чтобы выбирать было проще.",
         },
         {
-          title: "Личный контакт",
-          body: "Перед заказом мы подтверждаем детали напрямую — без обязательной регистрации и сложного оформления.",
+          title: "Личный подход",
+          body: "Мы помогаем с моделью, цветом и размером, а затем лично подтверждаем цену, оплату и получение.",
+        },
+        {
+          title: "Таллинн и Европа",
+          body: "Заказ можно получить лично в Таллинне или оформить доставку по Европе. Общение доступно на русском, эстонском и английском.",
         },
       ],
     },
@@ -326,19 +47,19 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Покупателям",
       title: "Как заказать",
       introduction:
-        "Выберите модель и отправьте короткий запрос. Это не является автоматической оплатой или подтверждённым заказом.",
+        "Три понятных шага от выбранной модели до личного подтверждения предзаказа.",
       sections: [
         {
           title: "1. Выберите модель",
-          body: "Откройте карточку товара и укажите подтверждённые варианты размера или цвета, если они доступны.",
+          body: "Откройте страницу товара, посмотрите фотографии, доступные цвета и таблицу размеров. Если таблицы нет, выберите личную помощь с размером.",
         },
         {
-          title: "2. Оставьте контакт",
-          body: "Сообщите имя и удобный способ связи. Регистрация не требуется.",
+          title: "2. Заполните форму",
+          body: "Укажите выбранный вариант, удобный контакт и способ получения. Аккаунт не нужен, а автоматическая оплата не производится.",
         },
         {
           title: "3. Получите подтверждение",
-          body: "Andrelook лично уточнит наличие, цену, сроки и дальнейшие шаги до оформления.",
+          body: "Мы свяжемся с вами и до оплаты подтвердим цену, размер, способ получения и ожидаемый срок.",
         },
       ],
     },
@@ -346,110 +67,181 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Покупателям",
       title: "Доставка и оплата",
       introduction:
-        "Доставка доступна по Европе. Способ оплаты зависит от личной передачи или доставки и ясно подтверждается до оплаты.",
+        "Способ получения и оплаты согласуется лично до подтверждения предзаказа.",
       sections: [
         {
-          title: "Понятный следующий шаг",
-          body: "После запроса мы подтвердим модель, размер, сумму, адрес или место личной передачи и только затем сообщим реквизиты для предоплаты.",
+          title: "Таллинн",
+          body: "Доступна личная передача в Таллинне. Для неё можно выбрать 30% предоплаты и остаток при получении либо полную предоплату.",
+        },
+        {
+          title: "Доставка по Европе",
+          body: "Для доставки по Эстонии и другим странам Европы используется полная предоплата. Точный способ и стоимость доставки зависят от адреса и сообщаются заранее.",
+        },
+        {
+          title: "До оплаты",
+          body: "Вы получите подтверждение модели, размера, итоговой суммы и способа получения до любого платежа.",
         },
       ],
     },
     "pre-order": {
       eyebrow: "Покупателям",
-      title: "Как работает предзаказ",
+      title: "Предзаказ",
       introduction:
-        "Все модели запуска доступны по предзаказу с ожидаемым сроком около 2–3 недель.",
+        "Коллекция Andrelook доступна по предзаказу с ориентировочным сроком 2–3 недели.",
       sections: [
         {
-          title: "Личное подтверждение",
-          body: "Актуальный срок, размер, цена и условия подтверждаются до оплаты и оформления заказа.",
+          title: "Что значит предзаказ",
+          body: "Вы выбираете модель сейчас, а мы лично подтверждаем её для вас до оплаты.",
+        },
+        {
+          title: "Ожидаемый срок",
+          body: "Ориентир — 2–3 недели. Актуальный срок для конкретного заказа подтверждается перед оплатой.",
+        },
+        {
+          title: "Без автоматических обязательств",
+          body: "Отправка формы не списывает средства и не завершает покупку. Следующий шаг начинается после личного контакта.",
         },
       ],
     },
     "returns-exchanges": {
       eyebrow: "Покупателям",
-      title: "Возвраты и обмен",
+      title: "Возврат и обмен",
       introduction:
-        "Полные условия возврата и обмена должны быть утверждены владельцем и проверены на соответствие применимому праву.",
+        "Применимые условия зависят от типа заказа и способа получения и сообщаются до оплаты.",
       sections: [
         {
-          title: "Перед заказом",
-          body: "Запросите действующие условия для конкретной покупки у Andrelook. Эта страница пока не заменяет утверждённую политику.",
+          title: "До подтверждения",
+          body: "Мы заранее сообщим условия возврата или обмена, применимые к вашему заказу, чтобы вы могли принять решение до оплаты.",
+        },
+        {
+          title: "Если возникла проблема",
+          body: "Свяжитесь с Andrelook как можно скорее через указанный при заказе канал и сохраните товар и упаковку в полученном состоянии.",
+        },
+        {
+          title: "Персональная помощь",
+          body: "Мы рассмотрим обращение по конкретному заказу и объясним доступные дальнейшие шаги.",
         },
       ],
-      requiresApproval: true,
     },
     faq: {
       eyebrow: "Помощь",
       title: "Частые вопросы",
-      introduction: "Коротко о текущем процессе выбора и запроса.",
+      introduction:
+        "Короткие ответы о предзаказе, размере, оплате и получении.",
       sections: [
         {
-          title: "Нужна ли регистрация?",
-          body: "Нет. Для запроса достаточно имени, выбранной модели и удобного контакта.",
+          title: "Сколько занимает предзаказ?",
+          body: "Ориентировочный срок — 2–3 недели. Актуальный срок по вашему заказу сообщается до оплаты.",
         },
         {
-          title: "Запрос означает покупку?",
-          body: "Нет. Andrelook сначала подтверждает доступность, цену и детали лично.",
+          title: "Как выбрать размер?",
+          body: "Используйте таблицу на странице модели. Для шести моделей без таблицы доступна персональная помощь с размером.",
         },
         {
-          title: "Можно ли получить помощь с размером?",
-          body: "Да. Отправьте запрос или напишите напрямую, если таблица размеров не отвечает на ваш вопрос.",
+          title: "Как проходит оплата?",
+          body: "При получении в Таллинне можно внести 30% предоплаты и оплатить остаток при передаче или выбрать полную предоплату. Для доставки используется полная предоплата.",
+        },
+        {
+          title: "Можно забрать заказ в Таллинне?",
+          body: "Да. Личная передача в Таллинне доступна как один из вариантов получения.",
+        },
+        {
+          title: "Доставляете по Европе?",
+          body: "Да. Способ и точная стоимость доставки зависят от адреса и сообщаются заранее.",
+        },
+        {
+          title: "Что происходит после отправки формы?",
+          body: "Мы свяжемся выбранным способом, согласуем модель, размер, получение, оплату и срок. На сайте оплата не списывается.",
+        },
+        {
+          title: "Какие условия возврата или обмена?",
+          body: "Условия, применимые к конкретному заказу и способу получения, сообщаются до оплаты.",
+        },
+        {
+          title: "Как связаться с Andrelook?",
+          body: "Напишите в Telegram, Instagram или на info.andrelook@gmail.com.",
         },
       ],
     },
     contact: {
-      eyebrow: "Andrelook · Tallinn",
-      title: "Связаться с нами",
-      introduction: "Выберите удобный канал связи — мы ответим лично.",
+      eyebrow: "Andrelook",
+      title: "Контакты",
+      introduction:
+        "Напишите нам о модели, размере или заказе удобным способом.",
       sections: [
         {
-          title: "Контакты",
-          body: "Telegram: @andrelookstore · Instagram: @andrelook.store · Email: info.andrelook@gmail.com",
+          title: "Telegram",
+          body: "Быстрый способ обсудить модель и детали предзаказа: @andrelookstore.",
+        },
+        {
+          title: "Instagram",
+          body: "Следите за Andrelook и отправляйте сообщения: @andrelook.store.",
+        },
+        {
+          title: "Email",
+          body: "Для подробных вопросов: info.andrelook@gmail.com.",
         },
       ],
     },
     privacy: {
-      eyebrow: "Юридическая информация",
+      eyebrow: "Правовая информация",
       title: "Конфиденциальность",
       introduction:
-        "Окончательный текст политики конфиденциальности требует утверждения владельцем и юридической проверки.",
+        "Мы используем данные из формы только для обработки вашего запроса и сопровождения заказа.",
       sections: [
         {
-          title: "Запросы покупателей",
-          body: "Форма запрашивает контактные данные только для ответа на запрос по выбранной модели. До публикации необходима полная утверждённая политика.",
+          title: "Какие данные мы получаем",
+          body: "Имя, контактные данные, выбранная модель, размер, цвет, способ получения и информация, которую вы сами добавляете в комментарий.",
+        },
+        {
+          title: "Для чего они нужны",
+          body: "Чтобы связаться с вами, подтвердить детали, выполнить заказ, вести историю обслуживания и решать вопросы по заказу.",
+        },
+        {
+          title: "Ваш вопрос о данных",
+          body: "По вопросам о доступе, исправлении или удалении ваших данных напишите на info.andrelook@gmail.com.",
         },
       ],
-      requiresApproval: true,
     },
     terms: {
-      eyebrow: "Юридическая информация",
+      eyebrow: "Правовая информация",
       title: "Условия использования",
       introduction:
-        "Окончательные коммерческие и юридические условия ещё не утверждены для публикации.",
+        "Сайт помогает выбрать модель и отправить запрос на предзаказ; сама форма не является автоматическим подтверждением покупки.",
       sections: [
         {
-          title: "Важно",
-          body: "Запрос через сайт не является автоматическим подтверждением заказа. Полный текст условий требует утверждения владельцем и юридической проверки.",
+          title: "Информация о моделях",
+          body: "Фотографии, цвета и размеры помогают сделать выбор. Итоговые коммерческие детали подтверждаются лично до оплаты.",
+        },
+        {
+          title: "Предзаказ",
+          body: "Обязательство возникает только после согласования цены, модели, размера, оплаты, получения и применимых условий.",
+        },
+        {
+          title: "Связь",
+          body: "Если вам нужно уточнение до отправки формы, свяжитесь с нами через Telegram, Instagram или info.andrelook@gmail.com.",
         },
       ],
-      requiresApproval: true,
     },
   },
   et: {
     about: {
-      eyebrow: "Andrelook · Tallinn",
-      title: "Andrelookist",
+      eyebrow: "Andrelook",
+      title: "Meist",
       introduction:
-        "Andrelook aitab valida mudeli ja suuruse ning esitada päringu personaalse toe abil.",
+        "Andrelook on Tallinnast pärit personaalne moeteenus hoolikalt valitud Moncleri ja Parajumpersi kollektsiooniga.",
       sections: [
         {
-          title: "Rahulik valik",
-          body: "Kataloogis on Andrelooki stardikollektsioon päris fotode ja selge eeltellimisteekonnaga.",
+          title: "Valitud kollektsioon",
+          body: "Oleme koondanud kompaktsesse valikusse ülerõivad, vestid, kardiganid ja igapäevased mudelid, et valimine oleks lihtsam.",
         },
         {
-          title: "Isiklik kontakt",
-          body: "Enne tellimust kinnitame üksikasjad otse — kohustusliku konto ja keeruka kassata.",
+          title: "Personaalne lähenemine",
+          body: "Aitame valida mudeli, värvi ja suuruse ning kinnitame seejärel hinna, makse ja kättesaamise personaalselt.",
+        },
+        {
+          title: "Tallinn ja Euroopa",
+          body: "Tellimuse saab kätte Tallinnas või lasta tarnida üle Euroopa. Suhtleme eesti, vene ja inglise keeles.",
         },
       ],
     },
@@ -457,19 +249,19 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Kuidas tellida",
       introduction:
-        "Vali mudel ja saada lühike päring. See ei ole automaatne makse ega kinnitatud tellimus.",
+        "Kolm selget sammu valitud tootest personaalse eeltellimuse kinnituseni.",
       sections: [
         {
-          title: "1. Vali mudel",
-          body: "Ava tooteleht ja vali kinnitatud suurus või värv, kui need on saadaval.",
+          title: "1. Vali toode",
+          body: "Vaata tootelehel fotosid, värve ja suurustabelit. Kui tabelit pole, vali personaalne suuruseabi.",
         },
         {
-          title: "2. Jäta kontakt",
-          body: "Lisa nimi ja sobiv suhtluskanal. Kontot pole vaja.",
+          title: "2. Täida vorm",
+          body: "Lisa valik, sobiv kontakt ja kättesaamisviis. Kontot pole vaja ning automaatset makset ei tehta.",
         },
         {
           title: "3. Saa kinnitus",
-          body: "Andrelook kinnitab enne tellimist isiklikult saadavuse, hinna, aja ja järgmised sammud.",
+          body: "Võtame ühendust ning kinnitame enne maksmist hinna, suuruse, kättesaamise ja eeldatava aja.",
         },
       ],
     },
@@ -477,23 +269,39 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Tarne ja maksmine",
       introduction:
-        "Tarne on saadaval üle Euroopa. Makseviis sõltub isiklikust üleandmisest või tarnest ning kinnitatakse selgelt enne makset.",
+        "Kättesaamis- ja makseviis lepitakse personaalselt kokku enne eeltellimuse kinnitamist.",
       sections: [
         {
-          title: "Selge järgmine samm",
-          body: "Pärast päringut kinnitame mudeli, suuruse, summa, aadressi või üleandmiskoha ning alles siis anname ettemakse andmed.",
+          title: "Tallinn",
+          body: "Tallinnas on võimalik personaalne üleandmine. Valida saab 30% ettemakse ja ülejäänud summa üleandmisel või täieliku ettemakse.",
+        },
+        {
+          title: "Tarne üle Euroopa",
+          body: "Eesti-sisese ja Euroopa tarne puhul kasutatakse täielikku ettemakset. Täpne tarneviis ja maksumus sõltuvad aadressist ning teatatakse ette.",
+        },
+        {
+          title: "Enne maksmist",
+          body: "Enne mis tahes makset saad kinnituse mudeli, suuruse, kogusumma ja kättesaamisviisi kohta.",
         },
       ],
     },
     "pre-order": {
       eyebrow: "Kliendile",
-      title: "Kuidas eeltellimus toimib",
+      title: "Eeltellimus",
       introduction:
-        "Kõik stardikollektsiooni mudelid on eeltellitavad eeldatava ajaga umbes 2–3 nädalat.",
+        "Andrelooki kollektsioon on eeltellitav eeldatava 2–3-nädalase ajaga.",
       sections: [
         {
-          title: "Isiklik kinnitus",
-          body: "Hetkeaeg, suurus, hind ja tingimused kinnitatakse enne makset ja tellimuse vormistamist.",
+          title: "Mida eeltellimus tähendab",
+          body: "Valid toote nüüd ning meie kinnitame selle sulle personaalselt enne maksmist.",
+        },
+        {
+          title: "Eeldatav aeg",
+          body: "Orienteeruv aeg on 2–3 nädalat. Konkreetse tellimuse ajakohane hinnang kinnitatakse enne makset.",
+        },
+        {
+          title: "Automaatset kohustust ei teki",
+          body: "Vormi saatmine ei võta raha ega lõpeta ostu. Järgmine samm algab pärast personaalset kontakti.",
         },
       ],
     },
@@ -501,86 +309,141 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Tagastus ja vahetus",
       introduction:
-        "Täielikud tagastus- ja vahetustingimused vajavad omaniku kinnitust ning õiguslikku kontrolli.",
+        "Kohaldatavad tingimused sõltuvad tellimusest ja kättesaamisviisist ning need antakse enne maksmist.",
       sections: [
         {
-          title: "Enne tellimist",
-          body: "Küsi Andrelookilt konkreetse ostu kehtivaid tingimusi. See leht ei asenda veel kinnitatud poliitikat.",
+          title: "Enne kinnitamist",
+          body: "Anname sinu tellimusele kehtivad tagastus- või vahetustingimused ette, et saaksid enne makset teadliku otsuse teha.",
+        },
+        {
+          title: "Kui tekib probleem",
+          body: "Võta Andrelookiga esimesel võimalusel ühendust tellimisel valitud kanalis ning hoia toode ja pakend saadud seisukorras.",
+        },
+        {
+          title: "Personaalne abi",
+          body: "Vaatame konkreetse tellimuse olukorra üle ja selgitame võimalikud järgmised sammud.",
         },
       ],
-      requiresApproval: true,
     },
     faq: {
       eyebrow: "Abi",
       title: "Korduma kippuvad küsimused",
-      introduction: "Lühidalt valiku ja päringu praegusest protsessist.",
+      introduction:
+        "Lühivastused eeltellimuse, suuruse, makse ja kättesaamise kohta.",
       sections: [
         {
-          title: "Kas konto on vajalik?",
-          body: "Ei. Päringuks piisab nimest, valitud mudelist ja sobivast kontaktist.",
+          title: "Kui kaua eeltellimus aega võtab?",
+          body: "Eeldatav aeg on 2–3 nädalat. Sinu tellimuse ajakohane tähtaeg antakse enne makset.",
         },
         {
-          title: "Kas päring tähendab ostu?",
-          body: "Ei. Andrelook kinnitab esmalt isiklikult saadavuse, hinna ja üksikasjad.",
+          title: "Kuidas suurust valida?",
+          body: "Kasuta tootelehe tabelit. Kuue tabelita mudeli puhul pakume personaalset suuruseabi.",
         },
         {
-          title: "Kas suuruse valikul saab abi?",
-          body: "Jah. Saada päring või kirjuta otse, kui suurustabelist ei piisa.",
+          title: "Kuidas maksmine toimub?",
+          body: "Tallinnas üleandmisel saab tasuda 30% ettemaksu ja ülejäänu kättesaamisel või valida täieliku ettemakse. Tarne puhul kasutatakse täielikku ettemakset.",
+        },
+        {
+          title: "Kas tellimusele saab Tallinnas järele tulla?",
+          body: "Jah. Personaalne üleandmine Tallinnas on üks kättesaamisvõimalustest.",
+        },
+        {
+          title: "Kas tarnite üle Euroopa?",
+          body: "Jah. Tarneviis ja täpne maksumus sõltuvad aadressist ning antakse ette.",
+        },
+        {
+          title: "Mis juhtub pärast vormi saatmist?",
+          body: "Võtame sinuga valitud kanalis ühendust ning lepime kokku mudeli, suuruse, kättesaamise, makse ja tähtaja. Veebilehel makset ei võeta.",
+        },
+        {
+          title: "Millised on tagastus- või vahetustingimused?",
+          body: "Konkreetsele tellimusele ja kättesaamisviisile kehtivad tingimused antakse enne makset.",
+        },
+        {
+          title: "Kuidas Andrelookiga ühendust võtta?",
+          body: "Kirjuta Telegramis, Instagramis või aadressil info.andrelook@gmail.com.",
         },
       ],
     },
     contact: {
-      eyebrow: "Andrelook · Tallinn",
-      title: "Võta ühendust",
-      introduction: "Vali sobiv kanal — vastame isiklikult.",
+      eyebrow: "Andrelook",
+      title: "Kontakt",
+      introduction:
+        "Kirjuta meile mudeli, suuruse või tellimuse kohta sobivas kanalis.",
       sections: [
         {
-          title: "Kontaktid",
-          body: "Telegram: @andrelookstore · Instagram: @andrelook.store · E-post: info.andrelook@gmail.com",
+          title: "Telegram",
+          body: "Kiire viis mudelit ja eeltellimust arutada: @andrelookstore.",
+        },
+        {
+          title: "Instagram",
+          body: "Jälgi Andrelooki ja saada sõnum: @andrelook.store.",
+        },
+        {
+          title: "E-post",
+          body: "Pikemate küsimuste jaoks: info.andrelook@gmail.com.",
         },
       ],
     },
     privacy: {
-      eyebrow: "Õigusteave",
+      eyebrow: "Õigusinfo",
       title: "Privaatsus",
       introduction:
-        "Lõplik privaatsuspoliitika vajab omaniku kinnitust ja õiguslikku kontrolli.",
+        "Kasutame vormi kaudu saadud andmeid ainult päringu töötlemiseks ja tellimuse teenindamiseks.",
       sections: [
         {
-          title: "Kliendipäringud",
-          body: "Vorm küsib kontaktandmeid ainult valitud mudeli päringule vastamiseks. Enne avaldamist on vaja täielikku kinnitatud poliitikat.",
+          title: "Milliseid andmeid saame",
+          body: "Nimi, kontaktandmed, valitud toode, suurus, värv, kättesaamisviis ja teave, mille ise kommentaari lisad.",
+        },
+        {
+          title: "Milleks neid kasutame",
+          body: "Et sinuga ühendust võtta, detailid kinnitada, tellimus täita, teenindusajalugu hoida ja tellimusküsimusi lahendada.",
+        },
+        {
+          title: "Sinu andmeküsimus",
+          body: "Andmetele ligipääsu, parandamise või kustutamise küsimustes kirjuta info.andrelook@gmail.com.",
         },
       ],
-      requiresApproval: true,
     },
     terms: {
-      eyebrow: "Õigusteave",
+      eyebrow: "Õigusinfo",
       title: "Kasutustingimused",
       introduction:
-        "Lõplikud äri- ja õigustingimused ei ole veel avaldamiseks kinnitatud.",
+        "Sait aitab valida toote ja saata eeltellimuspäringu; vormi saatmine ei kinnita ostu automaatselt.",
       sections: [
         {
-          title: "Oluline",
-          body: "Veebipäring ei kinnita tellimust automaatselt. Täistekst vajab omaniku kinnitust ja õiguslikku kontrolli.",
+          title: "Tooteinfo",
+          body: "Fotod, värvid ja suurused aitavad valida. Lõplikud müügidetailid kinnitatakse personaalselt enne makset.",
+        },
+        {
+          title: "Eeltellimus",
+          body: "Kohustus tekib alles pärast hinna, mudeli, suuruse, makse, kättesaamise ja kohaldatavate tingimuste kokkuleppimist.",
+        },
+        {
+          title: "Võta ühendust",
+          body: "Kui vajad enne vormi saatmist täpsustust, kirjuta Telegramis, Instagramis või aadressil info.andrelook@gmail.com.",
         },
       ],
-      requiresApproval: true,
     },
   },
   en: {
     about: {
-      eyebrow: "Andrelook · Tallinn",
-      title: "About Andrelook",
+      eyebrow: "Andrelook",
+      title: "About us",
       introduction:
-        "Andrelook helps you choose a piece and size, then make a request with personal support.",
+        "Andrelook is a personal fashion service from Tallinn with a focused edit of Moncler and Parajumpers pieces.",
       sections: [
         {
-          title: "A considered selection",
-          body: "The catalog presents Andrelook’s launch collection with real photography and a clear pre-order path.",
+          title: "A focused collection",
+          body: "We bring outerwear, gilets, cardigans and everyday pieces into one considered edit, making it easier to choose.",
         },
         {
-          title: "Personal contact",
-          body: "We confirm details directly before an order, without a required account or complicated checkout.",
+          title: "Personal service",
+          body: "We help with the piece, colour and size, then confirm price, payment and fulfilment with you directly.",
+        },
+        {
+          title: "Tallinn and Europe",
+          body: "Collect personally in Tallinn or arrange delivery across Europe. We support customers in English, Estonian and Russian.",
         },
       ],
     },
@@ -588,19 +451,19 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "How to order",
       introduction:
-        "Choose a piece and send a short request. This is not an automatic payment or confirmed order.",
+        "Three clear steps from choosing a piece to receiving personal pre-order confirmation.",
       sections: [
         {
-          title: "1. Choose a piece",
-          body: "Open the product page and select an approved size or colour when available.",
+          title: "1. Choose your piece",
+          body: "Review the product photography, colours and size guide. If no chart is available, choose personal sizing help.",
         },
         {
-          title: "2. Leave a contact",
-          body: "Add your name and preferred contact channel. No account is required.",
+          title: "2. Complete the form",
+          body: "Add your selection, preferred contact and fulfilment method. No account is required and no automatic payment is taken.",
         },
         {
           title: "3. Receive confirmation",
-          body: "Andrelook personally confirms availability, price, timing and next steps before an order.",
+          body: "We contact you and confirm the price, size, fulfilment and expected timing before payment.",
         },
       ],
     },
@@ -608,23 +471,39 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "Delivery & payment",
       introduction:
-        "Delivery is available across Europe. Payment depends on personal handover or delivery and is clearly confirmed before payment.",
+        "Fulfilment and payment are agreed personally before your pre-order is confirmed.",
       sections: [
         {
-          title: "A clear next step",
-          body: "After your request, we confirm the piece, size, total, address or handover location before sharing advance-payment details.",
+          title: "Tallinn",
+          body: "Personal handover is available in Tallinn. Choose either a 30% advance with the balance at handover, or full advance payment.",
+        },
+        {
+          title: "Delivery across Europe",
+          body: "Delivery within Estonia and across Europe uses full advance payment. The exact method and cost depend on the address and are shared before payment.",
+        },
+        {
+          title: "Before payment",
+          body: "You receive confirmation of the piece, size, total amount and fulfilment method before making any payment.",
         },
       ],
     },
     "pre-order": {
       eyebrow: "Customer care",
-      title: "How pre-order works",
+      title: "Pre-order",
       introduction:
-        "Every launch piece is available by pre-order with an expected timeframe of approximately 2–3 weeks.",
+        "The Andrelook collection is available by pre-order with an expected timeframe of approximately 2–3 weeks.",
       sections: [
         {
-          title: "Personal confirmation",
-          body: "Current timing, size, price and terms are confirmed before payment and order placement.",
+          title: "What pre-order means",
+          body: "You select the piece now and we confirm it for you personally before payment.",
+        },
+        {
+          title: "Expected timing",
+          body: "The guide is approximately 2–3 weeks. The current estimate for your specific order is confirmed before payment.",
+        },
+        {
+          title: "No automatic commitment",
+          body: "Submitting the form does not take payment or complete a purchase. The next step begins after personal contact.",
         },
       ],
     },
@@ -632,44 +511,79 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "Returns & exchanges",
       introduction:
-        "Full return and exchange terms require owner approval and review against applicable law.",
+        "Applicable terms depend on the order and fulfilment method and are shared before payment.",
       sections: [
         {
-          title: "Before ordering",
-          body: "Ask Andrelook for the current terms that apply to a specific purchase. This page does not yet replace an approved policy.",
+          title: "Before confirmation",
+          body: "We share the return or exchange terms that apply to your order so you can make an informed decision before payment.",
+        },
+        {
+          title: "If something is wrong",
+          body: "Contact Andrelook through your chosen channel as soon as possible and keep the piece and packaging in the condition received.",
+        },
+        {
+          title: "Personal support",
+          body: "We review the circumstances of the specific order and explain the available next steps.",
         },
       ],
-      requiresApproval: true,
     },
     faq: {
       eyebrow: "Help",
       title: "Frequently asked questions",
       introduction:
-        "A concise guide to the current selection and request process.",
+        "Quick answers about pre-ordering, sizing, payment and fulfilment.",
       sections: [
         {
-          title: "Do I need an account?",
-          body: "No. A name, selected piece and preferred contact are enough to make a request.",
+          title: "How long does pre-order take?",
+          body: "The expected timeframe is approximately 2–3 weeks. The current timing for your order is shared before payment.",
         },
         {
-          title: "Does a request complete a purchase?",
-          body: "No. Andrelook first confirms availability, price and details personally.",
+          title: "How do I choose a size?",
+          body: "Use the chart on the product page. Personal sizing help is available for the six pieces without a chart.",
         },
         {
-          title: "Can I get sizing help?",
-          body: "Yes. Send a request or message us directly if the verified size guide does not answer your question.",
+          title: "How does payment work?",
+          body: "For Tallinn handover, choose a 30% advance with the balance at handover or full advance payment. Delivery uses full advance payment.",
+        },
+        {
+          title: "Can I collect in Tallinn?",
+          body: "Yes. Personal handover in Tallinn is available as a fulfilment option.",
+        },
+        {
+          title: "Do you deliver across Europe?",
+          body: "Yes. The delivery method and exact cost depend on the address and are shared in advance.",
+        },
+        {
+          title: "What happens after I submit the form?",
+          body: "We contact you through your selected channel and agree the piece, size, fulfilment, payment and timing. No payment is taken on the website.",
+        },
+        {
+          title: "What are the return or exchange terms?",
+          body: "The terms that apply to the specific order and fulfilment method are shared before payment.",
+        },
+        {
+          title: "How can I contact Andrelook?",
+          body: "Message us on Telegram or Instagram, or email info.andrelook@gmail.com.",
         },
       ],
     },
     contact: {
-      eyebrow: "Andrelook · Tallinn",
-      title: "Contact Andrelook",
+      eyebrow: "Andrelook",
+      title: "Contact",
       introduction:
-        "Choose the channel that suits you and we will reply personally.",
+        "Talk to us about a piece, sizing or an order through your preferred channel.",
       sections: [
         {
-          title: "Contact details",
-          body: "Telegram: @andrelookstore · Instagram: @andrelook.store · Email: info.andrelook@gmail.com",
+          title: "Telegram",
+          body: "A quick way to discuss a piece and pre-order details: @andrelookstore.",
+        },
+        {
+          title: "Instagram",
+          body: "Follow Andrelook and send us a message: @andrelook.store.",
+        },
+        {
+          title: "Email",
+          body: "For detailed questions: info.andrelook@gmail.com.",
         },
       ],
     },
@@ -677,37 +591,47 @@ const content: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Legal information",
       title: "Privacy",
       introduction:
-        "The final privacy policy requires owner approval and legal review.",
+        "We use information from the form only to handle your request and support your order.",
       sections: [
         {
-          title: "Customer requests",
-          body: "The form asks for contact details only to respond to a request about the selected piece. A complete approved policy is required before publication.",
+          title: "Information we receive",
+          body: "Your name, contact details, selected piece, size, colour, fulfilment choice and anything you choose to add in the comment.",
+        },
+        {
+          title: "Why we use it",
+          body: "To contact you, confirm details, fulfil the order, maintain service history and resolve order-related questions.",
+        },
+        {
+          title: "Questions about your data",
+          body: "For access, correction or deletion questions, email info.andrelook@gmail.com.",
         },
       ],
-      requiresApproval: true,
     },
     terms: {
       eyebrow: "Legal information",
       title: "Terms of use",
       introduction:
-        "Final commercial and legal terms have not yet been approved for publication.",
+        "This site helps you choose a piece and send a pre-order request; submitting the form does not automatically confirm a purchase.",
       sections: [
         {
-          title: "Important",
-          body: "A website request does not automatically confirm an order. The complete terms require owner approval and legal review.",
+          title: "Product information",
+          body: "Photography, colours and sizing help you choose. Final commercial details are confirmed personally before payment.",
+        },
+        {
+          title: "Pre-order",
+          body: "A commitment begins only after price, piece, size, payment, fulfilment and the applicable terms have been agreed.",
+        },
+        {
+          title: "Contact",
+          body: "If you need clarification before using the form, contact us on Telegram, Instagram or info.andrelook@gmail.com.",
         },
       ],
-      requiresApproval: true,
     },
   },
 };
 
-export function getInfoPage(locale: Locale, slug: string): InfoPage | null {
-  if (!infoPageSlugs.includes(slug as InfoPageSlug)) return null;
-  const typedSlug = slug as InfoPageSlug;
-  const page = content[locale][typedSlug];
-  return {
-    ...page,
-    sections: [...page.sections, ...supplementalContent[locale][typedSlug]],
-  };
+export function getInfoPage(locale: Locale, slug: string) {
+  return infoPageSlugs.includes(slug as InfoPageSlug)
+    ? pages[locale][slug as InfoPageSlug]
+    : null;
 }

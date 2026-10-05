@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -13,8 +14,66 @@ import {
 } from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
 import { isDatabaseConfigured } from "@/lib/env";
+import { indexingRobots, localizedAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+const homeMetadata = {
+  en: {
+    description:
+      "Moncler and Parajumpers jackets, gilets, cardigans, sweatshirts, T-shirts and polos. Pre-order in 2–3 weeks, with Tallinn handover and delivery across Europe.",
+    locale: "en_GB",
+    title: "Andrelook — fashion pre-order in Tallinn",
+  },
+  et: {
+    description:
+      "Moncleri ja Parajumpersi joped, vestid, kardiganid, dressipluusid, T-särgid ja polod. Eeltellimus 2–3 nädalaga, üleandmine Tallinnas ja tarne üle Euroopa.",
+    locale: "et_EE",
+    title: "Andrelook — moe eeltellimus Tallinnas",
+  },
+  ru: {
+    description:
+      "Куртки, жилеты, кардиганы, худи, футболки и поло Moncler и Parajumpers. Предзаказ 2–3 недели, получение в Таллинне и доставка по Европе.",
+    locale: "ru_RU",
+    title: "Andrelook — одежда по предзаказу в Таллинне",
+  },
+} as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const metadata = homeMetadata[locale];
+  return {
+    alternates: localizedAlternates(locale, ""),
+    description: metadata.description,
+    openGraph: {
+      description: metadata.description,
+      images: [
+        {
+          alt: "Andrelook",
+          height: 1080,
+          url: "/brand/hero-bg.jpg",
+          width: 1920,
+        },
+      ],
+      locale: metadata.locale,
+      title: metadata.title,
+      type: "website",
+    },
+    robots: indexingRobots(),
+    title: { absolute: metadata.title },
+    twitter: {
+      card: "summary_large_image",
+      description: metadata.description,
+      images: ["/brand/hero-bg.jpg"],
+      title: metadata.title,
+    },
+  };
+}
 
 function CollectionLoading() {
   return (
@@ -33,7 +92,25 @@ function CollectionLoading() {
   );
 }
 
-async function HomeDiscovery({
+function formatProductCount(locale: "en" | "et" | "ru", count: number) {
+  if (locale === "et") return `${count} toodet`;
+  if (locale === "ru") {
+    const modulo100 = count % 100;
+    const modulo10 = count % 10;
+    const noun =
+      modulo100 >= 11 && modulo100 <= 14
+        ? "моделей"
+        : modulo10 === 1
+          ? "модель"
+          : modulo10 >= 2 && modulo10 <= 4
+            ? "модели"
+            : "моделей";
+    return `${count} ${noun}`;
+  }
+  return `${count} ${count === 1 ? "piece" : "pieces"}`;
+}
+
+async function HomeProducts({
   dictionary,
   locale,
   scope,
@@ -43,82 +120,92 @@ async function HomeDiscovery({
   scope: ReturnType<typeof storefrontScope>;
 }) {
   const copy = getStorefrontContent(locale).home;
-  const [products, categories] = isDatabaseConfigured()
-    ? await Promise.all([
-        getPublicCatalog(locale, scope),
-        getPublicCategories(locale, scope),
-      ])
-    : [[], []];
-  const categoryLinks = categories.flatMap((category) => category.children);
+  const products = isDatabaseConfigured()
+    ? await getPublicCatalog(locale, scope)
+    : [];
 
   return (
-    <>
-      <section className="collection-preview home-product-section">
-        <div className="container">
-          <header className="editorial-heading split-heading">
-            <div>
-              <span className="eyebrow">Andrelook edit</span>
-              <h2>{copy.collectionTitle}</h2>
-            </div>
-            <p>{copy.collectionIntro}</p>
-          </header>
-          {products.length ? (
-            <div className="catalog-grid compact-grid home-product-grid">
-              {products.slice(0, 6).map((product) => (
-                <ProductCard
-                  dictionary={dictionary}
-                  key={product.id}
-                  locale={locale}
-                  product={product}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <p>{dictionary.catalogEmpty}</p>
-            </div>
-          )}
-          <div className="section-action section-action-left">
-            <Link className="secondary-button" href={`/${locale}/catalog`}>
-              {dictionary.viewCatalog}
-            </Link>
-          </div>
-        </div>
-      </section>
-      <section className="container home-category-section">
+    <section className="collection-preview home-product-section">
+      <div className="container">
         <header className="editorial-heading split-heading">
           <div>
-            <span className="eyebrow">{dictionary.exploreCollection}</span>
-            <h2>{copy.categoriesTitle}</h2>
+            <span className="eyebrow">Andrelook edit</span>
+            <h2>{copy.collectionTitle}</h2>
           </div>
-          <p>{copy.categoriesIntro}</p>
+          <p>{copy.collectionIntro}</p>
         </header>
-        {categoryLinks.length ? (
-          <nav
-            aria-label={dictionary.catalog}
-            className="category-editorial-grid"
-          >
-            {categoryLinks.slice(0, 8).map((category, index) => (
-              <Link
-                href={`/${locale}/catalog/${category.slug}`}
-                key={category.slug}
-              >
-                <span className="category-index">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <strong>{category.name}</strong>
-                <small>
-                  {category.productCount} {dictionary.catalogResults}
-                </small>
-                <span aria-hidden="true" className="category-arrow">
-                  ↗
-                </span>
-              </Link>
+        {products.length ? (
+          <div className="catalog-grid compact-grid home-product-grid">
+            {products.slice(0, 6).map((product) => (
+              <ProductCard
+                dictionary={dictionary}
+                key={product.id}
+                locale={locale}
+                product={product}
+              />
             ))}
-          </nav>
-        ) : null}
-      </section>
-    </>
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>{dictionary.catalogEmpty}</p>
+          </div>
+        )}
+        <div className="section-action section-action-left">
+          <Link className="secondary-button" href={`/${locale}/catalog`}>
+            {dictionary.viewCatalog}
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function HomeCategories({
+  dictionary,
+  locale,
+  scope,
+}: {
+  dictionary: ReturnType<typeof getDictionary>;
+  locale: Parameters<typeof getPublicCategories>[0];
+  scope: ReturnType<typeof storefrontScope>;
+}) {
+  const copy = getStorefrontContent(locale).home;
+  const categories = isDatabaseConfigured()
+    ? await getPublicCategories(locale, scope)
+    : [];
+  const categoryLinks = categories.flatMap((category) => category.children);
+  return (
+    <section className="container home-category-section">
+      <header className="editorial-heading split-heading">
+        <div>
+          <span className="eyebrow">{dictionary.exploreCollection}</span>
+          <h2>{copy.categoriesTitle}</h2>
+        </div>
+        <p>{copy.categoriesIntro}</p>
+      </header>
+      {categoryLinks.length ? (
+        <nav
+          aria-label={dictionary.catalog}
+          className="category-editorial-grid"
+        >
+          {categoryLinks.slice(0, 8).map((category, index) => (
+            <Link
+              href={`/${locale}/catalog/${category.slug}`}
+              key={category.slug}
+            >
+              <span className="category-index">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <strong>{category.name}</strong>
+              <small>{formatProductCount(locale, category.productCount)}</small>
+              <span aria-hidden="true" className="category-arrow">
+                ↗
+              </span>
+            </Link>
+          ))}
+        </nav>
+      ) : null}
+    </section>
   );
 }
 
@@ -135,9 +222,6 @@ export default async function LocalizedHome({
 
   return (
     <>
-      {scope === "local-review" ? (
-        <p className="review-banner">{dictionary.reviewBanner}</p>
-      ) : null}
       <section className="hero home-hero">
         <Image
           alt=""
@@ -170,8 +254,26 @@ export default async function LocalizedHome({
         </div>
       </section>
 
+      <section
+        aria-label={dictionary.whyAndrelook}
+        className="home-trust-strip"
+      >
+        <div className="container home-trust-strip-inner">
+          {content.home.serviceItems.map((item) => (
+            <div key={item.title}>
+              <strong>{item.title}</strong>
+              <span>{item.body}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <Suspense fallback={<CollectionLoading />}>
-        <HomeDiscovery dictionary={dictionary} locale={locale} scope={scope} />
+        <HomeProducts dictionary={dictionary} locale={locale} scope={scope} />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <HomeCategories dictionary={dictionary} locale={locale} scope={scope} />
       </Suspense>
 
       <section className="commercial-states-section">
@@ -181,14 +283,23 @@ export default async function LocalizedHome({
             <h2>{content.home.stateTitle}</h2>
             <p>{content.home.stateIntro}</p>
           </header>
-          <div className="state-explainer-list launch-preorder-story">
-            <article>
-              <span className="status-pill status-preorder">
-                {dictionary.availabilityPreOrder}
-              </span>
-              <p>{content.commerce.preorderExplanation}</p>
-            </article>
-          </div>
+          <ol className="ordering-steps preorder-steps">
+            {content.home.orderSteps.map((step, index) => (
+              <li key={step.title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <Link
+            className="primary-action-inline"
+            href={`/${locale}/how-to-order`}
+          >
+            {dictionary.howToOrder}
+          </Link>
         </div>
       </section>
 
@@ -209,33 +320,6 @@ export default async function LocalizedHome({
           </ul>
           <Link className="text-action" href={`/${locale}/faq`}>
             {dictionary.faq} →
-          </Link>
-        </div>
-      </section>
-
-      <section className="ordering-section">
-        <div className="container ordering-grid">
-          <header className="editorial-heading">
-            <span className="eyebrow">{dictionary.howItWorks}</span>
-            <h2>{content.home.orderTitle}</h2>
-            <p>{content.home.orderIntro}</p>
-          </header>
-          <ol className="ordering-steps">
-            {content.home.orderSteps.map((step, index) => (
-              <li key={step.title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <Link
-            className="primary-action-inline"
-            href={`/${locale}/how-to-order`}
-          >
-            {dictionary.howToOrder}
           </Link>
         </div>
       </section>

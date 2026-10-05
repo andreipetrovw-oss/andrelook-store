@@ -1,11 +1,7 @@
 import type { Locale } from "@/config/locales";
 
 export type StorefrontContent = {
-  catalog: {
-    discoveryNote: string;
-    filterHint: string;
-    resultsLabel: string;
-  };
+  catalog: { discoveryNote: string; filterHint: string; resultsLabel: string };
   commerce: {
     availableExplanation: string;
     detailsPending: string;
@@ -58,358 +54,345 @@ export type StorefrontContent = {
 const content: Record<Locale, StorefrontContent> = {
   ru: {
     catalog: {
-      discoveryNote:
-        "Ищите по модели или категории, а затем уточните статус и порядок отображения.",
-      filterHint: "Настройте выбор",
-      resultsLabel: "Подготовленные модели",
+      discoveryNote: "Найдите модель по названию, бренду или категории.",
+      filterHint: "Поиск по коллекции",
+      resultsLabel: "Модели",
     },
     commerce: {
-      availableExplanation:
-        "Статус модели и коммерческие детали показаны только после проверки.",
-      detailsPending: "Детали по запросу",
-      inStockExplanation:
-        "Модель отмечается «В наличии» только после проверки текущего статуса Andrelook.",
+      availableExplanation: "Эту модель можно заказать сейчас.",
+      detailsPending: "Цена подтверждается лично",
+      inStockExplanation: "Модель готова к заказу.",
       preorderExplanation:
-        "Все модели запуска доступны по предзаказу. Ожидаемый срок — около 2–3 недель; детали подтверждаются лично.",
-      priceOnRequest: "Цена по запросу",
+        "Предзаказ · ориентировочно 2–3 недели · доставка по Европе.",
+      priceOnRequest: "Цена подтверждается перед заказом",
       unavailableExplanation:
-        "Недоступную модель нельзя запросить, пока её статус не изменится.",
+        "Сейчас модель недоступна. Свяжитесь с нами, чтобы узнать о следующем поступлении.",
     },
     home: {
       assistanceBody:
-        "Проверенная таблица остаётся рядом с моделью. Если данных недостаточно, поможем разобраться лично до оформления запроса.",
-      assistanceTitle: "Размер без догадок",
+        "Для большинства моделей доступна таблица размеров. Если таблицы нет, мы поможем выбрать размер лично.",
+      assistanceTitle: "Поможем выбрать размер",
       categoriesIntro:
-        "Переходите сразу к нужному типу вещи. Количество отражает модели текущей стартовой коллекции.",
-      categoriesTitle: "Найдите свой раздел",
+        "Куртки, жилеты, кардиганы и повседневные модели в одной компактной коллекции.",
+      categoriesTitle: "Выберите категорию",
       collectionIntro:
-        "Реальные модели Andrelook с фотографиями, цветами, размерной информацией и личным сопровождением предзаказа.",
-      collectionTitle: "Выбранные модели",
+        "23 модели Moncler и Parajumpers с реальными фотографиями и персональным сопровождением заказа.",
+      collectionTitle: "Избранная коллекция",
       contactBody:
-        "Напишите в Telegram, Instagram или по электронной почте. Ответим на русском, эстонском или английском.",
-      contactTitle: "Обсудим выбранную модель",
+        "Напишите в Telegram, Instagram или по электронной почте — ответим на русском, эстонском или английском.",
+      contactTitle: "Поможем с выбором",
       eyebrow: "Andrelook · Tallinn",
       faq: [
         {
-          question: "Запрос — это уже покупка?",
+          question: "Форма — это уже покупка?",
           answer:
-            "Нет. Сначала Andrelook подтверждает цену, доступность, размер и дальнейшие шаги.",
+            "Нет. Сначала мы подтвердим цену, размер, способ получения и дальнейшие шаги.",
         },
         {
           question: "Можно получить помощь с размером?",
           answer:
-            "Да. Используйте таблицу на странице модели или оставьте комментарий в запросе.",
+            "Да. Используйте таблицу на странице модели или выберите персональную помощь при оформлении.",
         },
         {
           question: "Нужна регистрация?",
-          answer: "Нет. Для запроса достаточно имени и удобного канала связи.",
+          answer: "Нет. Аккаунт для предзаказа не нужен.",
         },
       ],
-      faqIntro:
-        "Короткие ответы о выборе и запросе. Полная информация собрана в разделе помощи.",
-      faqTitle: "Перед запросом",
+      faqIntro: "Главное о предзаказе, размерах и личном подтверждении.",
+      faqTitle: "Перед предзаказом",
       heroBody:
-        "Тщательно отобранные модели по предзаказу с доставкой по Европе, проверенными таблицами размеров и личной помощью из Таллинна.",
-      heroMeta: "Таллинн · Эстония · Личная поддержка",
+        "Премиальные модели по предзаказу с личной помощью из Таллинна и доставкой по Европе.",
+      heroMeta: "Предзаказ · 2–3 недели · Европа",
       heroTitle: "ANDRELOOK",
       orderIntro:
-        "Без автоматической оплаты и обязательного аккаунта. Каждый запрос остаётся понятным на всех этапах.",
+        "Без автоматической оплаты и обязательного аккаунта. Мы лично подтверждаем детали до оплаты.",
       orderSteps: [
         {
           title: "Выберите модель",
-          body: "Откройте карточку, изучите статус и проверенную размерную информацию.",
+          body: "Откройте страницу модели, выберите цвет и подходящий размер.",
         },
         {
-          title: "Укажите детали",
-          body: "Выберите доступные параметры и оставьте удобный контакт.",
+          title: "Отправьте предзаказ",
+          body: "Оставьте контакт и выберите удобный способ получения.",
         },
         {
           title: "Получите подтверждение",
-          body: "Andrelook лично подтвердит цену, размер, оплату и ожидаемый срок 2–3 недели.",
+          body: "Мы свяжемся с вами, подтвердим цену, размер, оплату и срок.",
         },
       ],
-      orderTitle: "Как начинается заказ",
+      orderTitle: "Как работает предзаказ",
       serviceIntro:
-        "Доверие строится на ясной информации и живом контакте, а не на неподтверждённых обещаниях.",
+        "От выбора размера до получения заказа — вы общаетесь с Andrelook напрямую.",
       serviceItems: [
         {
-          title: "Проверенные данные",
-          body: "Публикуем только подтверждённые сведения о модели, статусе и вариантах.",
+          title: "Личная помощь",
+          body: "Поможем выбрать модель, цвет и размер до оформления.",
         },
         {
-          title: "Помощь до заказа",
-          body: "Можно уточнить размер и детали до любого решения.",
+          title: "Понятные шаги",
+          body: "Цена, оплата и способ получения подтверждаются заранее.",
         },
         {
           title: "Три языка",
-          body: "Полный путь доступен на русском, эстонском и английском.",
+          body: "Обслуживание на русском, эстонском и английском.",
         },
       ],
-      serviceTitle: "Личный подход — это ясность",
+      serviceTitle: "Персональный сервис из Таллинна",
       sizingPoints: [
-        "Исходные единицы измерения сохраняются",
-        "Неясные подписи не угадываются",
-        "Можно запросить личную помощь",
+        "Таблица размеров рядом с моделью",
+        "Личная помощь для моделей без таблицы",
+        "Вопрос о посадке можно добавить к предзаказу",
       ],
       stateIntro:
-        "Каждую модель можно запросить сейчас; ожидаемый срок и следующий шаг понятны до отправки формы.",
-      stateTitle: "Стартовая коллекция по предзаказу",
+        "Выберите модель сейчас — мы подтвердим детали лично. Ориентировочный срок составляет 2–3 недели.",
+      stateTitle: "Как работает предзаказ",
     },
     product: {
       assistanceBody:
-        "Не уверены в размере или параметрах? Укажите вопрос в форме — подтверждение будет до оформления заказа.",
+        "Не уверены в размере? Добавьте вопрос к предзаказу — мы поможем до подтверждения.",
       commercialIntro:
-        "Предзаказ с ожидаемым сроком около 2–3 недель. Запрос не списывает оплату: мы сначала лично подтверждаем цену и детали.",
+        "Предзаказ · ориентировочно 2–3 недели · личное подтверждение перед оплатой.",
       deliverySummary:
-        "Личная передача в Таллинне или доставка по Европе. Способ оплаты зависит от получения и подтверждается до оплаты.",
-      detailsLabel: "Информация о модели",
-      helpLabel: "Помощь перед запросом",
+        "Личная передача в Таллинне или доставка по Европе. Способ получения и стоимость доставки подтверждаются заранее.",
+      detailsLabel: "О модели",
+      helpLabel: "Нужна помощь?",
       learnMoreLabel: "Подробнее",
-      orderContext: "Как оформить запрос",
-      requestLabel: "Перейти к запросу",
+      orderContext: "Оформление предзаказа",
+      requestLabel: "Оформить предзаказ",
       returnsSummary:
-        "Применимые условия возврата или обмена сообщаются до подтверждения заказа.",
-      sizeGuideAvailable: "Проверенная таблица",
+        "Условия возврата или обмена для вашего заказа сообщаются до подтверждения оплаты.",
+      sizeGuideAvailable: "Таблица размеров",
       sizingLabel: "Размер и посадка",
     },
   },
   et: {
     catalog: {
-      discoveryNote:
-        "Otsi mudeli või kategooria järgi, seejärel täpsusta olekut ja järjestust.",
-      filterHint: "Täpsusta valikut",
-      resultsLabel: "Ettevalmistatud mudelid",
+      discoveryNote: "Leia toode nime, brändi või kategooria järgi.",
+      filterHint: "Otsi kollektsioonist",
+      resultsLabel: "Tooted",
     },
     commerce: {
-      availableExplanation:
-        "Mudeli olekut ja müügiinfot näidatakse alles pärast kontrolli.",
-      detailsPending: "Üksikasjad päringu alusel",
-      inStockExplanation:
-        "Märge „Laos” kuvatakse ainult pärast seda, kui Andrelook on hetkeseisu kontrollinud.",
+      availableExplanation: "Seda toodet saab praegu tellida.",
+      detailsPending: "Hind kinnitatakse personaalselt",
+      inStockExplanation: "Toode on tellimiseks valmis.",
       preorderExplanation:
-        "Kõik stardikollektsiooni mudelid on eeltellitavad. Eeldatav aeg on umbes 2–3 nädalat; üksikasjad kinnitatakse isiklikult.",
-      priceOnRequest: "Hind päringu alusel",
+        "Eeltellimus · eeldatavalt 2–3 nädalat · tarne üle Euroopa.",
+      priceOnRequest: "Hind kinnitatakse enne tellimust",
       unavailableExplanation:
-        "Mittesaadava mudeli kohta ei saa päringut saata enne oleku muutmist.",
+        "Toode ei ole praegu saadaval. Järgmise võimaluse kohta küsi meilt.",
     },
     home: {
       assistanceBody:
-        "Kontrollitud suurustabel asub alati mudeli juures. Kui andmeid on vähe, aitame enne päringut isiklikult.",
-      assistanceTitle: "Suurus ilma oletusteta",
+        "Enamikul toodetel on suurustabel. Kui tabelit pole, aitame sobiva suuruse personaalselt valida.",
+      assistanceTitle: "Aitame suurust valida",
       categoriesIntro:
-        "Liigu kohe sobiva tootetüübi juurde. Arv näitab praeguse stardikollektsiooni mudeleid.",
-      categoriesTitle: "Leia õige kategooria",
+        "Joped, vestid, kardiganid ja igapäevased mudelid ühes kompaktses valikus.",
+      categoriesTitle: "Vali kategooria",
       collectionIntro:
-        "Andrelooki päris mudelid koos fotode, värvide, suurusinfo ja personaalse eeltellimustoega.",
-      collectionTitle: "Valitud mudelid",
+        "23 Moncleri ja Parajumpersi mudelit päris fotode ning personaalse tellimistoega.",
+      collectionTitle: "Valitud kollektsioon",
       contactBody:
-        "Kirjuta Telegramis, Instagramis või e-posti teel. Vastame eesti, vene või inglise keeles.",
-      contactTitle: "Räägime valitud mudelist",
+        "Kirjuta Telegramis, Instagramis või e-posti teel — vastame eesti, vene või inglise keeles.",
+      contactTitle: "Aitame valikut teha",
       eyebrow: "Andrelook · Tallinn",
       faq: [
         {
-          question: "Kas päring on juba ost?",
+          question: "Kas vormi saatmine on juba ost?",
           answer:
-            "Ei. Andrelook kinnitab esmalt hinna, saadavuse, suuruse ja järgmised sammud.",
+            "Ei. Kinnitame esmalt hinna, suuruse, kättesaamise ja järgmised sammud.",
         },
         {
           question: "Kas saan suuruse valikul abi?",
           answer:
-            "Jah. Kasuta tootelehe tabelit või lisa küsimus päringu kommentaari.",
+            "Jah. Kasuta tootelehe tabelit või vali vormil personaalne suuruseabi.",
         },
         {
           question: "Kas konto on vajalik?",
-          answer: "Ei. Päringuks piisab nimest ja sobivast kontaktkanalist.",
+          answer: "Ei. Eeltellimuseks pole kontot vaja.",
         },
       ],
-      faqIntro:
-        "Lühivastused valiku ja päringu kohta. Täielik teave on abilehel.",
-      faqTitle: "Enne päringut",
+      faqIntro: "Peamine info eeltellimuse, suuruse ja kinnitamise kohta.",
+      faqTitle: "Enne eeltellimust",
       heroBody:
-        "Hoolikalt valitud eeltellimusmudelid, tarne üle Euroopa, kontrollitud suurustabelid ja personaalne abi Tallinnast.",
-      heroMeta: "Tallinn · Eesti · Personaalne tugi",
+        "Premium-mudelid eeltellimisel, personaalne abi Tallinnast ja tarne üle Euroopa.",
+      heroMeta: "Eeltellimus · 2–3 nädalat · Euroopa",
       heroTitle: "ANDRELOOK",
       orderIntro:
-        "Ilma automaatse makse ja kohustusliku kontota. Iga päringu järgmine samm on selge.",
+        "Automaatset makset ega kontot pole vaja. Kinnitame kõik detailid enne maksmist.",
       orderSteps: [
         {
-          title: "Vali mudel",
-          body: "Ava tooteleht ning vaata olekut ja kontrollitud suurusinfot.",
+          title: "Vali toode",
+          body: "Ava tooteleht ning vali värv ja sobiv suurus.",
         },
         {
-          title: "Lisa üksikasjad",
-          body: "Vali kinnitatud valikud ja jäta sobiv kontakt.",
+          title: "Saada eeltellimus",
+          body: "Jäta kontakt ja vali sobiv kättesaamisviis.",
         },
         {
           title: "Saa kinnitus",
-          body: "Andrelook kinnitab isiklikult hinna, suuruse, makse ja eeldatava 2–3-nädalase aja.",
+          body: "Võtame ühendust ning kinnitame hinna, suuruse, makse ja tähtaja.",
         },
       ],
-      orderTitle: "Kuidas tellimus algab",
+      orderTitle: "Kuidas eeltellimus töötab",
       serviceIntro:
-        "Usaldus sünnib selgest teabest ja päris kontaktist, mitte kinnitamata lubadustest.",
+        "Suuruse valikust tellimuse kättesaamiseni suhtled otse Andrelookiga.",
       serviceItems: [
         {
-          title: "Kontrollitud teave",
-          body: "Avaldame ainult kinnitatud mudeli-, oleku- ja variandiinfo.",
+          title: "Personaalne abi",
+          body: "Aitame enne tellimist valida mudeli, värvi ja suuruse.",
         },
         {
-          title: "Abi enne tellimist",
-          body: "Suuruse ja üksikasjad saab enne otsust üle küsida.",
+          title: "Selged sammud",
+          body: "Hind, makse ja kättesaamine kinnitatakse ette.",
         },
         {
           title: "Kolm keelt",
-          body: "Kogu teekond on eesti, vene ja inglise keeles.",
+          body: "Teenindus eesti, vene ja inglise keeles.",
         },
       ],
-      serviceTitle: "Personaalne lähenemine tähendab selgust",
+      serviceTitle: "Personaalne teenindus Tallinnast",
       sizingPoints: [
-        "Algseid mõõtühikuid ei muudeta",
-        "Ebaselgeid nimetusi ei oletata",
-        "Saad küsida personaalset abi",
+        "Suurustabel on toote juures",
+        "Tabelita toodetele personaalne abi",
+        "Istuvuse küsimuse saab lisada eeltellimusele",
       ],
       stateIntro:
-        "Iga mudelit saab kohe küsida; eeldatav aeg ja järgmine samm on selged enne vormi saatmist.",
-      stateTitle: "Stardikollektsioon eeltellimisel",
+        "Vali toode nüüd ja kinnitame detailid personaalselt. Eeldatav aeg on 2–3 nädalat.",
+      stateTitle: "Kuidas eeltellimus töötab",
     },
     product: {
       assistanceBody:
-        "Kas suurus või detailid tekitavad küsimusi? Lisa küsimus vormi — kõik kinnitatakse enne tellimist.",
+        "Kas suurus tekitab küsimusi? Lisa küsimus eeltellimusele ja aitame enne kinnitamist.",
       commercialIntro:
-        "Eeltellimuse eeldatav aeg on umbes 2–3 nädalat. Päring ei võta makset — esmalt kinnitame hinna ja detailid isiklikult.",
+        "Eeltellimus · eeldatavalt 2–3 nädalat · personaalne kinnitus enne maksmist.",
       deliverySummary:
-        "Isiklik üleandmine Tallinnas või tarne üle Euroopa. Makseviis sõltub kättesaamisest ja kinnitatakse enne makset.",
-      detailsLabel: "Mudeli info",
-      helpLabel: "Abi enne päringut",
+        "Personaalne üleandmine Tallinnas või tarne üle Euroopa. Kättesaamine ja tarnekulu kinnitatakse ette.",
+      detailsLabel: "Tootest",
+      helpLabel: "Vajad abi?",
       learnMoreLabel: "Loe lähemalt",
-      orderContext: "Kuidas päringut esitada",
-      requestLabel: "Liigu päringu juurde",
+      orderContext: "Eeltellimuse vormistamine",
+      requestLabel: "Esita eeltellimus",
       returnsSummary:
-        "Kohaldatavad tagastus- või vahetustingimused antakse enne tellimuse kinnitamist.",
-      sizeGuideAvailable: "Kontrollitud tabel",
+        "Sinu tellimusele kehtivad tagastus- või vahetustingimused teatatakse enne makse kinnitamist.",
+      sizeGuideAvailable: "Suurustabel",
       sizingLabel: "Suurus ja istuvus",
     },
   },
   en: {
     catalog: {
-      discoveryNote:
-        "Search by model or category, then refine by status and order.",
-      filterHint: "Refine your selection",
-      resultsLabel: "Prepared pieces",
+      discoveryNote: "Find a piece by name, brand or category.",
+      filterHint: "Search the collection",
+      resultsLabel: "Pieces",
     },
     commerce: {
-      availableExplanation:
-        "Model status and commercial details appear only after review.",
-      detailsPending: "Details on request",
-      inStockExplanation:
-        "A piece is marked In stock only after Andrelook checks its current status.",
+      availableExplanation: "This piece is ready to order.",
+      detailsPending: "Price confirmed personally",
+      inStockExplanation: "This piece is ready to order.",
       preorderExplanation:
-        "Every launch piece is available by pre-order. The expected timeframe is approximately 2–3 weeks, with details confirmed personally.",
-      priceOnRequest: "Price on request",
+        "Pre-order · approximately 2–3 weeks · delivery across Europe.",
+      priceOnRequest: "Price confirmed before ordering",
       unavailableExplanation:
-        "An unavailable piece cannot be requested until its status changes.",
+        "This piece is not currently available. Contact us about the next opportunity.",
     },
     home: {
       assistanceBody:
-        "A verified size chart stays beside each supported piece. If the evidence is incomplete, we help personally before a request is placed.",
-      assistanceTitle: "Sizing without guesswork",
+        "Most pieces include a size chart. Where a chart is unavailable, we help you choose personally.",
+      assistanceTitle: "Personal sizing help",
       categoriesIntro:
-        "Go straight to the type of piece you need. Counts reflect the current launch collection.",
-      categoriesTitle: "Find your category",
+        "Jackets, gilets, cardigans and everyday pieces in one focused collection.",
+      categoriesTitle: "Shop by category",
       collectionIntro:
-        "Real Andrelook pieces with photography, colours, sizing information and personal pre-order support.",
-      collectionTitle: "Selected pieces",
+        "23 Moncler and Parajumpers pieces with real photography and personal order support.",
+      collectionTitle: "The Andrelook edit",
       contactBody:
-        "Message us on Telegram, Instagram or email. We can respond in English, Estonian or Russian.",
-      contactTitle: "Let’s discuss your selection",
+        "Message us on Telegram, Instagram or email — we reply in English, Estonian or Russian.",
+      contactTitle: "Let us help you choose",
       eyebrow: "Andrelook · Tallinn",
       faq: [
         {
-          question: "Is a request already a purchase?",
+          question: "Is submitting the form already a purchase?",
           answer:
-            "No. Andrelook first confirms price, availability, sizing and the next steps.",
+            "No. We first confirm the price, size, fulfilment and next steps with you.",
         },
         {
-          question: "Can I get sizing help?",
+          question: "Can I get help choosing a size?",
           answer:
-            "Yes. Use the chart on the product page or add your question to the request.",
+            "Yes. Use the product size chart or choose personal sizing help in the form.",
         },
         {
           question: "Do I need an account?",
-          answer:
-            "No. A name and your preferred contact channel are enough for a request.",
+          answer: "No. You can pre-order without creating an account.",
         },
       ],
-      faqIntro:
-        "Short answers about choosing and requesting. Full guidance is available in the help section.",
-      faqTitle: "Before you request",
+      faqIntro: "The essentials on pre-ordering, sizing and confirmation.",
+      faqTitle: "Before you pre-order",
       heroBody:
-        "A considered pre-order edit with delivery across Europe, verified size guides and personal support from Tallinn.",
-      heroMeta: "Tallinn · Estonia · Personal support",
+        "Premium pieces by pre-order, personal support from Tallinn and delivery across Europe.",
+      heroMeta: "Pre-order · 2–3 weeks · Europe",
       heroTitle: "ANDRELOOK",
       orderIntro:
-        "No automatic payment and no required account. Every request has a clear next step.",
+        "No automatic payment and no account required. We confirm every detail before payment.",
       orderSteps: [
         {
-          title: "Choose a piece",
-          body: "Open the product page and review its status and verified sizing evidence.",
+          title: "Choose your piece",
+          body: "Open the product page and select your colour and size.",
         },
         {
-          title: "Add the details",
-          body: "Select the available options and leave your preferred contact.",
+          title: "Send your pre-order",
+          body: "Leave your preferred contact and fulfilment method.",
         },
         {
           title: "Receive confirmation",
-          body: "Andrelook personally confirms price, size, payment and the expected 2–3 week timeframe.",
+          body: "We contact you to confirm the price, size, payment and timing.",
         },
       ],
-      orderTitle: "How an order begins",
+      orderTitle: "How pre-order works",
       serviceIntro:
-        "Trust comes from clear information and real contact, never unverified promises.",
+        "From choosing a size to receiving your order, you speak directly with Andrelook.",
       serviceItems: [
         {
-          title: "Reviewed information",
-          body: "Only confirmed model, status and option data is published.",
+          title: "Personal help",
+          body: "We help you choose the piece, colour and size before ordering.",
         },
         {
-          title: "Help before ordering",
-          body: "Ask about sizing and details before making any decision.",
+          title: "Clear next steps",
+          body: "Price, payment and fulfilment are confirmed in advance.",
         },
         {
           title: "Three languages",
-          body: "The complete journey works in English, Estonian and Russian.",
+          body: "Service in English, Estonian and Russian.",
         },
       ],
-      serviceTitle: "Personal service means clarity",
+      serviceTitle: "Personal service from Tallinn",
       sizingPoints: [
-        "Original measurement units are preserved",
-        "Ambiguous labels are never guessed",
-        "Personal sizing help is available",
+        "Size chart beside the product",
+        "Personal help for pieces without a chart",
+        "Add a fit question to your pre-order",
       ],
       stateIntro:
-        "Every piece can be requested now, with the expected timing and next step clear before you submit.",
-      stateTitle: "The launch collection, by pre-order",
+        "Choose your piece now and we will confirm the details personally. Expected timing is approximately 2–3 weeks.",
+      stateTitle: "How pre-order works",
     },
     product: {
       assistanceBody:
-        "Unsure about sizing or another detail? Add the question to your request — confirmation comes before ordering.",
+        "Unsure about the size? Add a question to your pre-order and we will help before confirmation.",
       commercialIntro:
-        "Pre-order with an expected timeframe of approximately 2–3 weeks. A request takes no payment; we first confirm price and details personally.",
+        "Pre-order · approximately 2–3 weeks · personal confirmation before payment.",
       deliverySummary:
-        "Personal handover in Tallinn or delivery across Europe. Payment depends on fulfilment and is confirmed before payment.",
-      detailsLabel: "Product information",
-      helpLabel: "Help before requesting",
+        "Personal handover in Tallinn or delivery across Europe. Fulfilment and delivery cost are confirmed in advance.",
+      detailsLabel: "About this piece",
+      helpLabel: "Need help?",
       learnMoreLabel: "Learn more",
-      orderContext: "How to make a request",
-      requestLabel: "Go to request",
+      orderContext: "Complete your pre-order",
+      requestLabel: "Pre-order this piece",
       returnsSummary:
-        "The return or exchange terms that apply are shared before your order is confirmed.",
-      sizeGuideAvailable: "Verified chart",
-      sizingLabel: "Size and fit",
+        "The return or exchange terms that apply to your order are shared before payment is confirmed.",
+      sizeGuideAvailable: "Size guide",
+      sizingLabel: "Size & fit",
     },
   },
 };
 
-export function getStorefrontContent(locale: Locale): StorefrontContent {
+export function getStorefrontContent(locale: Locale) {
   return content[locale];
 }

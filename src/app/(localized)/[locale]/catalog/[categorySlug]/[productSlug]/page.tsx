@@ -7,6 +7,7 @@ import { cache } from "react";
 
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
+import { MobileProductCta } from "@/components/mobile-product-cta";
 import { RequestForm } from "@/components/request-form";
 import { SizeGuide } from "@/components/size-guide";
 import { isLocale } from "@/config/locales";
@@ -145,7 +146,12 @@ export default async function ProductPage({ params }: Props) {
           currency: product.currency,
           style: "currency",
         }).format(product.retailPriceMinor / 100)
-      : content.commerce.priceOnRequest;
+      : null;
+  const preorderTime = {
+    en: "2–3 weeks",
+    et: "2–3 nädalat",
+    ru: "2–3 недели",
+  }[locale];
   const chart = product.sizeChart
     ? parseSizeChart(product.sizeChart.data)
     : null;
@@ -230,7 +236,13 @@ export default async function ProductPage({ params }: Props) {
               </span>
             </div>
             <h1>{product.name}</h1>
-            <p className="product-price">{formattedPrice}</p>
+            {formattedPrice ? (
+              <p className="product-price">{formattedPrice}</p>
+            ) : (
+              <p className="product-price-note">
+                {content.commerce.detailsPending}
+              </p>
+            )}
             <p className="commercial-intro">
               {content.product.commercialIntro}
             </p>
@@ -283,14 +295,13 @@ export default async function ProductPage({ params }: Props) {
                 <dd>{availability}</dd>
               </div>
               <div>
-                <dt>{dictionary.price}</dt>
-                <dd>{formattedPrice}</dd>
+                <dt>{dictionary.preorder}</dt>
+                <dd>{preorderTime}</dd>
               </div>
-              {product.availability === "PRE_ORDER" &&
-              product.preorderEstimate ? (
+              {formattedPrice ? (
                 <div>
-                  <dt>{dictionary.preorder}</dt>
-                  <dd>{product.preorderEstimate}</dd>
+                  <dt>{dictionary.price}</dt>
+                  <dd>{formattedPrice}</dd>
                 </div>
               ) : null}
               <div>
@@ -335,7 +346,13 @@ export default async function ProductPage({ params }: Props) {
                   units={product.sizeChart.units}
                 />
               ) : (
-                <p className="pending-note">{dictionary.sizeGuidePending}</p>
+                <div className="personal-sizing-service">
+                  <h3>{dictionary.personalSizing}</h3>
+                  <p>{content.product.assistanceBody}</p>
+                  <a className="secondary-button" href="#request">
+                    {content.product.requestLabel}
+                  </a>
+                </div>
               )}
               <aside className="sizing-help-note">
                 <strong>{content.product.helpLabel}</strong>
@@ -415,6 +432,10 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </section>
       ) : null}
+      <MobileProductCta
+        label={content.product.requestLabel}
+        productName={product.name}
+      />
     </>
   );
 }

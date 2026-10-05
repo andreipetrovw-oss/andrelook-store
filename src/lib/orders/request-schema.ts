@@ -25,19 +25,22 @@ export const requestOrderSchema = z
       .trim()
       .length(2)
       .transform((value) => value.toUpperCase()),
-    email: z.email().max(200),
+    email: z.preprocess((value) => {
+      const text = typeof value === "string" ? value.trim() : "";
+      return text || undefined;
+    }, z.email().max(200).optional()),
     firstName: z.string().trim().min(2).max(80),
     fulfilmentMethod: z.enum(["PERSONAL_HANDOVER", "DELIVERY"]),
     initialReferrer: optionalText(1000),
     landingPath: optionalText(500),
-    lastName: z.string().trim().min(2).max(80),
+    lastName: optionalText(80),
     locale: z.enum(locales),
     measurements: optionalText(500),
     paymentPreference: z.enum([
       "DEPOSIT_30_BALANCE_ON_HANDOVER",
       "FULL_ADVANCE",
     ]),
-    phone: z.string().trim().min(5).max(40),
+    phone: optionalText(40),
     postalCode: optionalText(30),
     preferredLocale: z.enum(locales),
     productId: z.string().trim().min(1).max(64),
@@ -81,6 +84,23 @@ export const requestOrderSchema = z
         code: "custom",
         message: "International delivery requires full advance payment.",
         path: ["paymentPreference"],
+      });
+    }
+    if (input.contactMethod === "EMAIL" && !input.email) {
+      context.addIssue({
+        code: "custom",
+        message: "An email address is required for email contact.",
+        path: ["email"],
+      });
+    }
+    if (
+      input.contactMethod === "PHONE" &&
+      (!input.phone || input.phone.length < 5)
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "A phone number is required for phone contact.",
+        path: ["phone"],
       });
     }
 

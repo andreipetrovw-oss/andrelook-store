@@ -138,11 +138,11 @@ export async function createOrderRequest(
   }[input.contactMethod];
   if (!contactValue) throw new RequestRejectedError("selection");
   const contactFields = {
-    email: input.email,
+    email: input.email ?? null,
     firstName: input.firstName,
     instagramHandle: input.contactMethod === "INSTAGRAM" ? socialHandle : null,
-    lastName: input.lastName,
-    phone: input.phone,
+    lastName: input.lastName ?? null,
+    phone: input.phone ?? null,
     telegramHandle: input.contactMethod === "TELEGRAM" ? socialHandle : null,
   };
 
@@ -151,7 +151,7 @@ export async function createOrderRequest(
       const customer = await tx.customer.create({
         data: {
           ...contactFields,
-          name: `${input.firstName} ${input.lastName}`,
+          name: [input.firstName, input.lastName].filter(Boolean).join(" "),
           preferredContactMethod: input.contactMethod,
           preferredContactValue: contactValue,
           preferredLocale: databaseLocale[input.preferredLocale],

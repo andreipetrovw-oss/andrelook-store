@@ -27,10 +27,21 @@ export async function generateMetadata({
   if (!isLocale(locale)) {
     return {};
   }
+  const dictionary = getDictionary(locale);
   return {
     alternates: localizedAlternates(locale, "catalog"),
+    description: dictionary.catalogIntro,
+    openGraph: {
+      description: dictionary.catalogIntro,
+      title: dictionary.catalog,
+    },
     robots: indexingRobots(),
-    title: getDictionary(locale).catalog,
+    title: dictionary.catalog,
+    twitter: {
+      card: "summary_large_image",
+      description: dictionary.catalogIntro,
+      title: dictionary.catalog,
+    },
   };
 }
 

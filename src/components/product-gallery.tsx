@@ -21,7 +21,8 @@ export function ProductGallery({
               <Image
                 alt={image.alt}
                 fill
-                priority={index === 0}
+                fetchPriority={index === 0 ? "high" : undefined}
+                loading={index === 0 ? "eager" : "lazy"}
                 sizes="(max-width: 1024px) 100vw, 58vw"
                 src={image.url}
               />

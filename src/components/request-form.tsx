@@ -62,11 +62,12 @@ const copy = {
     lastName: "Last name",
     measurements: "Measurements or sizing question",
     nextStep:
-      "We will check the details and contact you personally. No payment was taken.",
+      "Thank you. We will contact you through your chosen channel to confirm price, sizing and fulfilment. No payment was taken.",
     payment: "Payment preference",
     phone: "Phone",
     postal: "Postal code",
     quantity: "Quantity",
+    reference: "Reference",
     shipping: "Delivery in Europe",
     sizeHelp: "I need help choosing a size",
     social: "Telegram or Instagram username",
@@ -86,11 +87,12 @@ const copy = {
     lastName: "Perekonnanimi",
     measurements: "Mõõdud või suuruseküsimus",
     nextStep:
-      "Kontrollime üksikasjad ja võtame sinuga isiklikult ühendust. Makset ei võetud.",
+      "Aitäh. Võtame sinuga valitud kanalis ühendust ning kinnitame hinna, suuruse ja kättesaamise. Makset ei võetud.",
     payment: "Makseeelistus",
     phone: "Telefon",
     postal: "Postiindeks",
     quantity: "Kogus",
+    reference: "Viide",
     shipping: "Tarne Euroopas",
     sizeHelp: "Vajan suuruse valikul abi",
     social: "Telegrami või Instagrami kasutajanimi",
@@ -110,11 +112,12 @@ const copy = {
     lastName: "Фамилия",
     measurements: "Мерки или вопрос по размеру",
     nextStep:
-      "Мы проверим детали и свяжемся с вами лично. Оплата не списывалась.",
+      "Спасибо. Мы свяжемся с вами по выбранному каналу и подтвердим цену, размер и получение. Оплата не списывалась.",
     payment: "Вариант оплаты",
     phone: "Телефон",
     postal: "Почтовый индекс",
     quantity: "Количество",
+    reference: "Номер заявки",
     shipping: "Доставка по Европе",
     sizeHelp: "Мне нужна помощь с размером",
     social: "Имя пользователя Telegram или Instagram",
@@ -213,7 +216,7 @@ export function RequestForm({
         <h2>{dictionary.requestSuccess}</h2>
         <p>{labels.nextStep}</p>
         <p>
-          {dictionary.requestTitle}: <strong>{state.reference}</strong>
+          {labels.reference}: <strong>{state.reference}</strong>
         </p>
         <a
           className="secondary-contact"
@@ -317,22 +320,10 @@ export function RequestForm({
             <input autoComplete="given-name" name="firstName" required />
           </label>
           <label>
-            <span>{labels.lastName}</span>
-            <input autoComplete="family-name" name="lastName" required />
-          </label>
-          <label>
-            <span>{labels.phone}</span>
-            <input
-              autoComplete="tel"
-              inputMode="tel"
-              name="phone"
-              required
-              type="tel"
-            />
-          </label>
-          <label>
-            <span>{labels.email}</span>
-            <input autoComplete="email" name="email" required type="email" />
+            <span>
+              {labels.lastName} <small>({dictionary.optional})</small>
+            </span>
+            <input autoComplete="family-name" name="lastName" />
           </label>
           <label>
             <span>{dictionary.contactMethod}</span>
@@ -354,6 +345,30 @@ export function RequestForm({
             </label>
           ) : (
             <input name="socialHandle" type="hidden" value="" />
+          )}
+          {contactMethod === "PHONE" ? (
+            <label>
+              <span>{labels.phone}</span>
+              <input
+                autoComplete="tel"
+                inputMode="tel"
+                name="phone"
+                required
+                type="tel"
+              />
+              <input name="email" type="hidden" value="" />
+            </label>
+          ) : contactMethod === "EMAIL" ? (
+            <label>
+              <span>{labels.email}</span>
+              <input autoComplete="email" name="email" required type="email" />
+              <input name="phone" type="hidden" value="" />
+            </label>
+          ) : (
+            <>
+              <input name="phone" type="hidden" value="" />
+              <input name="email" type="hidden" value="" />
+            </>
           )}
           <label>
             <span>{labels.language}</span>

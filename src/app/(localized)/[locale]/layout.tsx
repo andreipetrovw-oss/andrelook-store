@@ -32,6 +32,14 @@ export async function generateMetadata({
     metadataBase: getServerConfig().siteUrl,
     openGraph: {
       description: dictionary.tagline,
+      images: [
+        {
+          alt: "Andrelook",
+          height: 1080,
+          url: "/brand/hero-bg.jpg",
+          width: 1920,
+        },
+      ],
       siteName: "Andrelook",
       title: "Andrelook",
       type: "website",
@@ -42,8 +50,9 @@ export async function generateMetadata({
       template: "%s | Andrelook",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       description: dictionary.tagline,
+      images: ["/brand/hero-bg.jpg"],
       title: "Andrelook",
     },
   };

@@ -18,11 +18,6 @@ export function filterAndSortProducts(
   params: CatalogParams,
 ): PublicProductDto[] {
   const query = params.q?.trim().toLocaleLowerCase() ?? "";
-  const availability = ["IN_STOCK", "PRE_ORDER", "UNAVAILABLE"].includes(
-    params.availability ?? "",
-  )
-    ? params.availability
-    : undefined;
   const filtered = products.filter((product) => {
     const searchText = [
       product.name,
@@ -32,23 +27,12 @@ export function filterAndSortProducts(
       .filter(Boolean)
       .join(" ")
       .toLocaleLowerCase();
-    return (
-      (!query || searchText.includes(query)) &&
-      (!availability || product.availability === availability)
-    );
+    return !query || searchText.includes(query);
   });
   if (params.sort === "name") {
     return filtered.toSorted((left, right) =>
       left.name.localeCompare(right.name),
     );
-  }
-  if (params.sort === "price-asc" || params.sort === "price-desc") {
-    const direction = params.sort === "price-asc" ? 1 : -1;
-    return filtered.toSorted((left, right) => {
-      if (left.retailPriceMinor === null) return 1;
-      if (right.retailPriceMinor === null) return -1;
-      return (left.retailPriceMinor - right.retailPriceMinor) * direction;
-    });
   }
   return filtered;
 }
@@ -68,21 +52,7 @@ export function CatalogExperience({
 }) {
   const content = getStorefrontContent(locale);
   const visibleProducts = filterAndSortProducts(products, params);
-  const hasFilters = Boolean(params.q || params.availability || params.sort);
-  const availabilityOptions = [
-    { label: dictionary.filterAll, value: "" },
-    { label: dictionary.availabilityInStock, value: "IN_STOCK" },
-    { label: dictionary.availabilityPreOrder, value: "PRE_ORDER" },
-    { label: dictionary.availabilityUnavailable, value: "UNAVAILABLE" },
-  ];
-  const availabilityHref = (value: string) => {
-    const next = new URLSearchParams();
-    if (params.q) next.set("q", params.q);
-    if (params.sort) next.set("sort", params.sort);
-    if (value) next.set("availability", value);
-    const query = next.toString();
-    return query ? `${basePath}?${query}` : basePath;
-  };
+  const hasFilters = Boolean(params.q || params.sort);
   return (
     <section aria-label={dictionary.catalog} className="catalog-results">
       <div className="catalog-discovery" id="catalog-controls">
@@ -91,24 +61,10 @@ export function CatalogExperience({
             <span className="eyebrow">{content.catalog.filterHint}</span>
             <p>{content.catalog.discoveryNote}</p>
           </div>
-          <nav
-            aria-label={dictionary.filterAvailability}
-            className="availability-filters"
-          >
-            {availabilityOptions.map((option) => (
-              <Link
-                aria-current={
-                  (params.availability ?? "") === option.value
-                    ? "page"
-                    : undefined
-                }
-                href={availabilityHref(option.value)}
-                key={option.value || "all"}
-              >
-                {option.label}
-              </Link>
-            ))}
-          </nav>
+          <span className="catalog-preorder-note">
+            {dictionary.availabilityPreOrder} · 2–3{" "}
+            {locale === "ru" ? "недели" : locale === "et" ? "nädalat" : "weeks"}
+          </span>
         </div>
       </div>
       <div className="container catalog-toolbar">
@@ -130,19 +86,8 @@ export function CatalogExperience({
             <select defaultValue={params.sort ?? ""} name="sort">
               <option value="">{dictionary.sortCurated}</option>
               <option value="name">{dictionary.sortName}</option>
-              <option value="price-asc">{dictionary.sortPriceAscending}</option>
-              <option value="price-desc">
-                {dictionary.sortPriceDescending}
-              </option>
             </select>
           </label>
-          {params.availability ? (
-            <input
-              name="availability"
-              type="hidden"
-              value={params.availability}
-            />
-          ) : null}
           <button type="submit">{dictionary.search}</button>
           {hasFilters ? (
             <Link className="clear-action" href={basePath}>

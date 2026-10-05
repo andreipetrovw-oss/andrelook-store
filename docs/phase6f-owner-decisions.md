@@ -1,4 +1,4 @@
-# Phase 6F consolidated owner decision sheet
+# Phase 6F.1 consolidated owner decision sheet
 
 Complete this sheet only for facts that require owner authority. Confirmed global Phase 6F rules are already implemented and are intentionally omitted.
 
@@ -32,9 +32,11 @@ Provide the final customer-facing EUR price for each of the 23 launch products. 
 |        22 | Moncler Polo Shirt                           |                  |
 |        23 | Moncler Logo Patch Swimming Shorts           |                  |
 
-## 2. Six unresolved size-chart identities
+## 2. Six unresolved size-chart identities (optional before cutover)
 
 Confirm the exact source/size chart for legacy IDs 6, 9, 13, 19, 20 and 22, or explicitly approve a launch workflow with personal sizing help and no selectable chart-backed size for the affected product. Phase 6F will not attach similarity-based charts automatically.
+
+The customer storefront now gives these six products a complete personal sizing-help path, so this decision does not block owner UAT.
 
 ## 3. Legal and returns facts
 
@@ -53,3 +55,12 @@ For owner notifications to become operational at `info.andrelook@gmail.com`, app
 ## 6. Delivery cost
 
 Confirm whether customer delivery is free, quoted per order, or follows another policy. The implemented customer flow confirms the delivery method and cost before payment and does not invent a fixed shipping price.
+
+## 7. Final storefront domain
+
+Confirm the final customer-facing domain only when production cutover is authorized. Phase 6F.1 remains isolated on the Andrelook V1 staging project and does not change either production domain.
+
+## Decision status
+
+- **Storefront ready:** Phase 6F.1 can reach owner UAT without the decisions above.
+- **Production cutover ready:** No. Retail prices, legal seller facts and approved policies, delivery-cost policy, final domain and notification sender/domain remain owner-controlled inputs. The optional Facebook URL and six chart decisions may be completed independently.

@@ -35,13 +35,6 @@ export function SiteHeader({
           <Link href={`/${locale}/contact`}>{dictionary.contact}</Link>
         </nav>
         <div className="header-actions">
-          <Link
-            aria-label={dictionary.search}
-            className="header-search"
-            href={`/${locale}/catalog#catalog-controls`}
-          >
-            {dictionary.search}
-          </Link>
           <LanguageSwitcher
             currentLocale={locale}
             label={dictionary.language}

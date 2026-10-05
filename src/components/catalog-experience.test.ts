@@ -36,20 +36,23 @@ const products = [
 ];
 
 describe("catalog browsing state", () => {
-  it("searches only public DTO text and combines availability", () => {
+  it("searches only public DTO text and ignores retired availability controls", () => {
     expect(
       filterAndSortProducts(products, { availability: "IN_STOCK", q: "coat" }),
-    ).toEqual([]);
+    ).toEqual([products[0]]);
     expect(filterAndSortProducts(products, { q: "test brand" })).toHaveLength(
       3,
     );
   });
 
-  it("sorts known prices while keeping pending prices intentional", () => {
+  it("supports curated and name ordering but ignores retired price sorts", () => {
     expect(
       filterAndSortProducts(products, { sort: "price-asc" }).map(
         (item) => item.id,
       ),
-    ).toEqual(["c", "a", "b"]);
+    ).toEqual(["b", "a", "c"]);
+    expect(
+      filterAndSortProducts(products, { sort: "name" }).map((item) => item.id),
+    ).toEqual(["a", "b", "c"]);
   });
 });

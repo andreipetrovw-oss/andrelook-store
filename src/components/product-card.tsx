@@ -7,6 +7,19 @@ import type { PublicProductDto } from "@/lib/catalog/public-dto";
 
 import { ProductPlaceholder } from "./product-placeholder";
 
+function formatAdditionalColours(locale: Locale, count: number) {
+  if (locale === "et") return count === 1 ? "värv" : "värvi";
+  if (locale === "ru") {
+    const modulo100 = count % 100;
+    const modulo10 = count % 10;
+    if (modulo100 >= 11 && modulo100 <= 14) return "цветов";
+    if (modulo10 === 1) return "цвет";
+    if (modulo10 >= 2 && modulo10 <= 4) return "цвета";
+    return "цветов";
+  }
+  return count === 1 ? "colour" : "colours";
+}
+
 export function ProductCard({
   dictionary,
   locale,
@@ -24,7 +37,14 @@ export function ProductCard({
           currency: product.currency,
           style: "currency",
         }).format(product.retailPriceMinor / 100)
-      : content.commerce.priceOnRequest;
+      : null;
+  const preorderTime = {
+    en: "2–3 weeks",
+    et: "2–3 nädalat",
+    ru: "2–3 недели",
+  }[locale];
+  const firstColour = product.colors[0]?.name;
+  const additionalColours = product.colors.length - 1;
   const availability = product.availability
     ? {
         IN_STOCK: dictionary.availabilityInStock,
@@ -73,17 +93,19 @@ export function ProductCard({
         </h2>
         {product.colors.length ? (
           <p className="product-card-options">
-            {dictionary.colour}:{" "}
-            {product.colors.map((colour) => colour.name).join(", ")}
+            {firstColour}
+            {additionalColours > 0
+              ? ` · +${additionalColours} ${formatAdditionalColours(locale, additionalColours)}`
+              : ""}
           </p>
         ) : null}
         {product.availability === "PRE_ORDER" && product.preorderEstimate ? (
           <p className="product-card-options">
-            {dictionary.preorder}: {product.preorderEstimate}
+            {dictionary.availabilityPreOrder} · {preorderTime}
           </p>
         ) : null}
         <div className="product-card-footer">
-          <span>{formattedPrice}</span>
+          {formattedPrice ? <span>{formattedPrice}</span> : <span />}
           <span className="product-card-cta">{dictionary.viewProduct} ↗</span>
         </div>
       </div>

@@ -63,12 +63,6 @@ export default async function InformationPage({ params }: Props) {
           </nav>
         </aside>
         <div className="information-content-column">
-          {page.requiresApproval ? (
-            <aside className="approval-notice" role="note">
-              <span className="eyebrow">Owner review</span>
-              <p>{dictionary.approvalNotice}</p>
-            </aside>
-          ) : null}
           <div className="information-sections">
             {page.sections.map((section, index) => (
               <section key={section.title}>
@@ -105,12 +99,14 @@ export default async function InformationPage({ params }: Props) {
             <span className="eyebrow">Andrelook</span>
             <h2>{dictionary.needHelp}</h2>
             <div>
-              <Link
-                className="primary-action-inline"
-                href={`/${locale}/contact`}
-              >
-                {dictionary.contact}
-              </Link>
+              {infoSlug !== "contact" ? (
+                <Link
+                  className="primary-action-inline"
+                  href={`/${locale}/contact`}
+                >
+                  {dictionary.contact}
+                </Link>
+              ) : null}
               <Link className="text-action" href={`/${locale}/catalog`}>
                 {dictionary.viewCatalog} →
               </Link>

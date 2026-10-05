@@ -16,11 +16,22 @@ describe("localized information architecture", () => {
     }
   });
 
-  it("keeps policy pages behind an explicit approval boundary", () => {
+  it("keeps public policy pages customer-ready without internal approval language", () => {
     for (const locale of locales) {
       for (const slug of ["privacy", "terms", "returns-exchanges"] as const) {
-        expect(getInfoPage(locale, slug)?.requiresApproval).toBe(true);
+        const page = getInfoPage(locale, slug);
+        expect(JSON.stringify(page)).not.toMatch(/owner|omanik|владел/i);
       }
+    }
+  });
+
+  it("answers eight customer purchase questions in every locale", () => {
+    for (const locale of locales) {
+      const faq = getInfoPage(locale, "faq");
+      expect(faq?.sections).toHaveLength(8);
+      expect(JSON.stringify(faq)).not.toMatch(
+        /price missing|not yet published|catalog version/i,
+      );
     }
   });
 });
