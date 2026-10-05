@@ -309,8 +309,9 @@ async function main() {
       },
     });
     for (const product of catalog.products) {
-      await prisma.$transaction((transaction) =>
-        importProduct(transaction as PrismaClient, product),
+      await prisma.$transaction(
+        (transaction) => importProduct(transaction as PrismaClient, product),
+        { maxWait: 10_000, timeout: 30_000 },
       );
     }
     console.log(JSON.stringify(catalog.summary, null, 2));

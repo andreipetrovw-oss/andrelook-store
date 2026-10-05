@@ -5,6 +5,11 @@ import vm from "node:vm";
 
 import sharp from "sharp";
 
+import {
+  categoryNames,
+  productDescriptions,
+} from "./lib/phase6f1-product-copy";
+
 const PHASE5_SHA256 =
   "5cd48ecb73f0480604adb0607fef78590a6b8a50a091001df30584b88c03ce21";
 
@@ -124,6 +129,13 @@ async function main() {
   let imageCount = 0;
   for (const legacy of legacyProducts) {
     const slug = slugify(legacy.names.en);
+    const curatedDescription = productDescriptions[legacy.id];
+    const curatedCategory = categoryNames[legacy.category];
+    if (!curatedDescription || !curatedCategory) {
+      throw new Error(
+        `Missing Phase 6F.1 copy for legacy product ${legacy.id}.`,
+      );
+    }
     const images = [];
     for (const [index, relativePath] of legacy.images.entries()) {
       const fileName = basename(relativePath);
@@ -187,7 +199,7 @@ async function main() {
       availabilityType: "PRE_ORDER",
       brand: legacy.brand,
       category: {
-        names: legacy.cats,
+        names: curatedCategory,
         slug: legacy.category,
       },
       colors: (legacy.colors ?? []).map((color, index) => ({
@@ -233,10 +245,10 @@ async function main() {
       sortOrder: legacy.id,
       translations: legacy.names
         ? (["ru", "et", "en"] as const).map((locale) => ({
-            description: legacy.descs[locale],
+            description: curatedDescription[locale],
             locale,
             name: legacy.names[locale],
-            shortDescription: legacy.descs[locale].split("\n")[0],
+            shortDescription: curatedDescription[locale].split(". ")[0] + ".",
           }))
         : [],
     });
