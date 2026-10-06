@@ -6,7 +6,11 @@ import { SiteHeader } from "@/components/site-header";
 import { CampaignCapture } from "@/components/campaign-capture";
 import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
-import { localizedAlternates, indexingRobots } from "@/lib/seo";
+import {
+  indexingRobots,
+  localizedAlternates,
+  localizedOpenGraph,
+} from "@/lib/seo";
 import { getServerConfig } from "@/lib/env";
 import { andrelookFontVariables } from "@/lib/fonts";
 import "@/styles/globals.css";
@@ -32,6 +36,7 @@ export async function generateMetadata({
     metadataBase: getServerConfig().siteUrl,
     openGraph: {
       description: dictionary.tagline,
+      ...localizedOpenGraph(locale),
       images: [
         {
           alt: "Andrelook",
@@ -83,7 +88,11 @@ export default async function LocalizedLayout({
     url: new URL(`/${locale}`, getServerConfig().siteUrl).toString(),
   };
   return (
-    <html className={andrelookFontVariables} lang={locale}>
+    <html
+      className={andrelookFontVariables}
+      data-scroll-behavior="smooth"
+      lang={locale}
+    >
       <body>
         <CampaignCapture />
         <a className="skip-link" href="#main-content">

@@ -11,6 +11,7 @@ import {
   type PublicProductDto,
   type PublicProductRecord,
 } from "./public-dto";
+import { getCustomerCategoryName } from "./presentation";
 import {
   approvedPublicAssetWhere,
   visiblePublicationStatuses,
@@ -210,7 +211,11 @@ export async function getPublicCategories(
       return childTranslation && child._count.products > 0
         ? [
             {
-              name: childTranslation.name,
+              name: getCustomerCategoryName(
+                locale,
+                child.slug,
+                childTranslation.name,
+              ),
               productCount: child._count.products,
               slug: child.slug,
             },

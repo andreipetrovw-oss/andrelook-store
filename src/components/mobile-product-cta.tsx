@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useProductInteraction } from "./product-interaction-context";
+
 export function MobileProductCta({
   label,
   productName,
@@ -10,6 +12,7 @@ export function MobileProductCta({
   productName: string;
 }) {
   const [formVisible, setFormVisible] = useState(false);
+  const { drawerOpen, openOrder } = useProductInteraction();
 
   useEffect(() => {
     const request = document.getElementById("request");
@@ -24,12 +27,14 @@ export function MobileProductCta({
 
   return (
     <div
-      aria-hidden={formVisible}
+      aria-hidden={formVisible || drawerOpen}
       className="mobile-product-cta"
-      data-hidden={formVisible ? "true" : "false"}
+      data-hidden={formVisible || drawerOpen ? "true" : "false"}
     >
       <span>{productName}</span>
-      <a href="#request">{label}</a>
+      <button onClick={(event) => openOrder(event.currentTarget)} type="button">
+        {label}
+      </button>
     </div>
   );
 }

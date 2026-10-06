@@ -1,5 +1,7 @@
 import type { Locale } from "@/config/locales";
 
+import { getCustomerCategoryName } from "./presentation";
+
 export type PublicProductDto = {
   availability: "IN_STOCK" | "PRE_ORDER" | "UNAVAILABLE" | null;
   brand: { name: string; slug: string } | null;
@@ -102,7 +104,11 @@ export function toPublicProductDto(
       ? { name: record.brand.displayName, slug: record.brand.slug }
       : null,
     category: {
-      name: categoryTranslation.name,
+      name: getCustomerCategoryName(
+        locale,
+        record.category.slug,
+        categoryTranslation.name,
+      ),
       slug: record.category.slug,
     },
     colors: record.colors.flatMap((color) => {

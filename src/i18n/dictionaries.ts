@@ -205,8 +205,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     relatedProducts: "Другие модели",
     selectedProducts: "Выбранные модели",
     whyAndrelook: "Почему Andrelook",
-    trustClarity:
-      "Понятный процесс без обязательной регистрации и автоматической оплаты.",
+    trustClarity: "Аккаунт не нужен, автоматическая оплата не производится.",
     trustSupport: "Личная помощь с размером, наличием и деталями до заказа.",
     trustLanguages: "Полный сервис на русском, эстонском и английском языках.",
     validationRequired: "Заполните это поле.",
@@ -313,8 +312,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     relatedProducts: "Teised mudelid",
     selectedProducts: "Valitud mudelid",
     whyAndrelook: "Miks Andrelook",
-    trustClarity:
-      "Selge protsess ilma kohustusliku konto ja automaatse makseta.",
+    trustClarity: "Kontot pole vaja ja automaatset makset ei tehta.",
     trustSupport:
       "Personaalne abi suuruse, saadavuse ja detailidega enne tellimist.",
     trustLanguages: "Täielik teenindus eesti, vene ja inglise keeles.",
@@ -421,8 +419,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     relatedProducts: "Other pieces",
     selectedProducts: "Selected pieces",
     whyAndrelook: "Why Andrelook",
-    trustClarity:
-      "A clear process without a required account or automatic payment.",
+    trustClarity: "No account is required and no automatic payment is taken.",
     trustSupport:
       "Personal support with sizing, availability and details before ordering.",
     trustLanguages: "Complete service in English, Estonian and Russian.",

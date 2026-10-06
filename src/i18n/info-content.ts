@@ -47,7 +47,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Покупателям",
       title: "Как заказать",
       introduction:
-        "Три понятных шага от выбранной модели до личного подтверждения предзаказа.",
+        "Выберите модель, отправьте заявку и получите личное подтверждение предзаказа.",
       sections: [
         {
           title: "1. Выберите модель",
@@ -249,7 +249,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Kuidas tellida",
       introduction:
-        "Kolm selget sammu valitud tootest personaalse eeltellimuse kinnituseni.",
+        "Vali toode, saada tellimus ja saa personaalne eeltellimuse kinnitus.",
       sections: [
         {
           title: "1. Vali toode",
@@ -451,7 +451,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "How to order",
       introduction:
-        "Three clear steps from choosing a piece to receiving personal pre-order confirmation.",
+        "Choose a piece, submit your order and receive personal pre-order confirmation.",
       sections: [
         {
           title: "1. Choose your piece",

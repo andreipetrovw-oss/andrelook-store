@@ -2,9 +2,8 @@ export const locales = ["ru", "et", "en"] as const;
 
 export type Locale = (typeof locales)[number];
 
-// Provisional Phase 6B setting. Change here before cutover if the owner chooses
-// a different root/x-default locale.
-export const defaultLocale: Locale = "ru";
+// Estonian is the owner-approved primary storefront and x-default locale.
+export const defaultLocale: Locale = "et";
 
 export function isLocale(value: string): value is Locale {
   return locales.includes(value as Locale);

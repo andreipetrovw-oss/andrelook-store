@@ -109,18 +109,22 @@ const content: Record<Locale, StorefrontContent> = {
       orderSteps: [
         {
           title: "Выберите модель",
-          body: "Откройте страницу модели, выберите цвет и подходящий размер.",
+          body: "Выберите цвет и размер. Если сомневаетесь, поможем подобрать.",
         },
         {
-          title: "Отправьте предзаказ",
+          title: "Оформите заявку",
           body: "Оставьте контакт и выберите удобный способ получения.",
         },
         {
-          title: "Получите подтверждение",
-          body: "Мы свяжемся с вами, подтвердим цену, размер, оплату и срок.",
+          title: "Мы подтвердим заказ",
+          body: "Свяжемся с вами и согласуем детали и оплату.",
+        },
+        {
+          title: "Получите заказ",
+          body: "Обычно предзаказ занимает около 2–3 недель.",
         },
       ],
-      orderTitle: "Как работает предзаказ",
+      orderTitle: "От выбора до получения",
       serviceIntro:
         "От выбора размера до получения заказа — вы общаетесь с Andrelook напрямую.",
       serviceItems: [
@@ -129,7 +133,7 @@ const content: Record<Locale, StorefrontContent> = {
           body: "Поможем выбрать модель, цвет и размер до оформления.",
         },
         {
-          title: "Понятные шаги",
+          title: "Всё заранее согласовано",
           body: "Цена, оплата и способ получения подтверждаются заранее.",
         },
         {
@@ -145,13 +149,13 @@ const content: Record<Locale, StorefrontContent> = {
       ],
       stateIntro:
         "Выберите модель сейчас — мы подтвердим детали лично. Ориентировочный срок составляет 2–3 недели.",
-      stateTitle: "Как работает предзаказ",
+      stateTitle: "От выбора до получения",
     },
     product: {
       assistanceBody:
         "Не уверены в размере? Добавьте вопрос к предзаказу — мы поможем до подтверждения.",
       commercialIntro:
-        "Предзаказ · ориентировочно 2–3 недели · личное подтверждение перед оплатой.",
+        "Предзаказ · ориентировочно 2–3 недели · оплата после согласования.",
       deliverySummary:
         "Личная передача в Таллинне или доставка по Европе. Способ получения и стоимость доставки подтверждаются заранее.",
       detailsLabel: "О модели",
@@ -222,18 +226,22 @@ const content: Record<Locale, StorefrontContent> = {
       orderSteps: [
         {
           title: "Vali toode",
-          body: "Ava tooteleht ning vali värv ja sobiv suurus.",
+          body: "Vali värv ja suurus. Kui kahtled, aitame sobiva leida.",
         },
         {
-          title: "Saada eeltellimus",
+          title: "Esita tellimus",
           body: "Jäta kontakt ja vali sobiv kättesaamisviis.",
         },
         {
-          title: "Saa kinnitus",
-          body: "Võtame ühendust ning kinnitame hinna, suuruse, makse ja tähtaja.",
+          title: "Kinnitame tellimuse",
+          body: "Võtame ühendust ning lepime kokku detailid ja makse.",
+        },
+        {
+          title: "Saa tellimus kätte",
+          body: "Eeltellimus võtab tavaliselt umbes 2–3 nädalat.",
         },
       ],
-      orderTitle: "Kuidas eeltellimus töötab",
+      orderTitle: "Valikust kättesaamiseni",
       serviceIntro:
         "Suuruse valikust tellimuse kättesaamiseni suhtled otse Andrelookiga.",
       serviceItems: [
@@ -242,7 +250,7 @@ const content: Record<Locale, StorefrontContent> = {
           body: "Aitame enne tellimist valida mudeli, värvi ja suuruse.",
         },
         {
-          title: "Selged sammud",
+          title: "Kõik on ette kokku lepitud",
           body: "Hind, makse ja kättesaamine kinnitatakse ette.",
         },
         {
@@ -258,20 +266,20 @@ const content: Record<Locale, StorefrontContent> = {
       ],
       stateIntro:
         "Vali toode nüüd ja kinnitame detailid personaalselt. Eeldatav aeg on 2–3 nädalat.",
-      stateTitle: "Kuidas eeltellimus töötab",
+      stateTitle: "Valikust kättesaamiseni",
     },
     product: {
       assistanceBody:
         "Kas suurus tekitab küsimusi? Lisa küsimus eeltellimusele ja aitame enne kinnitamist.",
       commercialIntro:
-        "Eeltellimus · eeldatavalt 2–3 nädalat · personaalne kinnitus enne maksmist.",
+        "Eeltellimus · eeldatavalt 2–3 nädalat · makse pärast kokkulepet.",
       deliverySummary:
         "Personaalne üleandmine Tallinnas või tarne üle Euroopa. Kättesaamine ja tarnekulu kinnitatakse ette.",
       detailsLabel: "Tootest",
       helpLabel: "Vajad abi?",
       learnMoreLabel: "Loe lähemalt",
       orderContext: "Eeltellimuse vormistamine",
-      requestLabel: "Esita eeltellimus",
+      requestLabel: "Vormista eeltellimus",
       returnsSummary:
         "Sinu tellimusele kehtivad tagastus- või vahetustingimused teatatakse enne makse kinnitamist.",
       sizeGuideAvailable: "Suurustabel",
@@ -334,19 +342,23 @@ const content: Record<Locale, StorefrontContent> = {
         "No automatic payment and no account required. We confirm every detail before payment.",
       orderSteps: [
         {
-          title: "Choose your piece",
-          body: "Open the product page and select your colour and size.",
+          title: "Choose the piece",
+          body: "Select a colour and size. If you are unsure, we will help.",
         },
         {
-          title: "Send your pre-order",
-          body: "Leave your preferred contact and fulfilment method.",
+          title: "Submit your order",
+          body: "Leave your contact details and choose how to receive it.",
         },
         {
-          title: "Receive confirmation",
-          body: "We contact you to confirm the price, size, payment and timing.",
+          title: "We confirm the order",
+          body: "We contact you to agree the details and payment.",
+        },
+        {
+          title: "Receive it",
+          body: "A pre-order usually takes approximately 2–3 weeks.",
         },
       ],
-      orderTitle: "How pre-order works",
+      orderTitle: "From selection to delivery",
       serviceIntro:
         "From choosing a size to receiving your order, you speak directly with Andrelook.",
       serviceItems: [
@@ -355,7 +367,7 @@ const content: Record<Locale, StorefrontContent> = {
           body: "We help you choose the piece, colour and size before ordering.",
         },
         {
-          title: "Clear next steps",
+          title: "Everything agreed in advance",
           body: "Price, payment and fulfilment are confirmed in advance.",
         },
         {
@@ -371,20 +383,20 @@ const content: Record<Locale, StorefrontContent> = {
       ],
       stateIntro:
         "Choose your piece now and we will confirm the details personally. Expected timing is approximately 2–3 weeks.",
-      stateTitle: "How pre-order works",
+      stateTitle: "From selection to delivery",
     },
     product: {
       assistanceBody:
         "Unsure about the size? Add a question to your pre-order and we will help before confirmation.",
       commercialIntro:
-        "Pre-order · approximately 2–3 weeks · personal confirmation before payment.",
+        "Pre-order · approximately 2–3 weeks · payment after confirmation.",
       deliverySummary:
         "Personal handover in Tallinn or delivery across Europe. Fulfilment and delivery cost are confirmed in advance.",
       detailsLabel: "About this piece",
       helpLabel: "Need help?",
       learnMoreLabel: "Learn more",
       orderContext: "Complete your pre-order",
-      requestLabel: "Pre-order this piece",
+      requestLabel: "Pre-order",
       returnsSummary:
         "The return or exchange terms that apply to your order are shared before payment is confirmed.",
       sizeGuideAvailable: "Size guide",

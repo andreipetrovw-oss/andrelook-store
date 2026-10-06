@@ -8,6 +8,25 @@ import {
 } from "@/config/locales";
 import { getServerConfig } from "@/lib/env";
 
+const openGraphLocales: Record<Locale, string> = {
+  en: "en_GB",
+  et: "et_EE",
+  ru: "ru_RU",
+};
+
+export function localizedOpenGraph(locale: Locale) {
+  return {
+    alternateLocale: locales
+      .filter((item) => item !== locale)
+      .map((item) => openGraphLocales[item]),
+    locale: openGraphLocales[locale],
+  };
+}
+
+export function brandedTitle(title: string) {
+  return `${title} | Andrelook`;
+}
+
 export function localizedAlternates(
   locale: Locale,
   path: string,

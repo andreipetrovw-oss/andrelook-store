@@ -14,7 +14,12 @@ import {
 } from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
 import { isDatabaseConfigured } from "@/lib/env";
-import { indexingRobots, localizedAlternates } from "@/lib/seo";
+import {
+  brandedTitle,
+  indexingRobots,
+  localizedAlternates,
+  localizedOpenGraph,
+} from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -33,14 +38,15 @@ export async function generateMetadata({
     description: dictionary.catalogIntro,
     openGraph: {
       description: dictionary.catalogIntro,
-      title: dictionary.catalog,
+      ...localizedOpenGraph(locale),
+      title: brandedTitle(dictionary.catalog),
     },
     robots: indexingRobots(),
     title: dictionary.catalog,
     twitter: {
       card: "summary_large_image",
       description: dictionary.catalogIntro,
-      title: dictionary.catalog,
+      title: brandedTitle(dictionary.catalog),
     },
   };
 }

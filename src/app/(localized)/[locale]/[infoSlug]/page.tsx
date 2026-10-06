@@ -5,7 +5,12 @@ import { notFound } from "next/navigation";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getInfoPage, infoPageSlugs } from "@/i18n/info-content";
-import { indexingRobots, localizedAlternates } from "@/lib/seo";
+import {
+  brandedTitle,
+  indexingRobots,
+  localizedAlternates,
+  localizedOpenGraph,
+} from "@/lib/seo";
 
 type Props = { params: Promise<{ infoSlug: string; locale: string }> };
 
@@ -17,13 +22,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     alternates: localizedAlternates(locale, infoSlug),
     description: page.introduction,
-    openGraph: { description: page.introduction, title: page.title },
+    openGraph: {
+      description: page.introduction,
+      ...localizedOpenGraph(locale),
+      title: brandedTitle(page.title),
+    },
     robots: indexingRobots(),
     title: page.title,
     twitter: {
       card: "summary",
       description: page.introduction,
-      title: page.title,
+      title: brandedTitle(page.title),
     },
   };
 }

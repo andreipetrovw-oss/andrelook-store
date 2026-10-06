@@ -24,6 +24,14 @@ export function LanguageSwitcher({
           href={`/${locale}${rest ? `/${rest}` : ""}`}
           key={locale}
           lang={locale}
+          onClick={() => {
+            try {
+              localStorage.setItem("andrelookLocale", locale);
+              document.cookie = `andrelookLocale=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+            } catch {
+              // Language navigation must still work when storage is blocked.
+            }
+          }}
         >
           {locale.toUpperCase()}
         </Link>

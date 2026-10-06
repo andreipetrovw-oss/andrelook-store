@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import { defaultLocale, isLocale, localePath, locales } from "./locales";
 
 describe("locale configuration", () => {
-  it("supports exactly RU, ET and EN with provisional RU default", () => {
+  it("supports exactly RU, ET and EN with owner-approved ET default", () => {
     expect(locales).toEqual(["ru", "et", "en"]);
-    expect(defaultLocale).toBe("ru");
+    expect(defaultLocale).toBe("et");
   });
 
   it("rejects unsupported locale segments", () => {

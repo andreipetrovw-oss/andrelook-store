@@ -14,28 +14,29 @@ import {
 } from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
 import { isDatabaseConfigured } from "@/lib/env";
-import { indexingRobots, localizedAlternates } from "@/lib/seo";
+import {
+  indexingRobots,
+  localizedAlternates,
+  localizedOpenGraph,
+} from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 const homeMetadata = {
   en: {
     description:
-      "Moncler and Parajumpers jackets, gilets, cardigans, sweatshirts, T-shirts and polos. Pre-order in 2–3 weeks, with Tallinn handover and delivery across Europe.",
-    locale: "en_GB",
-    title: "Andrelook — fashion pre-order in Tallinn",
+      "Selected outerwear and knitwear by pre-order, with personal support from Tallinn and delivery across Europe.",
+    title: "Andrelook — pre-order fashion",
   },
   et: {
     description:
-      "Moncleri ja Parajumpersi joped, vestid, kardiganid, dressipluusid, T-särgid ja polod. Eeltellimus 2–3 nädalaga, üleandmine Tallinnas ja tarne üle Euroopa.",
-    locale: "et_EE",
-    title: "Andrelook — moe eeltellimus Tallinnas",
+      "Valitud ülerõivad ja kudumid ettetellimisel. Personaalne abi Tallinnast ja tarne üle Euroopa.",
+    title: "Andrelook — mood ettetellimisel",
   },
   ru: {
     description:
-      "Куртки, жилеты, кардиганы, худи, футболки и поло Moncler и Parajumpers. Предзаказ 2–3 недели, получение в Таллинне и доставка по Европе.",
-    locale: "ru_RU",
-    title: "Andrelook — одежда по предзаказу в Таллинне",
+      "Куртки, жилеты и трикотаж по предзаказу. Помощь с выбором из Таллинна и доставка по Европе.",
+    title: "Andrelook — одежда по предзаказу",
   },
 } as const;
 
@@ -60,7 +61,7 @@ export async function generateMetadata({
           width: 1920,
         },
       ],
-      locale: metadata.locale,
+      ...localizedOpenGraph(locale),
       title: metadata.title,
       type: "website",
     },
