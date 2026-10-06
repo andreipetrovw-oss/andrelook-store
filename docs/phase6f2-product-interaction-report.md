@@ -45,6 +45,16 @@ Accepted application deployment:
 
 The Vercel target named `production` is only the production environment of the isolated `andrelook-v1-staging` project. It is not the live Andrelook project and has no Andrelook custom domain.
 
+Verified pre-closeout-document deployment:
+
+- Branch HEAD / CI SHA / deployed Git SHA: `238d2209c33f97c07ceaee494d23a5d928cf78c6`
+- GitHub Actions run: `37412870607` — `success`
+- Deployment ID: `dpl_E1XMgMTHH3irgAKyY8Z1bnZZxRvV`
+- Immutable URL: <https://andrelook-v1-staging-qab94zxk8-andreys-projects-a106cf89.vercel.app>
+- State: `READY`
+
+The exact SHA, CI run and deployment produced after committing this closeout evidence are necessarily recorded in the final owner handoff: a Git commit cannot contain its own future hash or deployment ID.
+
 ## E. Local checkpoint diagnosis
 
 - The temporary local zero-product catalog was not a route or database regression.
@@ -86,12 +96,26 @@ The Vercel target named `production` is only the production environment of the i
 - Existing field validation, pending/disabled submission state, server action and request-key idempotency were preserved.
 - `verify:phase6f-orders` confirmed the established persistence and lifecycle records without creating local duplicates.
 
+Final isolated-staging E2E acceptance:
+
+- One authorized synthetic request was submitted once; it was not retried or duplicated.
+- Reference: `AL-20261006-C0F902`.
+- Product selection: `Moncler Maya Down Jacket` / `black` (`Must`) / `M/2` / quantity `1`.
+- Fulfilment: `PERSONAL_HANDOVER`, `EE` / `Tallinn`.
+- Payment preference: `DEPOSIT_30_BALANCE_ON_HANDOVER`; confirmed total remains pending, no payment rows exist and recorded payment is `0.00 EUR`.
+- Persisted status: `NEW`; its complete status history contains only the initial `NEW` event, with no accidental transition.
+- Attribution: `REFERRAL`; ET product landing path and initial staging referrer persisted correctly, with no fabricated UTM values.
+- Customer-facing success confirmed the selection and reference, stated that no payment was taken and exposed the expected `t.me/andrelookstore` continuation.
+- Protected CRM query returned exactly one matching order. Staging totals after acceptance are one admin, ten customers, ten orders and one pre-existing payment.
+- The owner-notification attempt failed only because Resend restricts the unverified sender to its own test recipient. This known sender-domain limitation did not affect transaction persistence or the customer success state.
+
 ## J. Success experience
 
 - The success state remains inside the same order experience and shows the product selection and generated order reference.
 - Copy states that Andrelook will confirm price, sizing and fulfilment and that no payment was taken.
 - A Telegram continuation link remains available.
 - Closing the success state cannot re-run the server action or initiate automatic payment.
+- The final deployed acceptance displayed reference `AL-20261006-C0F902`, selection `Must · M/2` and the explicit no-payment confirmation.
 
 ## K. Default locale and language switching
 
@@ -164,6 +188,9 @@ The Vercel target named `production` is only the production environment of the i
   - Product: TTFB 2.850–3.348 s; total 2.995–3.498 s
 - Public HTML and the implementation diff contain no supplier URLs, source-image URLs, supplier/landed costs, private notes, credentials or customer data.
 - Public DTO boundaries, publication visibility, localization and request behavior remain unchanged except for customer-safe presentation labels.
+- Final deployed HTTP checks returned `307` from `/` to `/et`, `200` for home/catalog/product/robots/sitemap and a real `404` for a missing localized route. Security headers and `x-robots-tag: noindex` remained present.
+- Final deployed performance samples remained within the accepted range: home TTFB `0.318–0.619 s` / total `2.889–3.331 s`; catalog TTFB `2.878–3.235 s` / total `3.041–3.419 s`; product TTFB `2.782–2.869 s` / total `2.898–3.062 s`.
+- Final browser-console checks returned no errors or warnings, all inspected images loaded, and public HTML leakage scans remained clean.
 
 ## R. Catalog/data invariants
 
@@ -183,6 +210,7 @@ The Vercel target named `production` is only the production environment of the i
 - `/robots.txt` disallows `/`; the staging sitemap contains zero indexable URLs.
 - The only attached project domain is `andrelook-v1-staging.vercel.app`.
 - Protected CRM owner access was verified for `info.andrelook@gmail.com`.
+- The final E2E record `AL-20261006-C0F902` exists exactly once in the protected CRM as `NEW`, with `0.00 EUR` recorded and no accidental lifecycle transition.
 - Owner review URL: <https://andrelook-v1-staging.vercel.app>
 
 ## T. Production safety
