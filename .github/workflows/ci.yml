@@ -12,6 +12,7 @@ on:
       - phase6f-commercial-launch
       - phase6f1-storefront-perfection
       - phase6f2-product-interaction
+      - phase6f3-final-storefront
 
 permissions:
   contents: read

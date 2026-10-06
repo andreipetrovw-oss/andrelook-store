@@ -52,3 +52,49 @@ export function indexingRobots(): NonNullable<Metadata["robots"]> {
     ? { follow: true, index: true }
     : { follow: false, index: false, nocache: true };
 }
+
+export function productStructuredData({
+  availability,
+  brand,
+  currency,
+  description,
+  images,
+  name,
+  priceMinor,
+  url,
+}: {
+  availability: "IN_STOCK" | "PRE_ORDER" | "UNAVAILABLE" | null;
+  brand: string | null;
+  currency: string | null;
+  description: string | null;
+  images: string[];
+  name: string;
+  priceMinor: number | null;
+  url: string;
+}) {
+  const offer =
+    availability && currency && priceMinor !== null
+      ? {
+          "@type": "Offer",
+          availability: {
+            IN_STOCK: "https://schema.org/InStock",
+            PRE_ORDER: "https://schema.org/PreOrder",
+            UNAVAILABLE: "https://schema.org/OutOfStock",
+          }[availability],
+          price: (priceMinor / 100).toFixed(2),
+          priceCurrency: currency,
+          url,
+        }
+      : undefined;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    brand: brand ? { "@type": "Brand", name: brand } : undefined,
+    description: description ?? undefined,
+    image: images,
+    name,
+    offers: offer,
+    url,
+  };
+}

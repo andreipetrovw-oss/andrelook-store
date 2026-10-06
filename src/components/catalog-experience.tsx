@@ -4,6 +4,7 @@ import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { getStorefrontContent } from "@/i18n/storefront-content";
 import type { PublicProductDto } from "@/lib/catalog/public-dto";
+import { formatProductCount } from "@/lib/catalog/presentation";
 
 import { ProductCard } from "./product-card";
 
@@ -96,7 +97,7 @@ export function CatalogExperience({
           ) : null}
         </form>
         <p aria-live="polite" className="result-count">
-          <span>{visibleProducts.length}</span> {content.catalog.resultsLabel}
+          {formatProductCount(locale, visibleProducts.length)}
         </p>
       </div>
       <div className="container catalog-grid">

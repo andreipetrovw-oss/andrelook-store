@@ -29,6 +29,14 @@ type Props = {
   searchParams: Promise<CatalogParams>;
 };
 
+function categoryDescription(locale: "ru" | "et" | "en", name: string) {
+  return {
+    en: `${name} by Moncler and Parajumpers, selected by Andrelook in Tallinn with pre-order and personal sizing support.`,
+    et: `Andrelooki valitud ${name.toLocaleLowerCase()} Monclerilt ja Parajumpersilt, eeltellimisel ning abiga suuruse valikul.`,
+    ru: `${name} Moncler и Parajumpers в коллекции Andrelook: предзаказ и помощь с выбором размера из Таллинна.`,
+  }[locale];
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { categorySlug, locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -38,11 +46,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .flatMap((parent) => parent.children)
       .find((item) => item.slug === categorySlug);
     if (!category) notFound();
+    const description = categoryDescription(locale, category.name);
     return {
       alternates: localizedAlternates(locale, `catalog/${categorySlug}`),
-      description: getDictionary(locale).categoryContext,
+      description,
       openGraph: {
-        description: getDictionary(locale).categoryContext,
+        description,
         ...localizedOpenGraph(locale),
         title: brandedTitle(category.name),
       },
@@ -50,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: category.name,
       twitter: {
         card: "summary_large_image",
-        description: getDictionary(locale).categoryContext,
+        description,
         title: brandedTitle(category.name),
       },
     };
@@ -78,19 +87,22 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     .flatMap((parent) => parent.children)
     .find((item) => item.slug === categorySlug);
   if (!category && isDatabaseConfigured()) notFound();
+  const description = category
+    ? categoryDescription(locale, category.name)
+    : dictionary.categoryContext;
 
   return (
     <>
       <header className="catalog-hero compact">
         <div className="container">
-          <nav aria-label="Breadcrumb" className="breadcrumb">
+          <nav aria-label={dictionary.breadcrumb} className="breadcrumb">
             <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
             <span aria-hidden="true">/</span>
             <span>{category?.name ?? categorySlug}</span>
           </nav>
           <span className="eyebrow">{dictionary.catalog}</span>
           <h1>{category?.name ?? categorySlug}</h1>
-          <p>{dictionary.categoryContext}</p>
+          <p>{description}</p>
         </div>
       </header>
       <div className="container">

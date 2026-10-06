@@ -28,6 +28,7 @@ import {
   indexingRobots,
   localizedAlternates,
   localizedOpenGraph,
+  productStructuredData,
 } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -99,32 +100,16 @@ function ProductStructuredData({
   product: NonNullable<Awaited<ReturnType<typeof resolveProduct>>>;
   url: string;
 }) {
-  if (
-    storefrontScope() === "local-review" ||
-    !product.currency ||
-    product.retailPriceMinor === null ||
-    !product.availability
-  )
-    return null;
-  const availability = {
-    IN_STOCK: "https://schema.org/InStock",
-    PRE_ORDER: "https://schema.org/PreOrder",
-    UNAVAILABLE: "https://schema.org/OutOfStock",
-  }[product.availability];
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    description: approvedDescription(product.description) ?? undefined,
-    image: product.images.map((image) => image.url),
+  const data = productStructuredData({
+    availability: product.availability,
+    brand: product.brand?.name ?? null,
+    currency: product.currency,
+    description: approvedDescription(product.description),
+    images: product.images.map((image) => image.url),
     name: product.name,
-    offers: {
-      "@type": "Offer",
-      availability,
-      price: (product.retailPriceMinor / 100).toFixed(2),
-      priceCurrency: product.currency,
-      url,
-    },
-  };
+    priceMinor: product.retailPriceMinor,
+    url,
+  });
   return (
     <script
       dangerouslySetInnerHTML={{
@@ -230,7 +215,7 @@ export default async function ProductPage({ params }: Props) {
         sizes={sizes}
       >
         <article className="container product-detail phase6e-product-detail">
-          <nav aria-label="Breadcrumb" className="breadcrumb">
+          <nav aria-label={dictionary.breadcrumb} className="breadcrumb">
             <Link href={`/${locale}`}>{dictionary.home}</Link>
             <span aria-hidden="true">/</span>
             <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
@@ -291,7 +276,7 @@ export default async function ProductPage({ params }: Props) {
                   <dd>{availability}</dd>
                 </div>
                 <div>
-                  <dt>{dictionary.preorder}</dt>
+                  <dt>{dictionary.leadTime}</dt>
                   <dd>{preorderTime}</dd>
                 </div>
                 {formattedPrice ? (
@@ -301,11 +286,11 @@ export default async function ProductPage({ params }: Props) {
                   </div>
                 ) : null}
                 <div>
-                  <dt>{dictionary.sizeGuide}</dt>
+                  <dt>{content.product.sizingLabel}</dt>
                   <dd>
                     {chart
                       ? content.product.sizeGuideAvailable
-                      : dictionary.sizeGuidePending}
+                      : content.product.sizeGuideUnavailable}
                   </dd>
                 </div>
               </dl>
@@ -330,10 +315,12 @@ export default async function ProductPage({ params }: Props) {
                     <span className="eyebrow">
                       {content.product.sizingLabel}
                     </span>
-                    <h2>{dictionary.sizeGuide}</h2>
+                    <h2>
+                      {chart ? dictionary.sizeGuide : dictionary.personalSizing}
+                    </h2>
                   </div>
                   <Link className="text-action" href={`/${locale}/contact`}>
-                    {dictionary.personalSizing} →
+                    {dictionary.contact} →
                   </Link>
                 </div>
                 {chart && product.sizeChart ? (
@@ -345,17 +332,18 @@ export default async function ProductPage({ params }: Props) {
                   />
                 ) : (
                   <div className="personal-sizing-service">
-                    <h3>{dictionary.personalSizing}</h3>
                     <p>{content.product.assistanceBody}</p>
                     <a className="secondary-button" href="#request">
                       {content.product.requestLabel}
                     </a>
                   </div>
                 )}
-                <aside className="sizing-help-note">
-                  <strong>{content.product.helpLabel}</strong>
-                  <p>{content.product.assistanceBody}</p>
-                </aside>
+                {chart ? (
+                  <aside className="sizing-help-note">
+                    <strong>{content.product.helpLabel}</strong>
+                    <p>{content.product.assistanceBody}</p>
+                  </aside>
+                ) : null}
               </section>
 
               <section
@@ -416,7 +404,7 @@ export default async function ProductPage({ params }: Props) {
           <section className="container related-section">
             <header className="editorial-heading split-heading">
               <div>
-                <span className="eyebrow">Andrelook edit</span>
+                <span className="eyebrow">{content.home.editorialLabel}</span>
                 <h2>{dictionary.relatedProducts}</h2>
               </div>
               <Link

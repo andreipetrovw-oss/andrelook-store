@@ -11,6 +11,7 @@ export type Dictionary = {
   availabilityPreOrder: string;
   availabilityUnavailable: string;
   backToCatalog: string;
+  breadcrumb: string;
   catalog: string;
   catalogEmpty: string;
   catalogIntro: string;
@@ -45,6 +46,7 @@ export type Dictionary = {
   howStepThree: string;
   howStepTwo: string;
   language: string;
+  leadTime: string;
   mobileMenu: string;
   mobileMenuClose: string;
   name: string;
@@ -82,6 +84,7 @@ export type Dictionary = {
   sizeGuideHow: string;
   sizeGuideNote: string;
   sizeGuidePending: string;
+  sizeGuideUnitUnknown: string;
   storefrontKicker: string;
   submit: string;
   submitting: string;
@@ -107,17 +110,19 @@ export type Dictionary = {
 
 const dictionaries: Record<Locale, Dictionary> = {
   ru: {
-    about: "Об Andrelook",
+    about: "О нас",
     approvalNotice: "Свяжитесь с нами, если вам нужно уточнение до заказа.",
-    availability: "Наличие",
+    availability: "Доступность",
     availabilityInStock: "В наличии",
     availabilityPending: "Уточним лично",
     availabilityPreOrder: "Предзаказ",
     availabilityUnavailable: "Недоступно",
     backToCatalog: "Назад в каталог",
+    breadcrumb: "Навигационная цепочка",
     catalog: "Каталог",
     catalogEmpty: "Сейчас в каталоге нет доступных моделей.",
-    catalogIntro: "Выбранные модели с личной помощью по размеру и заказу.",
+    catalogIntro:
+      "Отобранные модели Moncler и Parajumpers по предзаказу с помощью в выборе размера.",
     catalogResults: "Моделей",
     catalogSearch: "Поиск по названию, категории или бренду",
     categoryAll: "Все модели",
@@ -149,6 +154,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     howStepThree: "Мы лично подтвердим детали до оформления заказа.",
     howStepTwo: "Оставьте удобный контакт — без регистрации и оплаты.",
     language: "Язык",
+    leadTime: "Срок",
     mobileMenu: "Меню",
     mobileMenuClose: "Закрыть меню",
     name: "Имя",
@@ -157,13 +163,13 @@ const dictionaries: Record<Locale, Dictionary> = {
     noSearchResults: "По выбранным условиям моделей не найдено.",
     optional: "необязательно",
     overview: "Обзор",
-    personalService: "Личный сервис из Таллинна по всей Европе",
+    personalService: "Andrelook на связи",
     price: "Цена",
-    pricePending: "Цена подтверждается лично",
+    pricePending: "Цена готовится к публикации",
     productInformation: "Важная информация",
     requestAction: "Оформить предзаказ",
     requestIntro:
-      "Отправьте предзаказ — мы лично подтвердим цену, размер и получение.",
+      "Отправьте предзаказ — мы согласуем цену, размер и получение до оплаты.",
     requestComment: "Комментарий",
     requestNextStep:
       "Мы свяжемся по выбранному каналу и подтвердим все детали до оплаты.",
@@ -189,13 +195,15 @@ const dictionaries: Record<Locale, Dictionary> = {
     sizeGuideNote:
       "Сравните мерки с похожей вещью, которая хорошо на вас сидит. Если сомневаетесь, попросите помочь с размером.",
     sizeGuidePending: "Нужна помощь с размером?",
+    sizeGuideUnitUnknown:
+      "Единица измерения не указана в исходной таблице; значения приведены без интерпретации.",
     storefrontKicker: "Andrelook · Tallinn",
     submit: "Отправить предзаказ",
     submitting: "Отправляем…",
-    tagline: "Мировые бренды · Личный подход",
+    tagline: "Moncler · Parajumpers · Таллинн",
     terms: "Условия",
     privacy: "Конфиденциальность",
-    returnsExchanges: "Возвраты и обмен",
+    returnsExchanges: "Возврат и обмен",
     preorder: "Предзаказ",
     faq: "Вопросы и ответы",
     personalSizing: "Помощь с размером",
@@ -222,9 +230,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     availabilityPreOrder: "Eeltellimus",
     availabilityUnavailable: "Pole saadaval",
     backToCatalog: "Tagasi kataloogi",
+    breadcrumb: "Asukoharada",
     catalog: "Kataloog",
     catalogEmpty: "Kataloogis pole praegu saadaval olevaid tooteid.",
-    catalogIntro: "Valitud mudelid koos personaalse suuruse- ja tellimisabiga.",
+    catalogIntro:
+      "Valitud Moncleri ja Parajumpersi mudelid eeltellimisel koos abiga suuruse valikul.",
     catalogResults: "Mudelit",
     catalogSearch: "Otsi nime, kategooria või brändi järgi",
     categoryAll: "Kõik mudelid",
@@ -256,6 +266,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     howStepThree: "Kinnitame kõik üksikasjad isiklikult enne tellimust.",
     howStepTwo: "Jäta sobiv kontakt — kontot ega makset pole vaja.",
     language: "Keel",
+    leadTime: "Tarneaeg",
     mobileMenu: "Menüü",
     mobileMenuClose: "Sulge menüü",
     name: "Nimi",
@@ -264,13 +275,13 @@ const dictionaries: Record<Locale, Dictionary> = {
     noSearchResults: "Valitud tingimustele vastavaid mudeleid ei leitud.",
     optional: "valikuline",
     overview: "Ülevaade",
-    personalService: "Personaalne teenindus Tallinnast üle Euroopa",
+    personalService: "Andrelook aitab",
     price: "Hind",
-    pricePending: "Hind kinnitatakse personaalselt",
+    pricePending: "Hind lisatakse enne avaldamist",
     productInformation: "Oluline teave",
     requestAction: "Esita eeltellimus",
     requestIntro:
-      "Saada eeltellimus — kinnitame isiklikult hinna, suuruse ja kättesaamise.",
+      "Saada eeltellimus — lepime enne maksmist kokku hinna, suuruse ja kättesaamise.",
     requestComment: "Kommentaar",
     requestNextStep:
       "Võtame valitud kanalis ühendust ja kinnitame kõik enne maksmist.",
@@ -296,10 +307,12 @@ const dictionaries: Record<Locale, Dictionary> = {
     sizeGuideNote:
       "Võrdle mõõte hästi istuva sarnase riideesemega. Kahtluse korral küsi suuruse valikul abi.",
     sizeGuidePending: "Vajad suuruse valikul abi?",
+    sizeGuideUnitUnknown:
+      "Mõõtühikut ei ole lähtetabelis märgitud; väärtused on esitatud muutmata kujul.",
     storefrontKicker: "Andrelook · Tallinn",
     submit: "Saada eeltellimus",
     submitting: "Saadan…",
-    tagline: "Maailma brändid · Isiklik lähenemine",
+    tagline: "Moncler · Parajumpers · Tallinn",
     terms: "Tingimused",
     privacy: "Privaatsus",
     returnsExchanges: "Tagastus ja vahetus",
@@ -321,7 +334,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     viewProduct: "Vaata mudelit",
   },
   en: {
-    about: "About Andrelook",
+    about: "About",
     approvalNotice: "Contact us if you need clarification before ordering.",
     availability: "Availability",
     availabilityInStock: "In stock",
@@ -329,9 +342,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     availabilityPreOrder: "Pre-order",
     availabilityUnavailable: "Unavailable",
     backToCatalog: "Back to catalog",
+    breadcrumb: "Breadcrumb",
     catalog: "Catalog",
     catalogEmpty: "No pieces are currently available in the catalog.",
-    catalogIntro: "Selected pieces with personal sizing and ordering support.",
+    catalogIntro:
+      "A curated edit of Moncler and Parajumpers pieces by pre-order, with personal sizing support.",
     catalogResults: "Pieces",
     catalogSearch: "Search by name, category or brand",
     categoryAll: "All pieces",
@@ -363,6 +378,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     howStepThree: "We personally confirm every detail before an order.",
     howStepTwo: "Leave your preferred contact — no account or payment needed.",
     language: "Language",
+    leadTime: "Lead time",
     mobileMenu: "Menu",
     mobileMenuClose: "Close menu",
     name: "Name",
@@ -371,13 +387,13 @@ const dictionaries: Record<Locale, Dictionary> = {
     noSearchResults: "No pieces match the selected criteria.",
     optional: "optional",
     overview: "Overview",
-    personalService: "Personal service from Tallinn across Europe",
+    personalService: "Talk to Andrelook",
     price: "Price",
-    pricePending: "Price confirmed personally",
+    pricePending: "Price pending publication",
     productInformation: "Important information",
     requestAction: "Pre-order this piece",
     requestIntro:
-      "Send your pre-order and we will personally confirm price, size and fulfilment.",
+      "Send your pre-order and we will confirm price, sizing and fulfilment before payment.",
     requestComment: "Comment",
     requestNextStep:
       "We will reply through your chosen channel and confirm everything before payment.",
@@ -403,15 +419,17 @@ const dictionaries: Record<Locale, Dictionary> = {
     sizeGuideNote:
       "Compare the measurements with a similar piece that fits you well. Ask for personal sizing help if you are unsure.",
     sizeGuidePending: "Need help choosing a size?",
+    sizeGuideUnitUnknown:
+      "The source chart does not state a measurement unit; values are shown without interpretation.",
     storefrontKicker: "Andrelook · Tallinn",
     submit: "Send pre-order",
     submitting: "Sending…",
-    tagline: "World brands · Personal approach",
+    tagline: "Moncler · Parajumpers · Tallinn",
     terms: "Terms",
     privacy: "Privacy",
     returnsExchanges: "Returns & exchanges",
     preorder: "Pre-order",
-    faq: "Frequently asked questions",
+    faq: "FAQ",
     personalSizing: "Personal sizing help",
     categoryContext:
       "A considered selection from this category. Availability and details are confirmed personally.",

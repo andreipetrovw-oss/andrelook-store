@@ -117,7 +117,13 @@ export function ProductCard({
             </p>
           ) : null}
           <div className="product-card-footer">
-            {formattedPrice ? <span>{formattedPrice}</span> : <span />}
+            <span
+              className={
+                formattedPrice ? undefined : "product-card-price-pending"
+              }
+            >
+              {formattedPrice ?? dictionary.pricePending}
+            </span>
             <span className="product-card-cta">{dictionary.viewProduct} ↗</span>
           </div>
         </div>

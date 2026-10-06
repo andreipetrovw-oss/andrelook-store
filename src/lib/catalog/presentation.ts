@@ -2,19 +2,19 @@ import type { Locale } from "@/config/locales";
 
 const categoryNames: Record<string, Record<Locale, string>> = {
   bottoms: {
-    en: "Swimwear",
-    et: "Ujumisriided",
-    ru: "Пляжная одежда",
+    en: "Swim shorts",
+    et: "Ujumispüksid",
+    ru: "Плавательные шорты",
   },
   hoodies: {
-    en: "Sweatshirts",
-    et: "Dressipluusid",
+    en: "Sweatshirts & hoodies",
+    et: "Dressipluusid ja pusad",
     ru: "Свитшоты и худи",
   },
   "light-jackets": {
-    en: "Jackets & knitwear",
-    et: "Jakid ja kudumid",
-    ru: "Куртки и трикотаж",
+    en: "Jackets & cardigans",
+    et: "Joped ja kardiganid",
+    ru: "Куртки и кардиганы",
   },
   "t-shirts": {
     en: "T-shirts & polos",
@@ -22,14 +22,14 @@ const categoryNames: Record<string, Record<Locale, string>> = {
     ru: "Футболки и поло",
   },
   vests: {
-    en: "Vests",
+    en: "Gilets",
     et: "Vestid",
     ru: "Жилеты",
   },
   "warm-jackets": {
-    en: "Outerwear",
-    et: "Üleriided",
-    ru: "Верхняя одежда",
+    en: "Puffer jackets",
+    et: "Soojad joped",
+    ru: "Утеплённые куртки",
   },
 };
 
@@ -50,4 +50,22 @@ export function getProductDisplayName(
   return name.toLocaleLowerCase().startsWith(prefix.toLocaleLowerCase())
     ? name.slice(prefix.length)
     : name;
+}
+
+export function formatProductCount(locale: Locale, count: number) {
+  if (locale === "et") return `${count} ${count === 1 ? "toode" : "toodet"}`;
+  if (locale === "ru") {
+    const modulo100 = count % 100;
+    const modulo10 = count % 10;
+    const noun =
+      modulo100 >= 11 && modulo100 <= 14
+        ? "моделей"
+        : modulo10 === 1
+          ? "модель"
+          : modulo10 >= 2 && modulo10 <= 4
+            ? "модели"
+            : "моделей";
+    return `${count} ${noun}`;
+  }
+  return `${count} ${count === 1 ? "piece" : "pieces"}`;
 }

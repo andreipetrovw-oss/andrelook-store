@@ -94,9 +94,7 @@ export function ProductConfigurator({
 
       <section aria-label={dictionary.size} className="product-option-preview">
         <div className="option-heading">
-          <h2>
-            {sizes.length ? dictionary.size : dictionary.sizeGuidePending}
-          </h2>
+          <h2>{dictionary.size}</h2>
           {sizes.length ? (
             <a href="#size-guide">{dictionary.sizeGuide}</a>
           ) : null}

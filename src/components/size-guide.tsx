@@ -28,7 +28,7 @@ const measurementLabels: Record<Locale, Record<string, string>> = {
   et: {
     "1/2 waist": "Pool vööümbermõõtu",
     "back length": "Seljapikkus",
-    bust: "Rinnaümbermõõt",
+    bust: "Rind",
     chest: "Rind",
     "clothes length": "Rõiva pikkus",
     "hip girt": "Puusaümbermõõt",
@@ -50,7 +50,7 @@ const measurementLabels: Record<Locale, Record<string, string>> = {
   ru: {
     "1/2 waist": "Полуобхват талии",
     "back length": "Длина по спинке",
-    bust: "Обхват груди",
+    bust: "Грудь",
     chest: "Грудь",
     "clothes length": "Длина изделия",
     "hip girt": "Обхват бёдер",
@@ -121,7 +121,14 @@ export function SizeGuide({
           </tbody>
         </table>
       </div>
-      <p className="size-guide-note">{dictionary.sizeGuideNote}</p>
+      {!units ? (
+        <p className="size-guide-evidence-note">
+          {dictionary.sizeGuideUnitUnknown}
+        </p>
+      ) : null}
+      {units ? (
+        <p className="size-guide-note">{dictionary.sizeGuideNote}</p>
+      ) : null}
     </details>
   );
 }

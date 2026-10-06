@@ -27,7 +27,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Andrelook",
       title: "О нас",
       introduction:
-        "Andrelook — персональный fashion-сервис из Таллинна с тщательно отобранной коллекцией Moncler и Parajumpers.",
+        "Andrelook — сервис из Таллинна с тщательно отобранной коллекцией Moncler и Parajumpers и помощью на каждом этапе заказа.",
       sections: [
         {
           title: "Отобранная коллекция",
@@ -35,7 +35,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "Личный подход",
-          body: "Мы помогаем с моделью, цветом и размером, а затем лично подтверждаем цену, оплату и получение.",
+          body: "Мы помогаем с моделью, цветом и размером, а затем согласуем цену, оплату и получение напрямую с вами.",
         },
         {
           title: "Таллинн и Европа",
@@ -47,18 +47,18 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Покупателям",
       title: "Как заказать",
       introduction:
-        "Выберите модель, отправьте заявку и получите личное подтверждение предзаказа.",
+        "Выберите модель, отправьте заявку и согласуйте детали предзаказа напрямую с нами.",
       sections: [
         {
-          title: "1. Выберите модель",
+          title: "Выберите модель",
           body: "Откройте страницу товара, посмотрите фотографии, доступные цвета и таблицу размеров. Если таблицы нет, выберите личную помощь с размером.",
         },
         {
-          title: "2. Заполните форму",
+          title: "Отправьте заявку",
           body: "Укажите выбранный вариант, удобный контакт и способ получения. Аккаунт не нужен, а автоматическая оплата не производится.",
         },
         {
-          title: "3. Получите подтверждение",
+          title: "Согласуйте детали",
           body: "Мы свяжемся с вами и до оплаты подтвердим цену, размер, способ получения и ожидаемый срок.",
         },
       ],
@@ -67,11 +67,11 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Покупателям",
       title: "Доставка и оплата",
       introduction:
-        "Способ получения и оплаты согласуется лично до подтверждения предзаказа.",
+        "Способ получения и оплаты согласуется с вами до подтверждения предзаказа.",
       sections: [
         {
           title: "Таллинн",
-          body: "Доступна личная передача в Таллинне. Для неё можно выбрать 30% предоплаты и остаток при получении либо полную предоплату.",
+          body: "В Таллинне заказ можно получить из рук в руки. Доступна предоплата 30% с остатком при получении или полная предоплата.",
         },
         {
           title: "Доставка по Европе",
@@ -91,7 +91,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Что значит предзаказ",
-          body: "Вы выбираете модель сейчас, а мы лично подтверждаем её для вас до оплаты.",
+          body: "Вы выбираете модель сейчас, а мы подтверждаем её доступность и детали до оплаты.",
         },
         {
           title: "Ожидаемый срок",
@@ -125,7 +125,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
     },
     faq: {
       eyebrow: "Помощь",
-      title: "Частые вопросы",
+      title: "Вопросы и ответы",
       introduction:
         "Короткие ответы о предзаказе, размере, оплате и получении.",
       sections: [
@@ -135,7 +135,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "Как выбрать размер?",
-          body: "Используйте таблицу на странице модели. Для шести моделей без таблицы доступна персональная помощь с размером.",
+          body: "Используйте таблицу на странице модели. Если таблица пока недоступна, мы поможем подобрать размер лично.",
         },
         {
           title: "Как проходит оплата?",
@@ -205,7 +205,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
     },
     terms: {
       eyebrow: "Правовая информация",
-      title: "Условия использования",
+      title: "Условия",
       introduction:
         "Сайт помогает выбрать модель и отправить запрос на предзаказ; сама форма не является автоматическим подтверждением покупки.",
       sections: [
@@ -227,17 +227,17 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
   et: {
     about: {
       eyebrow: "Andrelook",
-      title: "Meist",
+      title: "Andrelookist",
       introduction:
-        "Andrelook on Tallinnast pärit personaalne moeteenus hoolikalt valitud Moncleri ja Parajumpersi kollektsiooniga.",
+        "Andrelook on Tallinnast pärit moeteenus hoolikalt valitud Moncleri ja Parajumpersi kollektsiooniga.",
       sections: [
         {
           title: "Valitud kollektsioon",
           body: "Oleme koondanud kompaktsesse valikusse ülerõivad, vestid, kardiganid ja igapäevased mudelid, et valimine oleks lihtsam.",
         },
         {
-          title: "Personaalne lähenemine",
-          body: "Aitame valida mudeli, värvi ja suuruse ning kinnitame seejärel hinna, makse ja kättesaamise personaalselt.",
+          title: "Abi päriselt inimeselt",
+          body: "Aitame valida mudeli, värvi ja suuruse ning lepime seejärel sinuga kokku hinna, makse ja kättesaamise.",
         },
         {
           title: "Tallinn ja Euroopa",
@@ -249,18 +249,18 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Kuidas tellida",
       introduction:
-        "Vali toode, saada tellimus ja saa personaalne eeltellimuse kinnitus.",
+        "Vali toode, saada tellimus ja kinnita üksikasjad otse meiega.",
       sections: [
         {
-          title: "1. Vali toode",
-          body: "Vaata tootelehel fotosid, värve ja suurustabelit. Kui tabelit pole, vali personaalne suuruseabi.",
+          title: "Vali toode",
+          body: "Vaata tootelehel fotosid, värve ja suurustabelit. Kui tabelit pole, küsi suuruse valikul abi.",
         },
         {
-          title: "2. Täida vorm",
+          title: "Saada tellimus",
           body: "Lisa valik, sobiv kontakt ja kättesaamisviis. Kontot pole vaja ning automaatset makset ei tehta.",
         },
         {
-          title: "3. Saa kinnitus",
+          title: "Kinnita üksikasjad",
           body: "Võtame ühendust ning kinnitame enne maksmist hinna, suuruse, kättesaamise ja eeldatava aja.",
         },
       ],
@@ -269,11 +269,11 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Kliendile",
       title: "Tarne ja maksmine",
       introduction:
-        "Kättesaamis- ja makseviis lepitakse personaalselt kokku enne eeltellimuse kinnitamist.",
+        "Kättesaamis- ja makseviisi lepime enne eeltellimuse kinnitamist sinuga kokku.",
       sections: [
         {
           title: "Tallinn",
-          body: "Tallinnas on võimalik personaalne üleandmine. Valida saab 30% ettemakse ja ülejäänud summa üleandmisel või täieliku ettemakse.",
+          body: "Tallinnas saad tellimuse kätte isiklikult. Valida saab 30% ettemakse ja ülejäänud summa üleandmisel või täieliku ettemakse.",
         },
         {
           title: "Tarne üle Euroopa",
@@ -293,7 +293,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Mida eeltellimus tähendab",
-          body: "Valid toote nüüd ning meie kinnitame selle sulle personaalselt enne maksmist.",
+          body: "Valid toote nüüd ning meie kinnitame saadavuse ja üksikasjad enne maksmist.",
         },
         {
           title: "Eeldatav aeg",
@@ -337,7 +337,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "Kuidas suurust valida?",
-          body: "Kasuta tootelehe tabelit. Kuue tabelita mudeli puhul pakume personaalset suuruseabi.",
+          body: "Kasuta tootelehe suurustabelit. Kui tabel ei ole veel saadaval, aitame sobiva suuruse valida.",
         },
         {
           title: "Kuidas maksmine toimub?",
@@ -407,13 +407,13 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
     },
     terms: {
       eyebrow: "Õigusinfo",
-      title: "Kasutustingimused",
+      title: "Tingimused",
       introduction:
         "Sait aitab valida toote ja saata eeltellimuspäringu; vormi saatmine ei kinnita ostu automaatselt.",
       sections: [
         {
           title: "Tooteinfo",
-          body: "Fotod, värvid ja suurused aitavad valida. Lõplikud müügidetailid kinnitatakse personaalselt enne makset.",
+          body: "Fotod, värvid ja suurused aitavad valida. Lõplikud müügidetailid lepime kokku enne makset.",
         },
         {
           title: "Eeltellimus",
@@ -429,9 +429,9 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
   en: {
     about: {
       eyebrow: "Andrelook",
-      title: "About us",
+      title: "About",
       introduction:
-        "Andrelook is a personal fashion service from Tallinn with a focused edit of Moncler and Parajumpers pieces.",
+        "Andrelook is a Tallinn-based fashion service with a focused edit of Moncler and Parajumpers pieces and human help throughout the order.",
       sections: [
         {
           title: "A focused collection",
@@ -451,18 +451,18 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "How to order",
       introduction:
-        "Choose a piece, submit your order and receive personal pre-order confirmation.",
+        "Choose a piece, send your request and confirm the pre-order details directly with us.",
       sections: [
         {
-          title: "1. Choose your piece",
+          title: "Choose your piece",
           body: "Review the product photography, colours and size guide. If no chart is available, choose personal sizing help.",
         },
         {
-          title: "2. Complete the form",
+          title: "Send your request",
           body: "Add your selection, preferred contact and fulfilment method. No account is required and no automatic payment is taken.",
         },
         {
-          title: "3. Receive confirmation",
+          title: "Confirm the details",
           body: "We contact you and confirm the price, size, fulfilment and expected timing before payment.",
         },
       ],
@@ -471,7 +471,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       eyebrow: "Customer care",
       title: "Delivery & payment",
       introduction:
-        "Fulfilment and payment are agreed personally before your pre-order is confirmed.",
+        "Fulfilment and payment are agreed with you before the pre-order is confirmed.",
       sections: [
         {
           title: "Tallinn",
@@ -495,7 +495,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "What pre-order means",
-          body: "You select the piece now and we confirm it for you personally before payment.",
+          body: "You select the piece now and we confirm its availability and details before payment.",
         },
         {
           title: "Expected timing",
@@ -529,7 +529,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
     },
     faq: {
       eyebrow: "Help",
-      title: "Frequently asked questions",
+      title: "FAQ",
       introduction:
         "Quick answers about pre-ordering, sizing, payment and fulfilment.",
       sections: [
@@ -539,7 +539,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "How do I choose a size?",
-          body: "Use the chart on the product page. Personal sizing help is available for the six pieces without a chart.",
+          body: "Use the chart on the product page. If a chart is not yet available, we’ll help you choose the right size personally.",
         },
         {
           title: "How does payment work?",
@@ -609,7 +609,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
     },
     terms: {
       eyebrow: "Legal information",
-      title: "Terms of use",
+      title: "Terms",
       introduction:
         "This site helps you choose a piece and send a pre-order request; submitting the form does not automatically confirm a purchase.",
       sections: [

@@ -7,6 +7,7 @@ import {
   indexingRobots,
   localizedAlternates,
   localizedOpenGraph,
+  productStructuredData,
 } from "./seo";
 
 const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -51,6 +52,37 @@ describe("localized metadata", () => {
       follow: false,
       index: false,
       nocache: true,
+    });
+  });
+
+  it("emits Product schema without inventing an Offer before price approval", () => {
+    const withoutPrice = productStructuredData({
+      availability: "PRE_ORDER",
+      brand: "Moncler",
+      currency: "EUR",
+      description: "Evidence-backed product description.",
+      images: ["/products/example.webp"],
+      name: "Maya Down Jacket",
+      priceMinor: null,
+      url: "https://staging.example.test/en/catalog/jackets/maya",
+    });
+    expect(withoutPrice["@type"]).toBe("Product");
+    expect(withoutPrice.offers).toBeUndefined();
+
+    const withPrice = productStructuredData({
+      ...withoutPrice,
+      availability: "PRE_ORDER",
+      brand: "Moncler",
+      currency: "EUR",
+      description: "Evidence-backed product description.",
+      images: ["/products/example.webp"],
+      name: "Maya Down Jacket",
+      priceMinor: 12500,
+      url: "https://www.andrelook.store/en/catalog/jackets/maya",
+    });
+    expect(withPrice.offers).toMatchObject({
+      price: "125.00",
+      priceCurrency: "EUR",
     });
   });
 });

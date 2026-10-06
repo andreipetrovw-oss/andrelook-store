@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/product-card";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getStorefrontContent } from "@/i18n/storefront-content";
+import { formatProductCount } from "@/lib/catalog/presentation";
 import {
   getPublicCatalog,
   getPublicCategories,
@@ -25,18 +26,18 @@ export const dynamic = "force-dynamic";
 const homeMetadata = {
   en: {
     description:
-      "Selected outerwear and knitwear by pre-order, with personal support from Tallinn and delivery across Europe.",
-    title: "Andrelook — pre-order fashion",
+      "Discover a curated edit of Moncler and Parajumpers jackets, gilets and knitwear, with personal sizing support and European delivery from Tallinn.",
+    title: "Andrelook Tallinn — Moncler & Parajumpers pre-order",
   },
   et: {
     description:
-      "Valitud ülerõivad ja kudumid ettetellimisel. Personaalne abi Tallinnast ja tarne üle Euroopa.",
-    title: "Andrelook — mood ettetellimisel",
+      "Avasta Moncleri ja Parajumpersi valitud joped, vestid ning kudumid. Suuruse valiku abi, eeltellimus ja tarne Tallinnast üle Euroopa.",
+    title: "Andrelook Tallinn — Moncler ja Parajumpers eeltellimisel",
   },
   ru: {
     description:
-      "Куртки, жилеты и трикотаж по предзаказу. Помощь с выбором из Таллинна и доставка по Европе.",
-    title: "Andrelook — одежда по предзаказу",
+      "Отобранные куртки, жилеты и трикотаж Moncler и Parajumpers. Помощь с размером, предзаказ и доставка из Таллинна по Европе.",
+    title: "Andrelook Таллинн — Moncler и Parajumpers по предзаказу",
   },
 } as const;
 
@@ -93,24 +94,6 @@ function CollectionLoading() {
   );
 }
 
-function formatProductCount(locale: "en" | "et" | "ru", count: number) {
-  if (locale === "et") return `${count} toodet`;
-  if (locale === "ru") {
-    const modulo100 = count % 100;
-    const modulo10 = count % 10;
-    const noun =
-      modulo100 >= 11 && modulo100 <= 14
-        ? "моделей"
-        : modulo10 === 1
-          ? "модель"
-          : modulo10 >= 2 && modulo10 <= 4
-            ? "модели"
-            : "моделей";
-    return `${count} ${noun}`;
-  }
-  return `${count} ${count === 1 ? "piece" : "pieces"}`;
-}
-
 async function HomeProducts({
   dictionary,
   locale,
@@ -130,7 +113,7 @@ async function HomeProducts({
       <div className="container">
         <header className="editorial-heading split-heading">
           <div>
-            <span className="eyebrow">Andrelook edit</span>
+            <span className="eyebrow">{copy.editorialLabel}</span>
             <h2>{copy.collectionTitle}</h2>
           </div>
           <p>{copy.collectionIntro}</p>
@@ -228,7 +211,7 @@ export default async function LocalizedHome({
           alt=""
           className="hero-image"
           fill
-          priority
+          preload
           sizes="100vw"
           src="/brand/hero-bg.jpg"
         />
@@ -251,9 +234,13 @@ export default async function LocalizedHome({
               </Link>
             </div>
           </div>
-          <span className="hero-location">Tallinn · Europe</span>
+          <span className="hero-location">{content.home.locationLabel}</span>
         </div>
       </section>
+
+      <Suspense fallback={<CollectionLoading />}>
+        <HomeProducts dictionary={dictionary} locale={locale} scope={scope} />
+      </Suspense>
 
       <section
         aria-label={dictionary.whyAndrelook}
@@ -269,10 +256,6 @@ export default async function LocalizedHome({
         </div>
       </section>
 
-      <Suspense fallback={<CollectionLoading />}>
-        <HomeProducts dictionary={dictionary} locale={locale} scope={scope} />
-      </Suspense>
-
       <Suspense fallback={null}>
         <HomeCategories dictionary={dictionary} locale={locale} scope={scope} />
       </Suspense>
@@ -280,7 +263,7 @@ export default async function LocalizedHome({
       <section className="commercial-states-section">
         <div className="container commercial-states-grid">
           <header className="editorial-heading">
-            <span className="eyebrow">{dictionary.availability}</span>
+            <span className="eyebrow">{dictionary.howItWorks}</span>
             <h2>{content.home.stateTitle}</h2>
             <p>{content.home.stateIntro}</p>
           </header>
@@ -308,7 +291,7 @@ export default async function LocalizedHome({
         <div className="sizing-story-mark" aria-hidden="true">
           <span>A</span>
           <i />
-          <small>SIZE</small>
+          <small>{content.home.sizeMark}</small>
         </div>
         <div className="sizing-story-copy">
           <span className="eyebrow">{dictionary.personalSizing}</span>
@@ -322,25 +305,6 @@ export default async function LocalizedHome({
           <Link className="text-action" href={`/${locale}/faq`}>
             {dictionary.faq} →
           </Link>
-        </div>
-      </section>
-
-      <section className="container service-trust-section">
-        <header className="editorial-heading split-heading">
-          <div>
-            <span className="eyebrow">Andrelook</span>
-            <h2>{content.home.serviceTitle}</h2>
-          </div>
-          <p>{content.home.serviceIntro}</p>
-        </header>
-        <div className="service-trust-grid">
-          {content.home.serviceItems.map((item, index) => (
-            <article key={item.title}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
         </div>
       </section>
 

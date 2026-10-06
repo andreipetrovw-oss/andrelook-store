@@ -10,50 +10,159 @@ import {
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
+import { selectionSummary } from "@/lib/orders/selection-summary";
 
 import { useProductInteraction } from "./product-interaction-context";
 
 const initialRequestFormState: RequestFormState = { status: "idle" };
 
-const europe = [
-  ["EE", "Estonia / Eesti / Эстония"],
-  ["AT", "Austria"],
-  ["BE", "Belgium"],
-  ["BG", "Bulgaria"],
-  ["HR", "Croatia"],
-  ["CY", "Cyprus"],
-  ["CZ", "Czechia"],
-  ["DK", "Denmark"],
-  ["FI", "Finland"],
-  ["FR", "France"],
-  ["DE", "Germany"],
-  ["GR", "Greece"],
-  ["HU", "Hungary"],
-  ["IS", "Iceland"],
-  ["IE", "Ireland"],
-  ["IT", "Italy"],
-  ["LV", "Latvia"],
-  ["LI", "Liechtenstein"],
-  ["LT", "Lithuania"],
-  ["LU", "Luxembourg"],
-  ["MT", "Malta"],
-  ["NL", "Netherlands"],
-  ["NO", "Norway"],
-  ["PL", "Poland"],
-  ["PT", "Portugal"],
-  ["RO", "Romania"],
-  ["SK", "Slovakia"],
-  ["SI", "Slovenia"],
-  ["ES", "Spain"],
-  ["SE", "Sweden"],
-  ["CH", "Switzerland"],
-  ["GB", "United Kingdom"],
+const europeanCountryCodes = [
+  "EE",
+  "AT",
+  "BE",
+  "BG",
+  "HR",
+  "CY",
+  "CZ",
+  "DK",
+  "FI",
+  "FR",
+  "DE",
+  "GR",
+  "HU",
+  "IS",
+  "IE",
+  "IT",
+  "LV",
+  "LI",
+  "LT",
+  "LU",
+  "MT",
+  "NL",
+  "NO",
+  "PL",
+  "PT",
+  "RO",
+  "SK",
+  "SI",
+  "ES",
+  "SE",
+  "CH",
+  "GB",
 ] as const;
+
+type EuropeanCountryCode = (typeof europeanCountryCodes)[number];
+
+const countries: Record<Locale, Record<EuropeanCountryCode, string>> = {
+  en: {
+    AT: "Austria",
+    BE: "Belgium",
+    BG: "Bulgaria",
+    CH: "Switzerland",
+    CY: "Cyprus",
+    CZ: "Czechia",
+    DE: "Germany",
+    DK: "Denmark",
+    EE: "Estonia",
+    ES: "Spain",
+    FI: "Finland",
+    FR: "France",
+    GB: "United Kingdom",
+    GR: "Greece",
+    HR: "Croatia",
+    HU: "Hungary",
+    IE: "Ireland",
+    IS: "Iceland",
+    IT: "Italy",
+    LI: "Liechtenstein",
+    LT: "Lithuania",
+    LU: "Luxembourg",
+    LV: "Latvia",
+    MT: "Malta",
+    NL: "Netherlands",
+    NO: "Norway",
+    PL: "Poland",
+    PT: "Portugal",
+    RO: "Romania",
+    SE: "Sweden",
+    SI: "Slovenia",
+    SK: "Slovakia",
+  },
+  et: {
+    AT: "Austria",
+    BE: "Belgia",
+    BG: "Bulgaaria",
+    CH: "Šveits",
+    CY: "Küpros",
+    CZ: "Tšehhi",
+    DE: "Saksamaa",
+    DK: "Taani",
+    EE: "Eesti",
+    ES: "Hispaania",
+    FI: "Soome",
+    FR: "Prantsusmaa",
+    GB: "Ühendkuningriik",
+    GR: "Kreeka",
+    HR: "Horvaatia",
+    HU: "Ungari",
+    IE: "Iirimaa",
+    IS: "Island",
+    IT: "Itaalia",
+    LI: "Liechtenstein",
+    LT: "Leedu",
+    LU: "Luksemburg",
+    LV: "Läti",
+    MT: "Malta",
+    NL: "Madalmaad",
+    NO: "Norra",
+    PL: "Poola",
+    PT: "Portugal",
+    RO: "Rumeenia",
+    SE: "Rootsi",
+    SI: "Sloveenia",
+    SK: "Slovakkia",
+  },
+  ru: {
+    AT: "Австрия",
+    BE: "Бельгия",
+    BG: "Болгария",
+    CH: "Швейцария",
+    CY: "Кипр",
+    CZ: "Чехия",
+    DE: "Германия",
+    DK: "Дания",
+    EE: "Эстония",
+    ES: "Испания",
+    FI: "Финляндия",
+    FR: "Франция",
+    GB: "Великобритания",
+    GR: "Греция",
+    HR: "Хорватия",
+    HU: "Венгрия",
+    IE: "Ирландия",
+    IS: "Исландия",
+    IT: "Италия",
+    LI: "Лихтенштейн",
+    LT: "Литва",
+    LU: "Люксембург",
+    LV: "Латвия",
+    MT: "Мальта",
+    NL: "Нидерланды",
+    NO: "Норвегия",
+    PL: "Польша",
+    PT: "Португалия",
+    RO: "Румыния",
+    SE: "Швеция",
+    SI: "Словения",
+    SK: "Словакия",
+  },
+};
 
 const copy = {
   en: {
     address: "Delivery address",
     city: "City",
+    chooseOptions: "Choose colour and size",
     close: "Close order panel",
     country: "Country",
     deposit: "30% advance, balance at personal handover",
@@ -83,6 +192,7 @@ const copy = {
   et: {
     address: "Tarneaadress",
     city: "Linn",
+    chooseOptions: "Vali värv ja suurus",
     close: "Sulge tellimuspaneel",
     country: "Riik",
     deposit: "30% ettemaks, jääk isiklikul üleandmisel",
@@ -112,6 +222,7 @@ const copy = {
   ru: {
     address: "Адрес доставки",
     city: "Город",
+    chooseOptions: "Выберите цвет и размер",
     close: "Закрыть оформление",
     country: "Страна",
     deposit: "30% предоплата, остаток при личной передаче",
@@ -220,8 +331,12 @@ export function RequestForm({
   const successRef = useRef<HTMLElement>(null);
 
   const selectedColour = colours.find((item) => item.code === colour)?.name;
-  const selectedSize =
-    size === SIZE_HELP_VALUE ? labels.sizingAssistance : size;
+  const selectedSummary = selectionSummary({
+    colour: selectedColour,
+    neutralPrompt: labels.chooseOptions,
+    size,
+    sizingAssistance: labels.sizingAssistance,
+  });
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -321,9 +436,7 @@ export function RequestForm({
           <h2>{dictionary.requestSuccess}</h2>
           <div className="order-success-product">
             <strong>{productName}</strong>
-            <span>
-              {[selectedColour, selectedSize].filter(Boolean).join(" · ")}
-            </span>
+            <span>{selectedSummary}</span>
           </div>
           <p>{labels.nextStep}</p>
           <p>
@@ -401,10 +514,7 @@ export function RequestForm({
             <span className="eyebrow">{labels.orderSummary}</span>
             <small>{brandName}</small>
             <strong>{productName}</strong>
-            <p>
-              {[selectedColour, selectedSize].filter(Boolean).join(" · ") ||
-                labels.sizeHelp}
-            </p>
+            <p>{selectedSummary}</p>
             <p>
               {dictionary.availabilityPreOrder} · {preorderTime}
             </p>
@@ -421,7 +531,7 @@ export function RequestForm({
             <input defaultValue="" key={name} name={name} type="hidden" />
           ))}
 
-          <fieldset>
+          <fieldset className="request-form-grid">
             <legend>{dictionary.productInformation}</legend>
             {sizes.length ? (
               <label>
@@ -571,7 +681,7 @@ export function RequestForm({
             </label>
           </fieldset>
 
-          <fieldset>
+          <fieldset className="request-form-grid">
             <legend>{dictionary.deliveryPayment}</legend>
             <label>
               <span>{labels.fulfilment}</span>
@@ -593,9 +703,9 @@ export function RequestForm({
                     onChange={(event) => setCountry(event.target.value)}
                     value={country}
                   >
-                    {europe.map(([code, name]) => (
+                    {europeanCountryCodes.map((code) => (
                       <option key={code} value={code}>
-                        {name}
+                        {countries[locale][code]}
                       </option>
                     ))}
                   </select>

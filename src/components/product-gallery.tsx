@@ -176,7 +176,7 @@ export function ProductGallery({
                 <Image
                   alt={activeImage.alt}
                   fill
-                  priority
+                  loading="eager"
                   sizes="100vw"
                   src={activeImage.url}
                 />
@@ -208,8 +208,8 @@ export function ProductGallery({
                 <Image
                   alt={image.alt}
                   fill
-                  fetchPriority={index === 0 ? "high" : undefined}
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading={index === 0 ? undefined : "lazy"}
+                  preload={index === 0}
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   src={image.url}
                 />

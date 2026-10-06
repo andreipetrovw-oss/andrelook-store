@@ -4,7 +4,7 @@ import { localizeMeasurementLabel } from "./size-guide";
 
 describe("size-guide measurement labels", () => {
   it("localizes known supplier terminology without changing unknown evidence", () => {
-    expect(localizeMeasurementLabel("ru", "Bust")).toBe("Обхват груди");
+    expect(localizeMeasurementLabel("ru", "Bust")).toBe("Грудь");
     expect(localizeMeasurementLabel("et", "Clothes length")).toBe(
       "Rõiva pikkus",
     );

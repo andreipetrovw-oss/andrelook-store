@@ -1,20 +1,41 @@
 import { describe, expect, it } from "vitest";
 
-import { getCustomerCategoryName, getProductDisplayName } from "./presentation";
+import {
+  formatProductCount,
+  getCustomerCategoryName,
+  getProductDisplayName,
+} from "./presentation";
 
 describe("customer catalog presentation", () => {
   it("uses the final customer taxonomy without changing route slugs", () => {
     expect(getCustomerCategoryName("en", "warm-jackets", "Fallback")).toBe(
-      "Outerwear",
+      "Puffer jackets",
     );
     expect(getCustomerCategoryName("et", "light-jackets", "Fallback")).toBe(
-      "Jakid ja kudumid",
+      "Joped ja kardiganid",
     );
     expect(getCustomerCategoryName("ru", "bottoms", "Fallback")).toBe(
-      "Пляжная одежда",
+      "Плавательные шорты",
     );
     expect(getCustomerCategoryName("en", "unknown", "Fallback")).toBe(
       "Fallback",
+    );
+  });
+
+  it("uses correct Estonian singular and plural product counts", () => {
+    expect(formatProductCount("et", 1)).toBe("1 toode");
+    expect(formatProductCount("et", 2)).toBe("2 toodet");
+  });
+
+  it("keeps equivalent hoodie taxonomy in all locales", () => {
+    expect(getCustomerCategoryName("ru", "hoodies", "Fallback")).toBe(
+      "Свитшоты и худи",
+    );
+    expect(getCustomerCategoryName("et", "hoodies", "Fallback")).toBe(
+      "Dressipluusid ja pusad",
+    );
+    expect(getCustomerCategoryName("en", "hoodies", "Fallback")).toBe(
+      "Sweatshirts & hoodies",
     );
   });
 

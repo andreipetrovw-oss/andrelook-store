@@ -30,8 +30,17 @@ describe("localized information architecture", () => {
       const faq = getInfoPage(locale, "faq");
       expect(faq?.sections).toHaveLength(8);
       expect(JSON.stringify(faq)).not.toMatch(
-        /price missing|not yet published|catalog version/i,
+        /price missing|not yet published|catalog version|six pieces|kuue tabelita|шести модел/i,
       );
+    }
+  });
+
+  it("does not duplicate the visual numbering used by information pages", () => {
+    for (const locale of locales) {
+      const page = getInfoPage(locale, "how-to-order");
+      for (const section of page?.sections ?? []) {
+        expect(section.title).not.toMatch(/^\d+[.)]/);
+      }
     }
   });
 });
