@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ruRU } from "@clerk/localizations";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -25,16 +26,19 @@ export default async function AdminLayout({
   const publishableKey = getServerConfig().clerkPublishableKey;
 
   return (
-    <ClerkProvider publishableKey={publishableKey ?? undefined}>
-      <html className={andrelookFontVariables} lang="en">
+    <ClerkProvider
+      localization={ruRU}
+      publishableKey={publishableKey ?? undefined}
+    >
+      <html className={andrelookFontVariables} lang="ru">
         <body>
           <div className="admin-shell">
             <aside className="admin-sidebar">
               <strong>ANDRELOOK CRM</strong>
-              <nav aria-label="Owner navigation">
-                <Link href="/admin">Overview</Link>
-                <Link href="/admin/orders">Orders</Link>
-                <Link href="/admin/catalog">Catalog</Link>
+              <nav aria-label="Навигация владельца">
+                <Link href="/admin">Обзор</Link>
+                <Link href="/admin/orders">Заказы</Link>
+                <Link href="/admin/catalog">Каталог</Link>
               </nav>
               <small>{access.identity.email}</small>
             </aside>

@@ -14,6 +14,7 @@ on:
       - phase6f2-product-interaction
       - phase6f3-final-storefront
       - commercial-data-completion
+      - production-cutover
 
 permissions:
   contents: read

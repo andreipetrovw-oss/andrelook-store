@@ -5,7 +5,7 @@ export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html className={andrelookFontVariables} lang="en">
+    <html className={andrelookFontVariables} lang="ru">
       <body>{children}</body>
     </html>
   );

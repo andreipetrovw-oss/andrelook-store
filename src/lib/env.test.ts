@@ -38,4 +38,11 @@ describe("staging environment safety", () => {
     delete process.env.OWNER_EMAILS;
     expect(() => getServerConfig()).toThrow("Clerk authentication requires");
   });
+
+  it("uses the dedicated CRM origin when configured", () => {
+    process.env.CRM_URL = "https://crm.andrelook.store";
+    expect(getServerConfig().crmUrl?.origin).toBe(
+      "https://crm.andrelook.store",
+    );
+  });
 });

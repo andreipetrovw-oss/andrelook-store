@@ -1,4 +1,9 @@
 import { getAdminCatalog } from "@/lib/admin/query";
+import {
+  availabilityTypeLabels,
+  publicationStatusLabels,
+  sourceReviewStatusLabels,
+} from "@/lib/admin/labels";
 import Link from "next/link";
 
 export default async function AdminCatalogPage() {
@@ -18,35 +23,35 @@ export default async function AdminCatalogPage() {
   };
   return (
     <>
-      <span className="eyebrow">Private catalog</span>
-      <h1>Catalog readiness</h1>
+      <span className="eyebrow">Закрытый каталог</span>
+      <h1>Готовность каталога</h1>
       <div className="admin-cards admin-cards-catalog">
         <article className="admin-card">
-          <span>Prepared identities</span>
+          <span>Заполненные карточки</span>
           <p>
             {summary.content}/{products.length}
           </p>
         </article>
         <article className="admin-card">
-          <span>Verified charts</span>
+          <span>Проверенные таблицы размеров</span>
           <p>
             {summary.charts}/{products.length}
           </p>
         </article>
         <article className="admin-card">
-          <span>Retail prices</span>
+          <span>Розничные цены</span>
           <p>
             {summary.prices}/{products.length}
           </p>
         </article>
         <article className="admin-card">
-          <span>Availability states</span>
+          <span>Статусы наличия</span>
           <p>
             {summary.availability}/{products.length}
           </p>
         </article>
         <article className="admin-card">
-          <span>Approved photography</span>
+          <span>Одобренные изображения</span>
           <p>
             {summary.images}/{products.length}
           </p>
@@ -56,14 +61,14 @@ export default async function AdminCatalogPage() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Product</th>
-              <th>State</th>
-              <th>Content</th>
-              <th>Public image</th>
-              <th>Size chart</th>
-              <th>Availability</th>
-              <th>Retail</th>
-              <th>Private source</th>
+              <th>Товар</th>
+              <th>Публикация</th>
+              <th>Контент</th>
+              <th>Публичное изображение</th>
+              <th>Таблица размеров</th>
+              <th>Наличие</th>
+              <th>Цена</th>
+              <th>Закрытый источник</th>
             </tr>
           </thead>
           <tbody>
@@ -78,19 +83,25 @@ export default async function AdminCatalogPage() {
                   </strong>
                   <small>{product.internalCode}</small>
                 </td>
-                <td>{product.publicationStatus}</td>
-                <td>{product.contentComplete ? "Ready" : "Pending"}</td>
-                <td>{product.imageReady ? "Ready" : "Pending"}</td>
+                <td>{publicationStatusLabels[product.publicationStatus]}</td>
+                <td>{product.contentComplete ? "Готов" : "Не готов"}</td>
+                <td>{product.imageReady ? "Готово" : "Не готово"}</td>
                 <td>
                   {product.sizeReady
-                    ? "Published"
-                    : (product.sizeChart?.reviewStatus ?? "Missing")}
+                    ? "Опубликована"
+                    : product.sizeChart
+                      ? sourceReviewStatusLabels[product.sizeChart.reviewStatus]
+                      : "Отсутствует"}
                 </td>
-                <td>{product.availabilityType ?? "Pending"}</td>
+                <td>
+                  {product.availabilityType
+                    ? availabilityTypeLabels[product.availabilityType]
+                    : "Не подтверждено"}
+                </td>
                 <td>
                   {product.retailPriceMinor !== null && product.currency
                     ? `${(product.retailPriceMinor / 100).toFixed(2)} ${product.currency}`
-                    : "Pending"}
+                    : "Не подтверждена"}
                 </td>
                 <td>
                   <span>{product.privateData?.supplierName ?? "—"}</span>
@@ -100,7 +111,7 @@ export default async function AdminCatalogPage() {
                       rel="noreferrer"
                       target="_blank"
                     >
-                      Source album
+                      Открыть источник
                     </a>
                   ) : null}
                 </td>

@@ -2,6 +2,12 @@ import { OrderStatus } from "@prisma/client";
 import Link from "next/link";
 
 import { getAdminOrders } from "@/lib/admin/query";
+import {
+  acquisitionChannelLabels,
+  notificationStatusLabels,
+  orderStatusLabels,
+  russianDate,
+} from "@/lib/admin/labels";
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -15,43 +21,43 @@ export default async function AdminOrdersPage({
   });
   return (
     <>
-      <span className="eyebrow">Assisted sales</span>
-      <h1>Orders</h1>
+      <span className="eyebrow">Продажи с сопровождением</span>
+      <h1>Заказы</h1>
       <form className="admin-filters">
         <label>
-          <span>Search</span>
+          <span>Поиск</span>
           <input
             defaultValue={filters.q}
             name="q"
-            placeholder="Reference, customer or product"
+            placeholder="Номер, клиент или товар"
           />
         </label>
         <label>
-          <span>Status</span>
+          <span>Статус</span>
           <select defaultValue={filters.status ?? ""} name="status">
-            <option value="">All statuses</option>
+            <option value="">Все статусы</option>
             {Object.values(OrderStatus).map((status) => (
               <option key={status} value={status}>
-                {status.replaceAll("_", " ")}
+                {orderStatusLabels[status]}
               </option>
             ))}
           </select>
         </label>
-        <button type="submit">Apply</button>
+        <button type="submit">Применить</button>
       </form>
       <div className="admin-table-wrap" tabIndex={0}>
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Reference</th>
-              <th>Customer</th>
-              <th>Product</th>
-              <th>Status</th>
-              <th>Source</th>
-              <th>Notification</th>
-              <th>Date</th>
-              <th>Next action</th>
-              <th>Balance</th>
+              <th>Номер</th>
+              <th>Клиент</th>
+              <th>Товар</th>
+              <th>Статус</th>
+              <th>Источник</th>
+              <th>Уведомление</th>
+              <th>Дата</th>
+              <th>Следующее действие</th>
+              <th>Остаток</th>
             </tr>
           </thead>
           <tbody>
@@ -64,16 +70,22 @@ export default async function AdminOrdersPage({
                 </td>
                 <td>{order.customer.name}</td>
                 <td>{order.items[0]?.productNameSnapshot ?? "—"}</td>
-                <td>{order.status.replaceAll("_", " ")}</td>
-                <td>{order.acquisitionChannel}</td>
-                <td>{order.notification?.status ?? "—"}</td>
-                <td>{order.orderDate.toLocaleDateString("en-GB")}</td>
+                <td>{orderStatusLabels[order.status]}</td>
+                <td>{acquisitionChannelLabels[order.acquisitionChannel]}</td>
                 <td>
-                  {order.nextActionAt?.toLocaleDateString("en-GB") ?? "—"}
+                  {order.notification
+                    ? notificationStatusLabels[order.notification.status]
+                    : "—"}
+                </td>
+                <td>{russianDate.format(order.orderDate)}</td>
+                <td>
+                  {order.nextActionAt
+                    ? russianDate.format(order.nextActionAt)
+                    : "—"}
                 </td>
                 <td>
                   {order.balanceMinor === null || !order.currency
-                    ? "Pending"
+                    ? "Не подтверждён"
                     : `${(order.balanceMinor / 100).toFixed(2)} ${order.currency}`}
                 </td>
               </tr>
@@ -82,7 +94,7 @@ export default async function AdminOrdersPage({
         </table>
       </div>
       {!orders.length ? (
-        <p className="admin-empty">No matching orders.</p>
+        <p className="admin-empty">Подходящих заказов нет.</p>
       ) : null}
     </>
   );

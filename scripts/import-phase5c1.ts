@@ -19,7 +19,7 @@ const expectedSha256 =
 
 type Arguments = {
   file: string;
-  target: "development" | "staging" | null;
+  target: "development" | "staging" | "production" | null;
   write: boolean;
 };
 
@@ -35,7 +35,9 @@ function parseArguments(argv: string[]): Arguments {
     path.resolve(process.cwd(), "../../phase5c1/final-master-catalog.json");
   const targetValue = valueAfter("--target");
   const target =
-    targetValue === "development" || targetValue === "staging"
+    targetValue === "development" ||
+    targetValue === "staging" ||
+    targetValue === "production"
       ? targetValue
       : null;
 
@@ -293,7 +295,15 @@ async function main() {
 
   if (!args.target) {
     throw new Error(
-      "--write requires --target development or --target staging. Production is refused.",
+      "--write requires --target development, staging, or production.",
+    );
+  }
+  if (
+    args.target === "production" &&
+    process.env.PRODUCTION_CUTOVER_TARGET !== "andrelook.store"
+  ) {
+    throw new Error(
+      "Production import requires PRODUCTION_CUTOVER_TARGET=andrelook.store.",
     );
   }
 

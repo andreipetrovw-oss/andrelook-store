@@ -30,6 +30,10 @@ export async function sendNewOrderNotification(orderId: string) {
     select: {
       city: true,
       countryCode: true,
+      addressLine1: true,
+      addressLine2: true,
+      acquisitionChannel: true,
+      currency: true,
       customer: {
         select: {
           email: true,
@@ -51,10 +55,19 @@ export async function sendNewOrderNotification(orderId: string) {
           colorSnapshot: true,
           sizeHelpRequested: true,
           sizeSnapshot: true,
+          unitPriceMinor: true,
         },
       },
+      initialReferrer: true,
+      landingPath: true,
+      postalCode: true,
       requestedLocale: true,
       paymentPreference: true,
+      utmCampaign: true,
+      utmContent: true,
+      utmMedium: true,
+      utmSource: true,
+      utmTerm: true,
     },
     where: { id: orderId },
   });
@@ -92,8 +105,34 @@ export async function sendNewOrderNotification(orderId: string) {
     : (item?.sizeSnapshot ?? "—");
   const crmUrl = new URL(
     `/admin/orders/${order.id}`,
-    config.siteUrl,
+    config.crmUrl ?? config.siteUrl,
   ).toString();
+  const price =
+    item?.unitPriceMinor === null ||
+    item?.unitPriceMinor === undefined ||
+    !order.currency
+      ? "—"
+      : `${(item.unitPriceMinor / 100).toFixed(2)} ${order.currency}`;
+  const address =
+    [
+      order.addressLine1,
+      order.addressLine2,
+      order.postalCode,
+      order.city,
+      order.countryCode,
+    ]
+      .filter(Boolean)
+      .join(", ") || "—";
+  const attribution = [
+    order.acquisitionChannel,
+    order.utmSource ? `source=${order.utmSource}` : null,
+    order.utmMedium ? `medium=${order.utmMedium}` : null,
+    order.utmCampaign ? `campaign=${order.utmCampaign}` : null,
+    order.utmContent ? `content=${order.utmContent}` : null,
+    order.utmTerm ? `term=${order.utmTerm}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const rows = [
     ["Reference", order.displayNumber],
     ["Customer", order.customer.name],
@@ -101,7 +140,9 @@ export async function sendNewOrderNotification(orderId: string) {
     ["Size", size],
     ["Colour", item?.colorSnapshot ?? "—"],
     ["Quantity", String(item?.quantity ?? 1)],
+    ["Unit price", price],
     ["Country / city", `${order.countryCode ?? "—"} / ${order.city ?? "—"}`],
+    ["Address", address],
     ["Fulfilment", order.fulfilmentMethod ?? "—"],
     ["Payment preference", order.paymentPreference ?? "—"],
     ["Preferred contact", order.customer.preferredContactMethod],
@@ -113,6 +154,9 @@ export async function sendNewOrderNotification(orderId: string) {
       order.customer.telegramHandle ?? order.customer.instagramHandle ?? "—",
     ],
     ["Language", order.requestedLocale],
+    ["Source / attribution", attribution],
+    ["Landing path", order.landingPath ?? "—"],
+    ["Initial referrer", order.initialReferrer ?? "—"],
   ];
   const text = [
     `New Andrelook order request ${order.displayNumber}`,
@@ -139,6 +183,7 @@ export async function sendNewOrderNotification(orderId: string) {
         subject: `[Andrelook] New order ${order.displayNumber}`,
         text,
         to: [config.orderNotificationTo],
+        ...(order.customer.email ? { replyTo: order.customer.email } : {}),
       },
       { idempotencyKey: `andrelook-new-order-${order.displayNumber}` },
     );

@@ -2,6 +2,12 @@ import { notFound } from "next/navigation";
 
 import { getPrivateCatalogProduct } from "@/lib/catalog/private-query";
 import { updateProductCommercialState } from "@/app/(admin)/admin/actions";
+import {
+  availabilityTypeLabels,
+  publicationStatusLabels,
+  russianDate,
+  sourceReviewStatusLabels,
+} from "@/lib/admin/labels";
 
 export default async function AdminCatalogProductPage({
   params,
@@ -16,29 +22,33 @@ export default async function AdminCatalogProductPage({
       <span className="eyebrow">{product.internalCode}</span>
       <h1>
         {product.translations.find((item) => item.locale === "EN")?.name ??
-          "Catalog record"}
+          "Карточка товара"}
       </h1>
       <div className="order-detail-grid">
         <section className="admin-panel">
-          <h2>Publication review</h2>
+          <h2>Публикация и коммерческие данные</h2>
           <dl>
             <div>
-              <dt>Status</dt>
-              <dd>{product.publicationStatus}</dd>
+              <dt>Статус</dt>
+              <dd>{publicationStatusLabels[product.publicationStatus]}</dd>
             </div>
             <div>
               <dt>Slug</dt>
-              <dd>{product.slug ?? "Pending"}</dd>
+              <dd>{product.slug ?? "Не заполнен"}</dd>
             </div>
             <div>
-              <dt>Availability</dt>
-              <dd>{product.availabilityType ?? "Pending"}</dd>
+              <dt>Наличие</dt>
+              <dd>
+                {product.availabilityType
+                  ? availabilityTypeLabels[product.availabilityType]
+                  : "Не подтверждено"}
+              </dd>
             </div>
             <div>
-              <dt>Retail price</dt>
+              <dt>Розничная цена</dt>
               <dd>
                 {product.retailPriceMinor === null || !product.currency
-                  ? "Pending"
+                  ? "Не подтверждена"
                   : `${(product.retailPriceMinor / 100).toFixed(2)} ${product.currency}`}
               </dd>
             </div>
@@ -49,31 +59,31 @@ export default async function AdminCatalogProductPage({
           >
             <input name="productId" type="hidden" value={product.id} />
             <label>
-              <span>Publication state</span>
+              <span>Статус публикации</span>
               <select
                 defaultValue={product.publicationStatus}
                 name="publicationStatus"
               >
-                <option value="DRAFT">Draft</option>
-                <option value="READY">Ready for protected review</option>
-                <option value="PUBLISHED">Published</option>
-                <option value="ARCHIVED">Archived</option>
+                <option value="DRAFT">Черновик</option>
+                <option value="READY">Готов к закрытой проверке</option>
+                <option value="PUBLISHED">Опубликован</option>
+                <option value="ARCHIVED">Архив</option>
               </select>
             </label>
             <label>
-              <span>Availability</span>
+              <span>Наличие</span>
               <select
                 defaultValue={product.availabilityType ?? ""}
                 name="availabilityType"
               >
-                <option value="">Not confirmed</option>
-                <option value="IN_STOCK">In stock</option>
-                <option value="PRE_ORDER">Pre-order</option>
-                <option value="UNAVAILABLE">Unavailable</option>
+                <option value="">Не подтверждено</option>
+                <option value="IN_STOCK">В наличии</option>
+                <option value="PRE_ORDER">Предзаказ</option>
+                <option value="UNAVAILABLE">Недоступен</option>
               </select>
             </label>
             <label>
-              <span>Retail price</span>
+              <span>Розничная цена</span>
               <input
                 defaultValue={
                   product.retailPriceMinor === null
@@ -82,11 +92,11 @@ export default async function AdminCatalogProductPage({
                 }
                 inputMode="decimal"
                 name="retailPrice"
-                placeholder="Leave empty until approved"
+                placeholder="Оставьте пустым до одобрения"
               />
             </label>
             <label>
-              <span>Currency</span>
+              <span>Валюта</span>
               <input
                 defaultValue={product.currency ?? ""}
                 maxLength={3}
@@ -95,34 +105,40 @@ export default async function AdminCatalogProductPage({
               />
             </label>
             <label>
-              <span>Pre-order estimate</span>
+              <span>Срок предзаказа</span>
               <input
                 defaultValue={product.preorderEstimateText ?? ""}
                 name="preorderEstimateText"
-                placeholder="Only when owner-approved"
+                placeholder="Только после одобрения владельцем"
               />
             </label>
-            <button type="submit">Save commercial state</button>
+            <button type="submit">Сохранить</button>
           </form>
           <p className="admin-readiness-note">
-            Publishing is fail-closed until a slug, three translations, category
-            translations, approved primary image, availability, retail price and
-            currency are present.
+            Публикация недоступна, пока не заполнены slug, три перевода,
+            переводы категории, одобренное главное изображение, наличие, цена и
+            валюта.
           </p>
         </section>
         <section className="admin-panel">
-          <h2>Private source</h2>
+          <h2>Закрытый источник</h2>
           <dl>
             <div>
-              <dt>Supplier</dt>
+              <dt>Поставщик</dt>
               <dd>{product.privateData?.supplierName ?? "—"}</dd>
             </div>
             <div>
-              <dt>Review state</dt>
-              <dd>{product.privateData?.sourceReviewStatus ?? "—"}</dd>
+              <dt>Статус проверки</dt>
+              <dd>
+                {product.privateData
+                  ? sourceReviewStatusLabels[
+                      product.privateData.sourceReviewStatus
+                    ]
+                  : "—"}
+              </dd>
             </div>
             <div>
-              <dt>Supplier cost</dt>
+              <dt>Стоимость поставщика</dt>
               <dd>
                 {product.privateData?.supplierCostMinor === null ||
                 !product.privateData?.supplierCurrency
@@ -137,19 +153,19 @@ export default async function AdminCatalogProductPage({
               rel="noreferrer"
               target="_blank"
             >
-              Open private source album
+              Открыть закрытый источник
             </a>
           ) : null}
         </section>
         <section className="admin-panel">
-          <h2>Storefront readiness</h2>
+          <h2>Готовность витрины</h2>
           <dl>
             <div>
-              <dt>Localized identity</dt>
+              <dt>Локализованная карточка</dt>
               <dd>{product.translations.length}/3</dd>
             </div>
             <div>
-              <dt>Approved public images</dt>
+              <dt>Одобренные публичные изображения</dt>
               <dd>
                 {
                   product.images.filter(
@@ -160,7 +176,7 @@ export default async function AdminCatalogProductPage({
               </dd>
             </div>
             <div>
-              <dt>Approved colours</dt>
+              <dt>Одобренные цвета</dt>
               <dd>
                 {
                   product.colors.filter(
@@ -170,7 +186,7 @@ export default async function AdminCatalogProductPage({
               </dd>
             </div>
             <div>
-              <dt>Enabled variants</dt>
+              <dt>Доступные варианты</dt>
               <dd>
                 {product.variants.filter((variant) => variant.isEnabled).length}
               </dd>
@@ -178,43 +194,50 @@ export default async function AdminCatalogProductPage({
           </dl>
         </section>
         <section className="admin-panel">
-          <h2>Size evidence</h2>
+          <h2>Доказательства таблицы размеров</h2>
           <dl>
             <div>
-              <dt>Review state</dt>
-              <dd>{product.sizeChart?.reviewStatus ?? "Missing"}</dd>
+              <dt>Статус проверки</dt>
+              <dd>
+                {product.sizeChart
+                  ? sourceReviewStatusLabels[product.sizeChart.reviewStatus]
+                  : "Отсутствует"}
+              </dd>
             </div>
             <div>
-              <dt>Public</dt>
-              <dd>{product.sizeChart?.isPublished ? "Yes" : "No"}</dd>
+              <dt>Публичная</dt>
+              <dd>{product.sizeChart?.isPublished ? "Да" : "Нет"}</dd>
             </div>
             <div>
-              <dt>Verification</dt>
+              <dt>Проверка</dt>
               <dd>{product.sizeChart?.evidence?.verification ?? "—"}</dd>
             </div>
             <div>
-              <dt>Verified</dt>
+              <dt>Дата проверки</dt>
               <dd>
-                {product.sizeChart?.evidence?.verificationDate?.toLocaleDateString(
-                  "en-GB",
-                ) ?? "—"}
+                {product.sizeChart?.evidence?.verificationDate
+                  ? russianDate.format(
+                      product.sizeChart.evidence.verificationDate,
+                    )
+                  : "—"}
               </dd>
             </div>
           </dl>
         </section>
         <section className="admin-panel admin-panel-wide">
           <h2>
-            Private source-image references ({product.sourceImages.length})
+            Закрытые ссылки на исходные изображения (
+            {product.sourceImages.length})
           </h2>
           <div className="admin-table-wrap" tabIndex={0}>
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Position</th>
-                  <th>Assigned role</th>
-                  <th>Review</th>
-                  <th>Dimensions</th>
-                  <th>Reference</th>
+                  <th>Позиция</th>
+                  <th>Роль</th>
+                  <th>Проверка</th>
+                  <th>Размеры</th>
+                  <th>Ссылка</th>
                 </tr>
               </thead>
               <tbody>
@@ -222,7 +245,7 @@ export default async function AdminCatalogProductPage({
                   <tr key={image.id}>
                     <td>{image.sourcePosition}</td>
                     <td>{image.assignedSourceRole ?? "—"}</td>
-                    <td>{image.reviewStatus}</td>
+                    <td>{sourceReviewStatusLabels[image.reviewStatus]}</td>
                     <td>
                       {image.width && image.height
                         ? `${image.width}×${image.height}`
@@ -234,7 +257,7 @@ export default async function AdminCatalogProductPage({
                         rel="noreferrer"
                         target="_blank"
                       >
-                        Open source
+                        Открыть источник
                       </a>
                     </td>
                   </tr>

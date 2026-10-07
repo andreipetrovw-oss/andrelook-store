@@ -3,19 +3,19 @@ import Link from "next/link";
 import { getAdminOverview } from "@/lib/admin/query";
 
 const cards = [
-  ["NEW", "New leads"],
-  ["CONFIRMED", "Active orders"],
-  ["AWAITING_PAYMENT", "Awaiting payment"],
-  ["IN_TRANSIT", "In transit"],
-  ["READY", "Ready"],
+  ["NEW", "Новые запросы"],
+  ["CONFIRMED", "Активные заказы"],
+  ["AWAITING_PAYMENT", "Ожидают оплаты"],
+  ["IN_TRANSIT", "В пути"],
+  ["READY", "Готовы"],
 ] as const;
 
 export default async function AdminOverviewPage() {
   const overview = await getAdminOverview();
   return (
     <>
-      <span className="eyebrow">Owner only</span>
-      <h1>Overview</h1>
+      <span className="eyebrow">Только для владельца</span>
+      <h1>Обзор</h1>
       <div className="admin-cards">
         {cards.map(([status, label]) => (
           <Link
@@ -28,7 +28,7 @@ export default async function AdminOverviewPage() {
           </Link>
         ))}
         <Link className="admin-card warning" href="/admin/orders">
-          <strong>Overdue next actions</strong>
+          <strong>Просроченные действия</strong>
           <p>{overview.overdue}</p>
         </Link>
       </div>

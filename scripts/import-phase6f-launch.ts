@@ -277,8 +277,17 @@ async function main() {
   if (!process.argv.includes("--write")) {
     throw new Error("Refusing to mutate the database without --write.");
   }
-  if (process.env.PHASE6F_TARGET !== "staging") {
-    throw new Error("PHASE6F_TARGET=staging is required.");
+  const target = process.env.PHASE6F_TARGET;
+  if (target !== "staging" && target !== "production") {
+    throw new Error("PHASE6F_TARGET=staging or production is required.");
+  }
+  if (
+    target === "production" &&
+    process.env.PRODUCTION_CUTOVER_TARGET !== "andrelook.store"
+  ) {
+    throw new Error(
+      "Production import requires PRODUCTION_CUTOVER_TARGET=andrelook.store.",
+    );
   }
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required.");
 
@@ -301,7 +310,7 @@ async function main() {
     });
     if (publishedSupplier) {
       throw new Error(
-        "Refusing to alter staging with published supplier products.",
+        `Refusing to alter ${target} with published supplier products.`,
       );
     }
     await prisma.product.updateMany({
