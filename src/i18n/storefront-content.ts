@@ -80,7 +80,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Утеплённые куртки, жилеты, кардиганы, свитшоты и футболки — по категориям, без лишнего поиска.",
       categoriesTitle: "Выберите категорию",
       collectionIntro:
-        "23 модели Moncler и Parajumpers с фотографиями каждой вещи и понятными вариантами цвета.",
+        "22 модели Moncler и Parajumpers с фотографиями каждой вещи и понятными вариантами цвета.",
       collectionTitle: "Избранная коллекция",
       contactBody:
         "Напишите в Telegram, Instagram или по электронной почте — ответим на русском, эстонском или английском.",
@@ -201,7 +201,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Soojad joped, vestid, kardiganid, dressipluusid ja T-särgid on jaotatud selgetesse kategooriatesse.",
       categoriesTitle: "Vali kategooria",
       collectionIntro:
-        "23 Moncleri ja Parajumpersi mudelit koos iga toote fotode ja selgete värvivalikutega.",
+        "22 Moncleri ja Parajumpersi mudelit koos iga toote fotode ja selgete värvivalikutega.",
       collectionTitle: "Valitud kollektsioon",
       contactBody:
         "Kirjuta Telegramis, Instagramis või e-posti teel — vastame eesti, vene või inglise keeles.",
@@ -322,7 +322,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Puffer jackets, gilets, cardigans, sweatshirts and T-shirts, arranged for effortless browsing.",
       categoriesTitle: "Shop by category",
       collectionIntro:
-        "23 Moncler and Parajumpers pieces, each shown with product photography and clear colour options.",
+        "22 Moncler and Parajumpers pieces, each shown with product photography and clear colour options.",
       collectionTitle: "Selected collection",
       contactBody:
         "Message us on Telegram, Instagram or email — we reply in English, Estonian or Russian.",
