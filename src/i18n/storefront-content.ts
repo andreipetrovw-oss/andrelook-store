@@ -86,7 +86,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Напишите в Telegram, Instagram или по электронной почте — ответим на русском, эстонском или английском.",
       contactTitle: "Поможем с выбором",
       editorialLabel: "ANDRELOOK EDIT",
-      eyebrow: "Мировые бренды · Andrelook",
+      eyebrow: "ANDRELOOK · TALLINN",
       faq: [
         {
           question: "Форма — это уже покупка?",
@@ -106,9 +106,9 @@ const content: Record<Locale, StorefrontContent> = {
       faqIntro: "Главное о предзаказе, размерах и согласовании деталей.",
       faqTitle: "Перед предзаказом",
       heroBody:
-        "Отобранные модели мировых брендов. Поможем выбрать модель, найти ваш размер и проведём заказ от первого вопроса до получения.",
-      heroMeta: "Предзаказ · 2–3 недели · Таллинн и Европа",
-      heroTitle: "Найдите вещь, которая действительно ваша.",
+        "Отобранные модели мировых брендов. Поможем выбрать модель и найти ваш размер — от первого вопроса до получения заказа.",
+      heroMeta: "ПРЕДЗАКАЗ · 2–3 НЕДЕЛИ · ТАЛЛИНН И ЕВРОПА",
+      heroTitle: "ANDRELOOK",
       locationLabel: "Таллинн · Европа",
       orderIntro:
         "Без автоматической оплаты и обязательного аккаунта. Все детали согласуем с вами до оплаты.",
@@ -207,7 +207,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Kirjuta Telegramis, Instagramis või e-posti teel — vastame eesti, vene või inglise keeles.",
       contactTitle: "Aitame valikut teha",
       editorialLabel: "ANDRELOOK EDIT",
-      eyebrow: "Maailma moebrändid · Andrelook",
+      eyebrow: "ANDRELOOK · TALLINN",
       faq: [
         {
           question: "Kas vormi saatmine on juba ost?",
@@ -227,9 +227,9 @@ const content: Record<Locale, StorefrontContent> = {
       faqIntro: "Peamine info eeltellimuse, suuruse ja kinnitamise kohta.",
       faqTitle: "Enne eeltellimust",
       heroBody:
-        "Hoolikalt valitud mudelid maailma moebrändidelt. Aitame leida sobiva toote ja suuruse ning oleme sinu kõrval valikust kättesaamiseni.",
-      heroMeta: "Eeltellimus · 2–3 nädalat · Tallinn ja Euroopa",
-      heroTitle: "Leia ese, mis on päriselt sinu oma.",
+        "Valitud mudelid maailma brändidelt. Aitame leida sobiva mudeli ja õige suuruse ning oleme abiks kuni tellimuse kättesaamiseni.",
+      heroMeta: "EELTELLIMUS · 2–3 NÄDALAT · TALLINN JA EUROOPA",
+      heroTitle: "ANDRELOOK",
       locationLabel: "Tallinn · Euroopa",
       orderIntro:
         "Automaatset makset ega kontot pole vaja. Kinnitame kõik detailid enne maksmist.",
@@ -328,7 +328,7 @@ const content: Record<Locale, StorefrontContent> = {
         "Message us on Telegram, Instagram or email — we reply in English, Estonian or Russian.",
       contactTitle: "Let us help you choose",
       editorialLabel: "ANDRELOOK EDIT",
-      eyebrow: "Global fashion brands · Andrelook",
+      eyebrow: "ANDRELOOK · TALLINN",
       faq: [
         {
           question: "Is submitting the form already a purchase?",
@@ -348,9 +348,9 @@ const content: Record<Locale, StorefrontContent> = {
       faqIntro: "The essentials on pre-ordering, sizing and confirmation.",
       faqTitle: "Before you pre-order",
       heroBody:
-        "A considered edit of global fashion brands. We help you find the right piece and size, then stay with your order from first question to delivery.",
-      heroMeta: "Pre-order · 2–3 weeks · Tallinn & Europe",
-      heroTitle: "Find the piece that feels unmistakably yours.",
+        "A curated selection from global brands. We’ll help you choose the right model and size, from the first question to delivery.",
+      heroMeta: "PRE-ORDER · 2–3 WEEKS · TALLINN & EUROPE",
+      heroTitle: "ANDRELOOK",
       locationLabel: "Tallinn · Europe",
       orderIntro:
         "No automatic payment and no account required. We confirm every detail before payment.",

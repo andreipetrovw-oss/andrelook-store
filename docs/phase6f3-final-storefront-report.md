@@ -1,6 +1,6 @@
 # Phase 6F.3 — Final Storefront, Content & Localization Perfection Report
 
-Date: 6 October 2026
+Date: 7 October 2026
 Status: isolated owner-UAT candidate; production cutover is not authorized
 
 This report covers the final general storefront pass. Only owner-supplied prices,
@@ -42,8 +42,10 @@ migration generation and the production build.
 
 ## D. Storefront outcome
 
-- The hero now leads with the approved global-brand positioning and a concise,
-  native promise in each locale.
+- The owner-approved hero hierarchy is restored: the original image, crop,
+  overlay, proportions, serif styling, spacing and CTA composition frame a large
+  centered `ANDRELOOK` wordmark. Global-brand positioning remains a supporting
+  line, never the dominant headline.
 - Homepage order is hero, products, concise trust strip, category discovery,
   ordering process, sizing service, FAQ and final contact CTA. Repeated service
   sections were removed instead of padded with filler.
@@ -126,8 +128,9 @@ unsupported-claim language. Highest pairwise word-set similarity remained below
 
 ## I. Page and customer-journey QA
 
-- Homepage: final hierarchy, strong hero, product section immediately after hero,
-  concise trust strip, category discovery and non-duplicative support content.
+- Homepage: final brand-first hero hierarchy, product section immediately after
+  hero, concise trust strip, category discovery and non-duplicative support
+  content.
 - Catalog/category: six customer categories, correct localized counts, search,
   filter and sort behavior retained.
 - Product cards: complete linked surface, 53 approved photos, brand/model/category,
@@ -152,6 +155,11 @@ and 1440 px on homepage, catalog, category, chart-backed PDP, no-chart PDP,
 How to order, Delivery & payment, Contact and the expanded order drawer.
 
 - 192 page/viewport checks plus 24 expanded-drawer checks
+- After the owner correction, the restored brand-first hero was rechecked in
+  all three locales at 320, 390, 768, 1024 and 1440 px (15 additional checks):
+  `ANDRELOOK` remained the dominant H1, the approved image/crop/overlay and CTA
+  composition were preserved, and no overflow, broken image or console issue
+  was found.
 - Zero horizontal-overflow failures
 - Exactly one H1 on every checked page
 - No broken image, clipped control or unstable layout found
@@ -187,7 +195,8 @@ scroll on narrow viewports without causing page overflow.
 
 - Clean `npm ci`: passed.
 - Prettier, ESLint, strict TypeScript: passed.
-- Vitest: 21 files / 62 tests, all passed.
+- Vitest: 22 files / 65 tests, all passed, including the owner-approved
+  brand-first hero regression matrix.
 - Prisma schema and migration status: valid; all three migrations applied.
 - Migration generation: passed (582-line deterministic from-empty script).
 - Optimized Next.js production build: passed.
