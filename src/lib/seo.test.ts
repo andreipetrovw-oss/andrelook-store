@@ -81,8 +81,10 @@ describe("localized metadata", () => {
       url: "https://www.andrelook.store/en/catalog/jackets/maya",
     });
     expect(withPrice.offers).toMatchObject({
+      availability: "https://schema.org/PreOrder",
       price: "125.00",
       priceCurrency: "EUR",
     });
+    expect(withPrice.offers).not.toHaveProperty("priceValidUntil");
   });
 });

@@ -45,8 +45,8 @@ export type LaunchProduct = {
     sourceInternalId: string;
   } | null;
   preorderEstimateText: "2–3 weeks";
-  publicationStatus: "READY";
-  retailPriceMinor: null;
+  publicationStatus: "DRAFT" | "READY";
+  retailPriceMinor: number | null;
   sizeChart: {
     chartData: {
       measurements: Array<{
@@ -84,8 +84,11 @@ export type Phase6fLaunchCatalog = {
   summary: {
     imageCount: number;
     mappedSizeChartCount: number;
+    ownerApprovedPriceCount: number;
     productCount: number;
-    unresolvedSizeChartCount: number;
+    publicProductCount: number;
+    retiredPrivateProductCount: number;
+    unresolvedPublicSizeChartCount: number;
   };
   version: 1;
 };
@@ -114,18 +117,40 @@ export function assertPhase6fLaunchCatalog(
   );
   const slugs = new Set(catalog.products.map((product) => product.slug));
   const images = catalog.products.flatMap((product) => product.images);
-  const charts = catalog.products.filter((product) => product.sizeChart);
+  const publicProducts = catalog.products.filter(
+    (product) => product.publicationStatus === "READY",
+  );
+  const retiredProduct = catalog.products.find(
+    (product) => product.internalCode === "AL-LEGACY-006",
+  );
+  const charts = publicProducts.filter((product) => product.sizeChart);
+  const pricedProducts = publicProducts.filter(
+    (product) =>
+      Number.isInteger(product.retailPriceMinor) &&
+      (product.retailPriceMinor ?? 0) > 0,
+  );
   if (
     codes.size !== 23 ||
     slugs.size !== 23 ||
     images.length !== 53 ||
-    charts.length !== 17 ||
+    publicProducts.length !== 22 ||
+    charts.length !== 22 ||
+    pricedProducts.length !== 22 ||
+    !retiredProduct ||
+    retiredProduct.publicationStatus !== "DRAFT" ||
+    retiredProduct.retailPriceMinor !== null ||
+    retiredProduct.sizeChart !== null ||
+    catalog.summary?.productCount !== 23 ||
+    catalog.summary.publicProductCount !== 22 ||
+    catalog.summary.retiredPrivateProductCount !== 1 ||
+    catalog.summary.imageCount !== 53 ||
+    catalog.summary.ownerApprovedPriceCount !== 22 ||
+    catalog.summary.mappedSizeChartCount !== 22 ||
+    catalog.summary.unresolvedPublicSizeChartCount !== 0 ||
     catalog.products.some(
       (product) =>
         product.availabilityType !== "PRE_ORDER" ||
         product.preorderEstimateText !== "2–3 weeks" ||
-        product.publicationStatus !== "READY" ||
-        product.retailPriceMinor !== null ||
         product.currency !== "EUR" ||
         product.translations.length !== 3 ||
         !product.images.length,

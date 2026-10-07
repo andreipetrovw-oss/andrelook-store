@@ -124,10 +124,14 @@ async function importProduct(prisma: PrismaClient, source: LaunchProduct) {
     where: { internalCode: source.internalCode },
   });
 
+  const internalNotes =
+    source.publicationStatus === "DRAFT"
+      ? "Owner removed this product from the public launch catalog. The private record, provenance, assets, and historical references are preserved for possible future review."
+      : "Owner-approved EUR retail price and exact launch evidence completed for the public launch assortment.";
+
   await prisma.productPrivate.upsert({
     create: {
-      internalNotes:
-        "Phase 6F launch record reconstructed from the verified Phase 4 production catalog. Retail price requires owner approval before publication.",
+      internalNotes,
       productId: product.id,
       sourcePayload: json({
         legacyId: source.legacyId,
@@ -140,8 +144,7 @@ async function importProduct(prisma: PrismaClient, source: LaunchProduct) {
       sourceReviewStatus: "APPROVED",
     },
     update: {
-      internalNotes:
-        "Phase 6F launch record reconstructed from the verified Phase 4 production catalog. Retail price requires owner approval before publication.",
+      internalNotes,
       sourcePayload: json({
         legacyId: source.legacyId,
         masterImages: source.images.map((image) => ({

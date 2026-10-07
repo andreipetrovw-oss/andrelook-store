@@ -123,11 +123,11 @@ async function main() {
         continue;
       }
       if (
-        product.publicationStatus !== "READY" ||
+        product.publicationStatus !== source.publicationStatus ||
         product.availabilityType !== "PRE_ORDER" ||
         product.preorderEstimateText !== "2–3 weeks" ||
         product.currency !== "EUR" ||
-        product.retailPriceMinor !== null ||
+        product.retailPriceMinor !== source.retailPriceMinor ||
         product.slug !== source.slug ||
         product.brand?.displayName !== source.brand ||
         product.category?.slug !== source.category.slug ||
@@ -177,6 +177,10 @@ async function main() {
           !isDeepStrictEqual(chart.chartData, source.sizeChart.chartData) ||
           chart.evidence?.sourceAlbumId !==
             source.sizeChart.evidence.sourceAlbumId ||
+          chart.evidence?.sourceImagePosition !==
+            source.sizeChart.evidence.sourceImagePosition ||
+          chart.evidence?.sourceImageSha256 !==
+            source.sizeChart.evidence.sourceImageSha256 ||
           chart.evidence?.sourceImageUrl !==
             source.sizeChart.evidence.sourceImageUrl ||
           chart.evidence?.verification !==
@@ -205,19 +209,37 @@ async function main() {
         ),
       ),
     );
+    const publicLaunch = launch.filter(
+      (product) => product.publicationStatus === "READY",
+    );
+    const retired = launch.filter(
+      (product) => product.publicationStatus === "DRAFT",
+    );
+    if (publicLaunch.length !== 22)
+      problems.push(`public launch products: ${publicLaunch.length}/22`);
+    if (retired.length !== 1 || retired[0]?.internalCode !== "AL-LEGACY-006") {
+      problems.push("private retired product is not exactly AL-LEGACY-006");
+    }
+    if (problems.length) throw new Error(problems.join("\n"));
+
     const report = {
-      availability: { PRE_ORDER: launch.length },
-      launchProducts: launch.length,
-      launchProductsMissingOwnerPrice: launch.filter(
+      availability: { PRE_ORDER: publicLaunch.length },
+      catalogRecords: launch.length,
+      ownerApprovedPrices: publicLaunch.filter(
+        (product) => product.retailPriceMinor !== null,
+      ).length,
+      privateRetiredProducts: retired.map((product) => product.internalCode),
+      publicLaunchProducts: publicLaunch.length,
+      publicLaunchProductsMissingOwnerPrice: publicLaunch.filter(
         (product) => product.retailPriceMinor === null,
       ).length,
-      launchProductsWithColours: launch.filter(
+      publicLaunchProductsWithColours: publicLaunch.filter(
         (product) => product.colors.length,
       ).length,
-      launchProductsWithSelectableSizes: launch.filter(
+      publicLaunchProductsWithSelectableSizes: publicLaunch.filter(
         (product) => product.sizeChart,
       ).length,
-      launchProductsWithoutVerifiedChart: launch.filter(
+      publicLaunchProductsWithoutVerifiedChart: publicLaunch.filter(
         (product) => !product.sizeChart,
       ).length,
       publicLegacyImages: imageCount,
@@ -226,7 +248,9 @@ async function main() {
         .digest("hex"),
       supplierResearchProductsPreserved: supplierCount,
       supplierResearchProductsVisible: supplierReady,
-      verifiedSizeCharts: launch.filter((product) => product.sizeChart).length,
+      verifiedPublicSizeCharts: publicLaunch.filter(
+        (product) => product.sizeChart,
+      ).length,
     };
     console.log(JSON.stringify(report, null, 2));
   } finally {
