@@ -5,6 +5,7 @@ vi.mock("server-only", () => ({}));
 const mocks = vi.hoisted(() => ({
   count: vi.fn(),
   findMany: vi.fn(),
+  findUnique: vi.fn(),
   groupBy: vi.fn(),
   requireOwner: vi.fn(),
 }));
@@ -15,13 +16,19 @@ vi.mock("@/lib/db", () => ({
     order: {
       count: mocks.count,
       findMany: mocks.findMany,
+      findUnique: mocks.findUnique,
       groupBy: mocks.groupBy,
     },
     product: { findMany: mocks.findMany },
   }),
 }));
 
-import { getAdminCatalog, getAdminOrders, getAdminOverview } from "./query";
+import {
+  getAdminCatalog,
+  getAdminOrder,
+  getAdminOrders,
+  getAdminOverview,
+} from "./query";
 
 describe("owner CRM data boundary", () => {
   beforeEach(() => {
@@ -37,6 +44,20 @@ describe("owner CRM data boundary", () => {
       overdue: 1,
     });
     expect(mocks.requireOwner).toHaveBeenCalledOnce();
+    expect(mocks.groupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          displayNumber: { notIn: ["AL-20261007-3C7477"] },
+        },
+      }),
+    );
+    expect(mocks.count).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          displayNumber: { notIn: ["AL-20261007-3C7477"] },
+        }),
+      }),
+    );
   });
 
   it("applies search/status filters and calculates order balances", async () => {
@@ -44,17 +65,36 @@ describe("owner CRM data boundary", () => {
       {
         confirmedTotalMinor: 20_000,
         currency: "EUR",
+        displayNumber: "AL-REAL-CUSTOMER",
         payments: [{ amountMinor: 5_000, kind: "DEPOSIT" }],
       },
     ]);
     const orders = await getAdminOrders({ query: "Alice", status: "NEW" });
     expect(orders[0]!).toMatchObject({
       balanceMinor: 15_000,
+      isTest: false,
       paidMinor: 5_000,
     });
     expect(mocks.findMany.mock.calls[0]![0].where).toMatchObject({
       status: "NEW",
     });
+  });
+
+  it("keeps the acceptance order accessible and clearly classified", async () => {
+    mocks.findUnique.mockResolvedValue({
+      confirmedTotalMinor: 7_900,
+      currency: "EUR",
+      displayNumber: "AL-20261007-3C7477",
+      payments: [],
+    });
+
+    await expect(getAdminOrder("acceptance-order-id")).resolves.toMatchObject({
+      displayNumber: "AL-20261007-3C7477",
+      isTest: true,
+    });
+    expect(mocks.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "acceptance-order-id" } }),
+    );
   });
 
   it("fails before private catalog data is read when authorization fails", async () => {

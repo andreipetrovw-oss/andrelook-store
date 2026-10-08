@@ -1,64 +1,141 @@
-import { getAdminCatalog } from "@/lib/admin/query";
+import Link from "next/link";
+
+import {
+  getAdminCatalogOverview,
+  getAdminCatalogView,
+  type AdminCatalogView,
+} from "@/lib/admin/catalog-segmentation";
 import {
   availabilityTypeLabels,
   publicationStatusLabels,
   sourceReviewStatusLabels,
 } from "@/lib/admin/labels";
-import Link from "next/link";
+import { getAdminCatalog } from "@/lib/admin/query";
 
-export default async function AdminCatalogPage() {
-  const products = await getAdminCatalog();
-  const summary = {
-    availability: products.filter((product) => product.availabilityType).length,
-    charts: products.filter(
-      (product) => product.sizeChart?.reviewStatus === "APPROVED",
-    ).length,
-    content: products.filter(
-      (product) => product.contentComplete && product.slug,
-    ).length,
-    images: products.filter((product) => product.imageReady).length,
-    prices: products.filter(
-      (product) => product.retailPriceMinor !== null && product.currency,
-    ).length,
-  };
+const catalogViews: Array<{
+  href: string;
+  key: AdminCatalogView;
+  label: string;
+}> = [
+  { href: "/admin/catalog", key: "published", label: "Опубликованные" },
+  {
+    href: "/admin/catalog?view=drafts",
+    key: "drafts",
+    label: "Черновики",
+  },
+  {
+    href: "/admin/catalog?view=research",
+    key: "research",
+    label: "Исследовательская база",
+  },
+];
+
+export default async function AdminCatalogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const [products, filters] = await Promise.all([
+    getAdminCatalog(),
+    searchParams,
+  ]);
+  const view = getAdminCatalogView(filters.view);
+  const overview = getAdminCatalogOverview(products);
+  const visibleProducts = overview[view];
+  const publicTotal = overview.published.length;
+
   return (
     <>
       <span className="eyebrow">Закрытый каталог</span>
-      <h1>Готовность каталога</h1>
-      <div className="admin-cards admin-cards-catalog">
+      <h1>Каталог</h1>
+      <section aria-labelledby="catalog-readiness-title">
+        <div className="admin-section-heading">
+          <div>
+            <span className="eyebrow">Готовность к работе</span>
+            <h2 id="catalog-readiness-title">Публичный каталог</h2>
+          </div>
+          <strong className="admin-readiness-total">
+            {overview.ready}/{publicTotal} готовы
+          </strong>
+        </div>
+        <div className="admin-cards admin-cards-catalog">
+          <article className="admin-card admin-card-primary">
+            <span>Публичный каталог</span>
+            <p>
+              {overview.ready}/{publicTotal}
+            </p>
+            <small>готовы к продаже</small>
+          </article>
+          <article className="admin-card">
+            <span>Карточки и контент</span>
+            <p>
+              {overview.metrics.content}/{publicTotal}
+            </p>
+          </article>
+          <article className="admin-card">
+            <span>Розничные цены</span>
+            <p>
+              {overview.metrics.prices}/{publicTotal}
+            </p>
+          </article>
+          <article className="admin-card">
+            <span>Таблицы размеров</span>
+            <p>
+              {overview.metrics.charts}/{publicTotal}
+            </p>
+          </article>
+          <article className="admin-card">
+            <span>Публичные изображения</span>
+            <p>
+              {overview.metrics.images}/{publicTotal}
+            </p>
+          </article>
+          <article className="admin-card">
+            <span>Наличие</span>
+            <p>
+              {overview.metrics.availability}/{publicTotal}
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <div className="admin-catalog-groups">
         <article className="admin-card">
-          <span>Заполненные карточки</span>
-          <p>
-            {summary.content}/{products.length}
-          </p>
+          <strong>Исследовательская база</strong>
+          <p>{overview.research.length}</p>
+          <small>записей</small>
         </article>
         <article className="admin-card">
-          <span>Проверенные таблицы размеров</span>
-          <p>
-            {summary.charts}/{products.length}
-          </p>
-        </article>
-        <article className="admin-card">
-          <span>Розничные цены</span>
-          <p>
-            {summary.prices}/{products.length}
-          </p>
-        </article>
-        <article className="admin-card">
-          <span>Статусы наличия</span>
-          <p>
-            {summary.availability}/{products.length}
-          </p>
-        </article>
-        <article className="admin-card">
-          <span>Одобренные изображения</span>
-          <p>
-            {summary.images}/{products.length}
-          </p>
+          <strong>Приватные / архивные</strong>
+          <p>{overview.drafts.length}</p>
+          <small>запись (Tibb сохранён)</small>
         </article>
       </div>
+
+      <nav aria-label="Разделы каталога" className="admin-tabs">
+        {catalogViews.map((item) => (
+          <Link
+            aria-current={view === item.key ? "page" : undefined}
+            href={item.href}
+            key={item.key}
+          >
+            {item.label}
+            <span>
+              {item.key === "published"
+                ? overview.published.length
+                : item.key === "drafts"
+                  ? overview.drafts.length
+                  : overview.research.length}
+            </span>
+          </Link>
+        ))}
+      </nav>
+
       <div className="admin-table-wrap" tabIndex={0}>
         <table className="admin-table">
+          <caption className="sr-only">
+            {catalogViews.find((item) => item.key === view)?.label}
+          </caption>
           <thead>
             <tr>
               <th>Товар</th>
@@ -72,7 +149,7 @@ export default async function AdminCatalogPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {visibleProducts.map((product) => (
               <tr key={product.id}>
                 <td>
                   <strong>
@@ -120,6 +197,9 @@ export default async function AdminCatalogPage() {
           </tbody>
         </table>
       </div>
+      {!visibleProducts.length ? (
+        <p className="admin-empty">В этом разделе пока нет записей.</p>
+      ) : null}
     </>
   );
 }

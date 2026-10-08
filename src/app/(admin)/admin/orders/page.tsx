@@ -67,6 +67,9 @@ export default async function AdminOrdersPage({
                   <Link href={`/admin/orders/${order.id}`}>
                     {order.displayNumber}
                   </Link>
+                  {order.isTest ? (
+                    <span className="admin-test-badge">Тестовый заказ</span>
+                  ) : null}
                 </td>
                 <td>{order.customer.name}</td>
                 <td>{order.items[0]?.productNameSnapshot ?? "—"}</td>

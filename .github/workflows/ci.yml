@@ -16,6 +16,7 @@ on:
       - commercial-data-completion
       - production-cutover
       - final-storefront-perfection
+      - codex/business-readiness-closeout
 
 permissions:
   contents: read

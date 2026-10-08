@@ -6,13 +6,20 @@ import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 import { calculateFinancials } from "@/lib/orders/financials";
 
+import { businessOrderWhere, isInternalTestOrder } from "./test-orders";
+
 export async function getAdminOverview() {
   await requireOwner();
   const prisma = getPrisma();
   const [groups, overdue] = await Promise.all([
-    prisma.order.groupBy({ by: ["status"], _count: { _all: true } }),
+    prisma.order.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+      where: businessOrderWhere,
+    }),
     prisma.order.count({
       where: {
+        ...businessOrderWhere,
         nextActionAt: { lt: new Date() },
         status: { notIn: ["DELIVERED", "CANCELLED"] },
       },
@@ -77,6 +84,7 @@ export async function getAdminOrders(filters: {
   return orders.map((order) => ({
     ...order,
     ...calculateFinancials(order.confirmedTotalMinor, order.payments),
+    isTest: isInternalTestOrder(order.displayNumber),
   }));
 }
 
@@ -96,6 +104,7 @@ export async function getAdminOrder(id: string) {
     ? {
         ...order,
         ...calculateFinancials(order.confirmedTotalMinor, order.payments),
+        isTest: isInternalTestOrder(order.displayNumber),
       }
     : null;
 }
@@ -134,7 +143,7 @@ export async function getAdminCatalog() {
   });
   return products.map((product) => ({
     ...product,
-    contentComplete: product._count.translations === 3,
+    contentComplete: product._count.translations === 3 && Boolean(product.slug),
     imageReady: product._count.images > 0,
     sizeReady: Boolean(
       product.sizeChart?.reviewStatus === "APPROVED" &&

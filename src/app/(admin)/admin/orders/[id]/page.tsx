@@ -31,7 +31,14 @@ export default async function AdminOrderPage({
   return (
     <>
       <span className="eyebrow">{order.displayNumber}</span>
-      <h1>{order.customer.name}</h1>
+      <div className="admin-title-row">
+        <h1>{order.customer.name}</h1>
+        {order.isTest ? (
+          <span className="admin-test-badge admin-test-badge-large">
+            Тестовый заказ
+          </span>
+        ) : null}
+      </div>
       <div className="order-detail-grid">
         <section className="admin-panel">
           <h2>Клиент и контакт</h2>

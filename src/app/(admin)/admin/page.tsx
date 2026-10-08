@@ -16,6 +16,10 @@ export default async function AdminOverviewPage() {
     <>
       <span className="eyebrow">Только для владельца</span>
       <h1>Обзор</h1>
+      <p className="admin-overview-note">
+        Показатели учитывают только реальные обращения. Тестовые заказы
+        сохранены в истории, но исключены из рабочих показателей.
+      </p>
       <div className="admin-cards">
         {cards.map(([status, label]) => (
           <Link
