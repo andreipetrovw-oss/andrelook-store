@@ -11,6 +11,7 @@ import {
   sourceReviewStatusLabels,
 } from "@/lib/admin/labels";
 import { getAdminCatalog } from "@/lib/admin/query";
+import { getServerConfig } from "@/lib/env";
 
 const catalogViews: Array<{
   href: string;
@@ -40,7 +41,9 @@ export default async function AdminCatalogPage({
     searchParams,
   ]);
   const view = getAdminCatalogView(filters.view);
-  const overview = getAdminCatalogOverview(products);
+  const overview = getAdminCatalogOverview(products, {
+    includeReady: getServerConfig().storefrontReviewMode,
+  });
   const visibleProducts = overview[view];
   const publicTotal = overview.published.length;
 

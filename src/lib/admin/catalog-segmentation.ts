@@ -21,22 +21,27 @@ export function getAdminCatalogView(value?: string): AdminCatalogView {
 
 export function getAdminCatalogSection(
   product: Pick<CatalogProductReadiness, "internalCode" | "publicationStatus">,
+  options: { includeReady?: boolean } = {},
 ): AdminCatalogView {
   if (product.internalCode.startsWith("AL-SRC-")) return "research";
-  return product.publicationStatus === "PUBLISHED" ? "published" : "drafts";
+  const isOperational =
+    product.publicationStatus === "PUBLISHED" ||
+    (options.includeReady && product.publicationStatus === "READY");
+  return isOperational ? "published" : "drafts";
 }
 
 export function getAdminCatalogOverview<T extends CatalogProductReadiness>(
   products: T[],
+  options: { includeReady?: boolean } = {},
 ) {
   const published = products.filter(
-    (product) => getAdminCatalogSection(product) === "published",
+    (product) => getAdminCatalogSection(product, options) === "published",
   );
   const drafts = products.filter(
-    (product) => getAdminCatalogSection(product) === "drafts",
+    (product) => getAdminCatalogSection(product, options) === "drafts",
   );
   const research = products.filter(
-    (product) => getAdminCatalogSection(product) === "research",
+    (product) => getAdminCatalogSection(product, options) === "research",
   );
 
   const metrics = {

@@ -65,4 +65,15 @@ describe("owner catalog presentation", () => {
       "drafts",
     );
   });
+
+  it("counts READY launch products only in an isolated review environment", () => {
+    const readyProduct = product("AL-LEGACY-001", "READY");
+    expect(getAdminCatalogSection(readyProduct)).toBe("drafts");
+    expect(getAdminCatalogSection(readyProduct, { includeReady: true })).toBe(
+      "published",
+    );
+    expect(
+      getAdminCatalogOverview([readyProduct], { includeReady: true }).ready,
+    ).toBe(1);
+  });
 });
