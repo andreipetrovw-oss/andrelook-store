@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { CategoryNavigation } from "@/components/category-navigation";
-import {
-  CatalogExperience,
-  type CatalogParams,
-} from "@/components/catalog-experience";
+import { CatalogExperience } from "@/components/catalog-experience";
 import Link from "next/link";
-import { isLocale } from "@/config/locales";
+import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import {
   getPublicCategories,
@@ -22,12 +20,28 @@ import {
   localizedOpenGraph,
 } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 type Props = {
   params: Promise<{ categorySlug: string; locale: string }>;
-  searchParams: Promise<CatalogParams>;
 };
+
+export async function generateStaticParams() {
+  if (!isDatabaseConfigured()) return [];
+  const scope = storefrontScope();
+  const entries = await Promise.all(
+    locales.map(async (locale) => {
+      const categories = await getPublicCategories(locale, scope);
+      return categories.flatMap((category) =>
+        category.children.map((child) => ({
+          categorySlug: child.slug,
+          locale,
+        })),
+      );
+    }),
+  );
+  return entries.flat();
+}
 
 function categoryDescription(locale: "ru" | "et" | "en", name: string) {
   return {
@@ -71,11 +85,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params, searchParams }: Props) {
+export default async function CategoryPage({ params }: Props) {
   const { categorySlug, locale } = await params;
   if (!isLocale(locale)) notFound();
   const dictionary = getDictionary(locale);
-  const filters = await searchParams;
   const scope = storefrontScope();
   const [products, categories] = isDatabaseConfigured()
     ? await Promise.all([
@@ -113,13 +126,16 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           locale={locale}
         />
       </div>
-      <CatalogExperience
-        basePath={`/${locale}/catalog/${categorySlug}`}
-        dictionary={dictionary}
-        locale={locale}
-        params={filters}
-        products={products}
-      />
+      <Suspense
+        fallback={<div aria-busy="true" className="container loading-line" />}
+      >
+        <CatalogExperience
+          basePath={`/${locale}/catalog/${categorySlug}`}
+          dictionary={dictionary}
+          locale={locale}
+          products={products}
+        />
+      </Suspense>
     </>
   );
 }

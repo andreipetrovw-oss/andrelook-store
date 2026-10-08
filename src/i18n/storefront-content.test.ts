@@ -31,4 +31,13 @@ describe("owner-approved brand-first hero", () => {
       expect(getDictionary(locale).tagline).toBe(expected[locale].tagline);
     },
   );
+
+  it("contains no incomplete size-chart or internal editorial language", () => {
+    for (const locale of ["ru", "et", "en"] as const) {
+      const serialized = JSON.stringify(getStorefrontContent(locale));
+      expect(serialized).not.toMatch(
+        /ANDRELOOK EDIT|без таблиц|таблица пока недоступна|tabelit pole|tabel pole veel|without a chart|chart is not yet available/i,
+      );
+    }
+  });
 });

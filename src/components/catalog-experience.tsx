@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -42,15 +45,18 @@ export function CatalogExperience({
   basePath,
   dictionary,
   locale,
-  params,
   products,
 }: {
   basePath: string;
   dictionary: Dictionary;
   locale: Locale;
-  params: CatalogParams;
   products: PublicProductDto[];
 }) {
+  const searchParams = useSearchParams();
+  const params = {
+    q: searchParams.get("q") ?? undefined,
+    sort: searchParams.get("sort") ?? undefined,
+  } satisfies CatalogParams;
   const content = getStorefrontContent(locale);
   const visibleProducts = filterAndSortProducts(products, params);
   const hasFilters = Boolean(params.q || params.sort);

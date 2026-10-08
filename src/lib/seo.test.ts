@@ -86,5 +86,8 @@ describe("localized metadata", () => {
       priceCurrency: "EUR",
     });
     expect(withPrice.offers).not.toHaveProperty("priceValidUntil");
+    expect(withPrice.image).toEqual([
+      "https://www.andrelook.store/products/example.webp",
+    ]);
   });
 });

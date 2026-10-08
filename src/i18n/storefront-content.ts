@@ -64,17 +64,17 @@ const content: Record<Locale, StorefrontContent> = {
     },
     commerce: {
       availableExplanation: "Эту модель можно заказать сейчас.",
-      detailsPending: "Цена готовится к публикации",
+      detailsPending: "Уточнить детали",
       inStockExplanation: "Модель готова к заказу.",
       preorderExplanation:
         "Предзаказ · ориентировочно 2–3 недели · доставка по Европе.",
-      priceOnRequest: "Цена будет добавлена перед публикацией",
+      priceOnRequest: "Уточнить детали",
       unavailableExplanation:
         "Сейчас модель недоступна. Свяжитесь с нами, чтобы узнать о следующем поступлении.",
     },
     home: {
       assistanceBody:
-        "Сверьте параметры в таблице модели. Если таблица пока недоступна или вы сомневаетесь, напишите нам — поможем с выбором.",
+        "Сверьте параметры с таблицей выбранной модели. Если сомневаетесь между размерами - напишите нам, поможем определиться до оформления заказа.",
       assistanceTitle: "Поможем выбрать размер",
       categoriesIntro:
         "Утеплённые куртки, жилеты, кардиганы, свитшоты и футболки — по категориям, без лишнего поиска.",
@@ -85,7 +85,7 @@ const content: Record<Locale, StorefrontContent> = {
       contactBody:
         "Напишите в Telegram, Instagram или по электронной почте — ответим на русском, эстонском или английском.",
       contactTitle: "Поможем с выбором",
-      editorialLabel: "ANDRELOOK EDIT",
+      editorialLabel: "ВЫБОР ANDRELOOK",
       eyebrow: "ANDRELOOK · TALLINN",
       faq: [
         {
@@ -150,8 +150,8 @@ const content: Record<Locale, StorefrontContent> = {
       serviceTitle: "Персональный сервис из Таллинна",
       sizeMark: "РАЗМЕР",
       sizingPoints: [
-        "Таблица размеров рядом с моделью",
-        "Личная помощь для моделей без таблицы",
+        "Таблица размеров у каждой модели",
+        "Помощь, если сомневаетесь между размерами",
         "Вопрос о посадке можно добавить к предзаказу",
       ],
       stateIntro:
@@ -171,7 +171,7 @@ const content: Record<Locale, StorefrontContent> = {
       orderContext: "Оформление предзаказа",
       requestLabel: "Оформить предзаказ",
       returnsSummary:
-        "Условия возврата или обмена для вашего заказа сообщаются до подтверждения оплаты.",
+        "Общий порядок описан на странице «Возврат и обмен». Применимые к заказу условия подтвердим до оплаты.",
       sizeGuideAvailable: "Есть таблица размеров",
       sizeGuideUnavailable: "Поможем выбрать размер",
       sizingLabel: "Размеры",
@@ -185,18 +185,18 @@ const content: Record<Locale, StorefrontContent> = {
     },
     commerce: {
       availableExplanation: "Seda toodet saab praegu tellida.",
-      detailsPending: "Hind lisatakse enne avaldamist",
+      detailsPending: "Küsi lisateavet",
       inStockExplanation: "Toode on tellimiseks valmis.",
       preorderExplanation:
         "Eeltellimus · eeldatavalt 2–3 nädalat · tarne üle Euroopa.",
-      priceOnRequest: "Hind lisatakse enne avaldamist",
+      priceOnRequest: "Küsi lisateavet",
       unavailableExplanation:
         "Toode ei ole praegu saadaval. Järgmise võimaluse kohta küsi meilt.",
     },
     home: {
       assistanceBody:
-        "Võrdle mõõte toote suurustabeliga. Kui tabelit veel pole või kahtled valikus, kirjuta meile — aitame.",
-      assistanceTitle: "Aitame suurust valida",
+        "Võrdle oma mõõte valitud mudeli suurustabeliga. Kui kahtled kahe suuruse vahel, kirjuta meile - aitame enne tellimuse esitamist otsustada.",
+      assistanceTitle: "Aitame valida õige suuruse",
       categoriesIntro:
         "Soojad joped, vestid, kardiganid, dressipluusid ja T-särgid on jaotatud selgetesse kategooriatesse.",
       categoriesTitle: "Vali kategooria",
@@ -206,7 +206,7 @@ const content: Record<Locale, StorefrontContent> = {
       contactBody:
         "Kirjuta Telegramis, Instagramis või e-posti teel — vastame eesti, vene või inglise keeles.",
       contactTitle: "Aitame valikut teha",
-      editorialLabel: "ANDRELOOK EDIT",
+      editorialLabel: "ANDRELOOKI VALIK",
       eyebrow: "ANDRELOOK · TALLINN",
       faq: [
         {
@@ -271,8 +271,8 @@ const content: Record<Locale, StorefrontContent> = {
       serviceTitle: "Personaalne teenindus Tallinnast",
       sizeMark: "SUURUS",
       sizingPoints: [
-        "Suurustabel on toote juures",
-        "Abi, kui tabel pole veel saadaval",
+        "Suurustabel iga mudeli juures",
+        "Abi kahe suuruse vahel valimisel",
         "Istuvuse küsimuse saab lisada eeltellimusele",
       ],
       stateIntro:
@@ -292,7 +292,7 @@ const content: Record<Locale, StorefrontContent> = {
       orderContext: "Eeltellimuse vormistamine",
       requestLabel: "Vormista eeltellimus",
       returnsSummary:
-        "Sinu tellimusele kehtivad tagastus- või vahetustingimused teatatakse enne makse kinnitamist.",
+        "Üldine kord on kirjas lehel „Tagastus ja vahetus“. Sinu tellimusele kehtivad tingimused kinnitame enne maksmist.",
       sizeGuideAvailable: "Suurustabel olemas",
       sizeGuideUnavailable: "Aitame suurust valida",
       sizingLabel: "Suurused",
@@ -306,18 +306,18 @@ const content: Record<Locale, StorefrontContent> = {
     },
     commerce: {
       availableExplanation: "This piece is ready to order.",
-      detailsPending: "Price pending publication",
+      detailsPending: "Contact us for details",
       inStockExplanation: "This piece is ready to order.",
       preorderExplanation:
         "Pre-order · approximately 2–3 weeks · delivery across Europe.",
-      priceOnRequest: "Price will be added before publication",
+      priceOnRequest: "Contact us for details",
       unavailableExplanation:
         "This piece is not currently available. Contact us about the next opportunity.",
     },
     home: {
       assistanceBody:
-        "Compare the chart with a similar piece you own. If a chart is not yet available or you are unsure, message us for help.",
-      assistanceTitle: "Personal sizing help",
+        "Compare your measurements with the chart for your chosen piece. If you’re between sizes, message us and we’ll help before you submit your order.",
+      assistanceTitle: "We’ll help you choose the right size",
       categoriesIntro:
         "Puffer jackets, gilets, cardigans, sweatshirts and T-shirts, arranged for effortless browsing.",
       categoriesTitle: "Shop by category",
@@ -327,7 +327,7 @@ const content: Record<Locale, StorefrontContent> = {
       contactBody:
         "Message us on Telegram, Instagram or email — we reply in English, Estonian or Russian.",
       contactTitle: "Let us help you choose",
-      editorialLabel: "ANDRELOOK EDIT",
+      editorialLabel: "ANDRELOOK SELECTION",
       eyebrow: "ANDRELOOK · TALLINN",
       faq: [
         {
@@ -392,8 +392,8 @@ const content: Record<Locale, StorefrontContent> = {
       serviceTitle: "Personal service from Tallinn",
       sizeMark: "SIZE",
       sizingPoints: [
-        "Size chart beside the product",
-        "Personal help for pieces without a chart",
+        "A size guide for every piece",
+        "Help when you’re between sizes",
         "Add a fit question to your pre-order",
       ],
       stateIntro:
@@ -413,7 +413,7 @@ const content: Record<Locale, StorefrontContent> = {
       orderContext: "Complete your pre-order",
       requestLabel: "Pre-order",
       returnsSummary:
-        "The return or exchange terms that apply to your order are shared before payment is confirmed.",
+        "The general process is explained on the Returns & exchanges page. We confirm the terms that apply to your order before payment.",
       sizeGuideAvailable: "Size chart available",
       sizeGuideUnavailable: "Personal sizing help",
       sizingLabel: "Sizing",

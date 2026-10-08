@@ -2,6 +2,8 @@ import { clerkMiddleware } from "@clerk/nextjs/server";
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { routeNeedsClerk } from "@/lib/auth/routing";
+
 const clerkProxy = clerkMiddleware();
 
 function hostname(request: NextRequest) {
@@ -64,6 +66,10 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
   }
 
   if (process.env.AUTH_PROVIDER !== "clerk") {
+    return NextResponse.next();
+  }
+
+  if (!routeNeedsClerk(path, isCrmHost)) {
     return NextResponse.next();
   }
 

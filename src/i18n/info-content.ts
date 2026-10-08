@@ -51,7 +51,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Выберите модель",
-          body: "Откройте страницу товара, посмотрите фотографии, доступные цвета и таблицу размеров. Если таблицы нет, выберите личную помощь с размером.",
+          body: "Откройте страницу товара, посмотрите фотографии и доступные цвета, затем сверьте параметры с таблицей размеров модели. Если сомневаетесь, добавьте вопрос о посадке к предзаказу.",
         },
         {
           title: "Отправьте заявку",
@@ -135,7 +135,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "Как выбрать размер?",
-          body: "Используйте таблицу на странице модели. Если таблица пока недоступна, мы поможем подобрать размер лично.",
+          body: "Сверьте параметры с таблицей на странице модели. Если сомневаетесь между размерами или в посадке, напишите нам - поможем выбрать.",
         },
         {
           title: "Как проходит оплата?",
@@ -253,7 +253,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Vali toode",
-          body: "Vaata tootelehel fotosid, värve ja suurustabelit. Kui tabelit pole, küsi suuruse valikul abi.",
+          body: "Vaata tootelehel fotosid ja värve ning võrdle oma mõõte mudeli suurustabeliga. Kui kahtled, lisa eeltellimusele küsimus istuvuse kohta.",
         },
         {
           title: "Saada tellimus",
@@ -337,7 +337,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "Kuidas suurust valida?",
-          body: "Kasuta tootelehe suurustabelit. Kui tabel ei ole veel saadaval, aitame sobiva suuruse valida.",
+          body: "Võrdle oma mõõte tootelehe suurustabeliga. Kui kahtled kahe suuruse vahel või istuvuses, kirjuta meile - aitame valida.",
         },
         {
           title: "Kuidas maksmine toimub?",
@@ -455,7 +455,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
       sections: [
         {
           title: "Choose your piece",
-          body: "Review the product photography, colours and size guide. If no chart is available, choose personal sizing help.",
+          body: "Review the product photography and colours, then compare your measurements with the size guide for the piece. If you are unsure, add a fit question to your pre-order.",
         },
         {
           title: "Send your request",
@@ -539,7 +539,7 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         },
         {
           title: "How do I choose a size?",
-          body: "Use the chart on the product page. If a chart is not yet available, we’ll help you choose the right size personally.",
+          body: "Compare your measurements with the size guide on the product page. If you are between sizes or unsure about the fit, message us and we’ll help you choose.",
         },
         {
           title: "How does payment work?",

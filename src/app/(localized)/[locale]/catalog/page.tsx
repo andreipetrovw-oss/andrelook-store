@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
-import {
-  CatalogExperience,
-  type CatalogParams,
-} from "@/components/catalog-experience";
+import { CatalogExperience } from "@/components/catalog-experience";
 import { CategoryNavigation } from "@/components/category-navigation";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -21,7 +19,7 @@ import {
   localizedOpenGraph,
 } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -53,10 +51,8 @@ export async function generateMetadata({
 
 export default async function CatalogPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<CatalogParams>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) {
@@ -64,7 +60,6 @@ export default async function CatalogPage({
   }
 
   const dictionary = getDictionary(locale);
-  const filters = await searchParams;
   const scope = storefrontScope();
   const [products, categories] = isDatabaseConfigured()
     ? await Promise.all([
@@ -89,13 +84,16 @@ export default async function CatalogPage({
           locale={locale}
         />
       </div>
-      <CatalogExperience
-        basePath={`/${locale}/catalog`}
-        dictionary={dictionary}
-        locale={locale}
-        params={filters}
-        products={products}
-      />
+      <Suspense
+        fallback={<div aria-busy="true" className="container loading-line" />}
+      >
+        <CatalogExperience
+          basePath={`/${locale}/catalog`}
+          dictionary={dictionary}
+          locale={locale}
+          products={products}
+        />
+      </Suspense>
     </>
   );
 }

@@ -19,7 +19,7 @@ export function SiteFooter({
             alt="Andrelook"
             className="footer-logo"
             height={302}
-            loading="eager"
+            sizes="(max-width: 640px) 114px, 160px"
             src="/brand/logo.png"
             width={476}
           />

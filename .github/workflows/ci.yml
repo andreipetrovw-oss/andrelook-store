@@ -15,6 +15,7 @@ on:
       - phase6f3-final-storefront
       - commercial-data-completion
       - production-cutover
+      - final-storefront-perfection
 
 permissions:
   contents: read
@@ -45,4 +46,7 @@ jobs:
       - run: npm run test:run
       - run: npm run db:validate
       - run: npm run db:migration:script
-      - run: npm run build
+      # Vercel builds pre-render the public catalog with its environment-bound
+      # database. CI intentionally verifies the no-database build path after
+      # schema and migration checks above.
+      - run: DATABASE_URL= npm run build

@@ -293,7 +293,6 @@ export function RequestForm({
   productName,
   productVersion,
   preorderTime,
-  requestKey,
   sizes,
 }: {
   availability: "IN_STOCK" | "PRE_ORDER" | "UNAVAILABLE" | null;
@@ -306,7 +305,6 @@ export function RequestForm({
   productName: string;
   productVersion: string;
   preorderTime: string;
-  requestKey: string;
   sizes: string[];
 }) {
   const labels = copy[locale];
@@ -328,6 +326,7 @@ export function RequestForm({
   } = useProductInteraction();
   const formRef = useRef<HTMLFormElement>(null);
   const panelRef = useRef<HTMLElement>(null);
+  const requestKeyRef = useRef<HTMLInputElement>(null);
   const successRef = useRef<HTMLElement>(null);
 
   const selectedColour = colours.find((item) => item.code === colour)?.name;
@@ -522,11 +521,20 @@ export function RequestForm({
         </div>
         <h2>{dictionary.requestTitle}</h2>
         <p>{dictionary.requestIntro}</p>
-        <form action={action} className="request-form" ref={formRef}>
+        <form
+          action={action}
+          className="request-form"
+          onSubmit={() => {
+            if (requestKeyRef.current && !requestKeyRef.current.value) {
+              requestKeyRef.current.value = crypto.randomUUID();
+            }
+          }}
+          ref={formRef}
+        >
           <input name="locale" type="hidden" value={locale} />
           <input name="productId" type="hidden" value={productId} />
           <input name="productVersion" type="hidden" value={productVersion} />
-          <input name="requestKey" type="hidden" value={requestKey} />
+          <input name="requestKey" ref={requestKeyRef} type="hidden" />
           {campaignFields.map((name) => (
             <input defaultValue="" key={name} name={name} type="hidden" />
           ))}

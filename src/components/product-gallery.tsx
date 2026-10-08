@@ -207,6 +207,7 @@ export function ProductGallery({
               >
                 <Image
                   alt={image.alt}
+                  fetchPriority={index === 0 ? "high" : undefined}
                   fill
                   loading={index === 0 ? undefined : "lazy"}
                   preload={index === 0}

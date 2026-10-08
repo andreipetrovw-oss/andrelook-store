@@ -72,6 +72,7 @@ export function productStructuredData({
   priceMinor: number | null;
   url: string;
 }) {
+  const productionOrigin = new URL(url).origin;
   const offer =
     availability && currency && priceMinor !== null
       ? {
@@ -92,7 +93,7 @@ export function productStructuredData({
     "@type": "Product",
     brand: brand ? { "@type": "Brand", name: brand } : undefined,
     description: description ?? undefined,
-    image: images,
+    image: images.map((image) => new URL(image, productionOrigin).toString()),
     name,
     offers: offer,
     url,

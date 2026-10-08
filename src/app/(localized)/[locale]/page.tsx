@@ -21,7 +21,7 @@ import {
   localizedOpenGraph,
 } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 const homeMetadata = {
   en: {
@@ -210,6 +210,7 @@ export default async function LocalizedHome({
         <Image
           alt=""
           className="hero-image"
+          fetchPriority="high"
           fill
           preload
           sizes="100vw"

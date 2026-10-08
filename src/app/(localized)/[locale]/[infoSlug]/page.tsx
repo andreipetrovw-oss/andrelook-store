@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { isLocale } from "@/config/locales";
+import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getInfoPage, infoPageSlugs } from "@/i18n/info-content";
 import {
@@ -13,6 +13,12 @@ import {
 } from "@/lib/seo";
 
 type Props = { params: Promise<{ infoSlug: string; locale: string }> };
+
+export function generateStaticParams() {
+  return locales.flatMap((locale) =>
+    infoPageSlugs.map((infoSlug) => ({ infoSlug, locale })),
+  );
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { infoSlug, locale } = await params;

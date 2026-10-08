@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,17 +10,18 @@ import { ProductInteractionProvider } from "@/components/product-interaction-con
 import { MobileProductCta } from "@/components/mobile-product-cta";
 import { RequestForm } from "@/components/request-form";
 import { SizeGuide } from "@/components/size-guide";
-import { isLocale } from "@/config/locales";
+import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getStorefrontContent } from "@/i18n/storefront-content";
 import {
+  getPublicCatalog,
   getPublicCategoryProducts,
   getPublicProduct,
 } from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
 import { parseSizeChart } from "@/lib/catalog/size-chart";
 import { getProductDisplayName } from "@/lib/catalog/presentation";
-import { getServerConfig } from "@/lib/env";
+import { getServerConfig, isDatabaseConfigured } from "@/lib/env";
 import {
   brandedTitle,
   indexingRobots,
@@ -31,7 +30,7 @@ import {
   productStructuredData,
 } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 type Props = {
   params: Promise<{
@@ -40,6 +39,22 @@ type Props = {
     productSlug: string;
   }>;
 };
+
+export async function generateStaticParams() {
+  if (!isDatabaseConfigured()) return [];
+  const scope = storefrontScope();
+  const entries = await Promise.all(
+    locales.map(async (locale) => {
+      const products = await getPublicCatalog(locale, scope);
+      return products.map((product) => ({
+        categorySlug: product.category.slug,
+        locale,
+        productSlug: product.slug,
+      }));
+    }),
+  );
+  return entries.flat();
+}
 
 const getCachedProduct = cache(
   (locale: "ru" | "et" | "en", categorySlug: string, productSlug: string) =>
@@ -393,7 +408,6 @@ export default async function ProductPage({ params }: Props) {
                 productName={displayName}
                 productVersion={product.version}
                 preorderTime={preorderTime}
-                requestKey={randomUUID()}
                 sizes={sizes}
               />
             </aside>

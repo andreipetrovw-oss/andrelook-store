@@ -76,16 +76,25 @@ export default async function LocalizedLayout({
   }
 
   const dictionary = getDictionary(locale);
+  const siteUrl = getServerConfig().siteUrl;
   const organization = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    areaServed: "Europe",
+    contactPoint: {
+      "@type": "ContactPoint",
+      availableLanguage: ["Estonian", "Russian", "English"],
+      contactType: "customer service",
+      email: "info.andrelook@gmail.com",
+    },
     email: "info.andrelook@gmail.com",
+    logo: new URL("/brand/logo.png", siteUrl).toString(),
     name: "Andrelook",
     sameAs: [
       "https://t.me/andrelookstore",
       "https://www.instagram.com/andrelook.store/",
     ],
-    url: new URL(`/${locale}`, getServerConfig().siteUrl).toString(),
+    url: siteUrl.origin,
   };
   return (
     <html

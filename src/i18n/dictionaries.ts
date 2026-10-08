@@ -165,7 +165,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     overview: "Обзор",
     personalService: "Andrelook на связи",
     price: "Цена",
-    pricePending: "Цена готовится к публикации",
+    pricePending: "Уточнить детали",
     productInformation: "Важная информация",
     requestAction: "Оформить предзаказ",
     requestIntro:
@@ -196,7 +196,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       "Сравните мерки с похожей вещью, которая хорошо на вас сидит. Если сомневаетесь, попросите помочь с размером.",
     sizeGuidePending: "Нужна помощь с размером?",
     sizeGuideUnitUnknown:
-      "Единица измерения не указана в исходной таблице; значения приведены без интерпретации.",
+      "Размеры приведены по исходной таблице модели. Если сомневаетесь в замерах или посадке, напишите нам - поможем подобрать размер.",
     storefrontKicker: "Andrelook · Tallinn",
     submit: "Отправить предзаказ",
     submitting: "Отправляем…",
@@ -210,8 +210,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     categoryContext:
       "Отобранные модели этой категории. Наличие и детали подтверждаются лично.",
     needHelp: "Нужна помощь?",
-    relatedProducts: "Другие модели",
-    selectedProducts: "Выбранные модели",
+    relatedProducts: "Ещё из коллекции",
+    selectedProducts: "Выбор Andrelook",
     whyAndrelook: "Почему Andrelook",
     trustClarity: "Аккаунт не нужен, автоматическая оплата не производится.",
     trustSupport: "Личная помощь с размером, наличием и деталями до заказа.",
@@ -277,7 +277,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     overview: "Ülevaade",
     personalService: "Andrelook aitab",
     price: "Hind",
-    pricePending: "Hind lisatakse enne avaldamist",
+    pricePending: "Küsi lisateavet",
     productInformation: "Oluline teave",
     requestAction: "Esita eeltellimus",
     requestIntro:
@@ -308,7 +308,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       "Võrdle mõõte hästi istuva sarnase riideesemega. Kahtluse korral küsi suuruse valikul abi.",
     sizeGuidePending: "Vajad suuruse valikul abi?",
     sizeGuideUnitUnknown:
-      "Mõõtühikut ei ole lähtetabelis märgitud; väärtused on esitatud muutmata kujul.",
+      "Mõõdud on esitatud mudeli lähtetabeli alusel. Kui kahtlete mõõtudes või istuvuses, kirjutage meile - aitame sobiva suuruse valida.",
     storefrontKicker: "Andrelook · Tallinn",
     submit: "Saada eeltellimus",
     submitting: "Saadan…",
@@ -322,8 +322,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     categoryContext:
       "Selle kategooria valitud mudelid. Saadavus ja detailid kinnitatakse isiklikult.",
     needHelp: "Vajad abi?",
-    relatedProducts: "Teised mudelid",
-    selectedProducts: "Valitud mudelid",
+    relatedProducts: "Veel kollektsioonist",
+    selectedProducts: "Andrelooki valik",
     whyAndrelook: "Miks Andrelook",
     trustClarity: "Kontot pole vaja ja automaatset makset ei tehta.",
     trustSupport:
@@ -389,7 +389,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     overview: "Overview",
     personalService: "Talk to Andrelook",
     price: "Price",
-    pricePending: "Price pending publication",
+    pricePending: "Contact us for details",
     productInformation: "Important information",
     requestAction: "Pre-order this piece",
     requestIntro:
@@ -420,7 +420,7 @@ const dictionaries: Record<Locale, Dictionary> = {
       "Compare the measurements with a similar piece that fits you well. Ask for personal sizing help if you are unsure.",
     sizeGuidePending: "Need help choosing a size?",
     sizeGuideUnitUnknown:
-      "The source chart does not state a measurement unit; values are shown without interpretation.",
+      "Measurements are shown according to the original size table for this model. If you're unsure about the measurements or fit, contact us and we'll help you choose the right size.",
     storefrontKicker: "Andrelook · Tallinn",
     submit: "Send pre-order",
     submitting: "Sending…",
@@ -434,8 +434,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     categoryContext:
       "A considered selection from this category. Availability and details are confirmed personally.",
     needHelp: "Need help?",
-    relatedProducts: "Other pieces",
-    selectedProducts: "Selected pieces",
+    relatedProducts: "More from the collection",
+    selectedProducts: "Andrelook selection",
     whyAndrelook: "Why Andrelook",
     trustClarity: "No account is required and no automatic payment is taken.",
     trustSupport:

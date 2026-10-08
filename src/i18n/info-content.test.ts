@@ -30,7 +30,7 @@ describe("localized information architecture", () => {
       const faq = getInfoPage(locale, "faq");
       expect(faq?.sections).toHaveLength(8);
       expect(JSON.stringify(faq)).not.toMatch(
-        /price missing|not yet published|catalog version|six pieces|kuue tabelita|шести модел/i,
+        /price missing|not yet published|catalog version|six pieces|kuue tabelita|шести модел|chart is not yet available|таблица пока недоступна|tabel ei ole veel saadaval/i,
       );
     }
   });
