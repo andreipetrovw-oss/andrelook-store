@@ -1549,6 +1549,7 @@ button:disabled {
 
 .ordering-steps h3,
 .service-trust-grid h3,
+.product-service-grid h2,
 .product-service-grid h3 {
   font-family: var(--font-editorial);
   font-size: 1.65rem;
@@ -1920,6 +1921,7 @@ button:disabled {
   padding: 1.25rem;
 }
 
+.product-service-grid h2,
 .product-service-grid h3 {
   margin-top: 2.5rem;
 }

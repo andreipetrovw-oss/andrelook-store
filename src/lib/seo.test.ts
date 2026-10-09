@@ -4,10 +4,13 @@ vi.mock("server-only", () => ({}));
 
 import {
   brandedTitle,
+  faqPageStructuredData,
   indexingRobots,
   localizedAlternates,
   localizedOpenGraph,
+  organizationStructuredData,
   productStructuredData,
+  websiteStructuredData,
 } from "./seo";
 
 const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -89,5 +92,46 @@ describe("localized metadata", () => {
     expect(withPrice.image).toEqual([
       "https://www.andrelook.store/products/example.webp",
     ]);
+  });
+
+  it("emits stable factual Organization and WebSite entities", () => {
+    const siteUrl = new URL("https://www.andrelook.store");
+    const organization = organizationStructuredData(siteUrl);
+    const website = websiteStructuredData(siteUrl);
+
+    expect(organization).toMatchObject({
+      "@id": "https://www.andrelook.store/#organization",
+      "@type": "Organization",
+      email: "info.andrelook@gmail.com",
+      name: "Andrelook",
+      url: "https://www.andrelook.store",
+    });
+    expect(organization).not.toHaveProperty("address");
+    expect(organization).not.toHaveProperty("legalName");
+    expect(organization).not.toHaveProperty("telephone");
+    expect(website).toEqual({
+      "@context": "https://schema.org",
+      "@id": "https://www.andrelook.store/#website",
+      "@type": "WebSite",
+      inLanguage: ["et", "ru", "en"],
+      name: "Andrelook",
+      publisher: { "@id": "https://www.andrelook.store/#organization" },
+      url: "https://www.andrelook.store",
+    });
+  });
+
+  it("maps visible FAQ copy without adding claims", () => {
+    expect(
+      faqPageStructuredData([{ body: "Visible answer", title: "Question?" }]),
+    ).toMatchObject({
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          acceptedAnswer: { "@type": "Answer", text: "Visible answer" },
+          name: "Question?",
+        },
+      ],
+    });
   });
 });

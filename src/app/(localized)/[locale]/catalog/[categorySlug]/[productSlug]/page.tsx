@@ -250,9 +250,16 @@ export default async function ProductPage({ params }: Props) {
             />
             <div className="product-summary">
               <div className="product-identity-line">
-                <span className="eyebrow">
-                  {product.brand?.name ?? product.category.name}
-                </span>
+                {product.brand ? (
+                  <Link
+                    className="eyebrow"
+                    href={`/${locale}/brands/${product.brand.slug}`}
+                  >
+                    {product.brand.name}
+                  </Link>
+                ) : (
+                  <span className="eyebrow">{product.category.name}</span>
+                )}
                 <span className={`status-pill ${statusClass}`}>
                   {availability}
                 </span>

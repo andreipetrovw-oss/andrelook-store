@@ -17,6 +17,7 @@ on:
       - production-cutover
       - final-storefront-perfection
       - codex/business-readiness-closeout
+      - growth-g1-seo-geo
 
 permissions:
   contents: read

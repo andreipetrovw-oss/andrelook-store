@@ -28,6 +28,8 @@ export function SiteFooter({
         <div>
           <h2>{dictionary.footerCustomerCare}</h2>
           <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
+          <Link href={`/${locale}/brands/moncler`}>Moncler</Link>
+          <Link href={`/${locale}/brands/parajumpers`}>Parajumpers</Link>
           <Link href={`/${locale}/how-to-order`}>{dictionary.howToOrder}</Link>
           <Link href={`/${locale}/delivery-payment`}>
             {dictionary.deliveryPayment}

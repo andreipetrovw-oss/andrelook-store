@@ -144,6 +144,28 @@ export async function getPublicCategoryProducts(
   });
 }
 
+export async function getPublicBrandProducts(
+  locale: Locale,
+  brandSlug: string,
+  scope: StorefrontScope = "public",
+): Promise<PublicProductDto[]> {
+  const products = await getPrisma().product.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: publicProductSelect,
+    where: {
+      AND: [
+        storefrontProductWhere(locale, scope),
+        { brand: { is: { slug: brandSlug } } },
+      ],
+    },
+  });
+
+  return products.flatMap((product) => {
+    const dto = mapRecord(product, locale, scope);
+    return dto ? [dto] : [];
+  });
+}
+
 export async function getPublicProduct(
   locale: Locale,
   categorySlug: string,

@@ -8,6 +8,13 @@ import {
 } from "@/config/locales";
 import { getServerConfig } from "@/lib/env";
 
+export const canonicalEntityName = "Andrelook";
+
+export const publicSocialProfiles = [
+  "https://t.me/andrelookstore",
+  "https://www.instagram.com/andrelook.store/",
+] as const;
+
 const openGraphLocales: Record<Locale, string> = {
   en: "en_GB",
   et: "et_EE",
@@ -97,5 +104,64 @@ export function productStructuredData({
     name,
     offers: offer,
     url,
+  };
+}
+
+export function organizationStructuredData(siteUrl: URL) {
+  const origin = siteUrl.origin;
+  return {
+    "@context": "https://schema.org",
+    "@id": `${origin}/#organization`,
+    "@type": "Organization",
+    areaServed: [
+      { "@type": "City", name: "Tallinn" },
+      { "@type": "Country", name: "Estonia" },
+      { "@type": "Place", name: "Europe" },
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      availableLanguage: ["Estonian", "Russian", "English"],
+      contactType: "customer service",
+      email: "info.andrelook@gmail.com",
+    },
+    description:
+      "Andrelook is a Tallinn-based pre-order fashion service with a curated selection of Moncler and Parajumpers products, personal sizing support and delivery in Europe.",
+    email: "info.andrelook@gmail.com",
+    logo: {
+      "@type": "ImageObject",
+      contentUrl: new URL("/brand/logo.png", siteUrl).toString(),
+      height: 302,
+      width: 476,
+    },
+    name: canonicalEntityName,
+    sameAs: [...publicSocialProfiles],
+    url: origin,
+  };
+}
+
+export function websiteStructuredData(siteUrl: URL) {
+  const origin = siteUrl.origin;
+  return {
+    "@context": "https://schema.org",
+    "@id": `${origin}/#website`,
+    "@type": "WebSite",
+    inLanguage: ["et", "ru", "en"],
+    name: canonicalEntityName,
+    publisher: { "@id": `${origin}/#organization` },
+    url: origin,
+  };
+}
+
+export function faqPageStructuredData(
+  sections: Array<{ body: string; title: string }>,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: sections.map((section) => ({
+      "@type": "Question",
+      acceptedAnswer: { "@type": "Answer", text: section.body },
+      name: section.title,
+    })),
   };
 }

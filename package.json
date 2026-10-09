@@ -22,6 +22,7 @@
     "prepare:phase6f": "tsx scripts/prepare-phase6f-launch.ts",
     "prepare:commercial-data": "tsx scripts/prepare-commercial-data.ts",
     "import:phase6f": "tsx scripts/import-phase6f-launch.ts",
+    "indexnow:submit": "tsx scripts/submit-indexnow.ts",
     "promote:production": "tsx scripts/promote-production-catalog.ts",
     "verify:phase6f-data": "tsx scripts/verify-phase6f-staging.ts",
     "verify:phase6f-orders": "tsx scripts/verify-phase6f-orders.ts",

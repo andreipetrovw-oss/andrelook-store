@@ -7,6 +7,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getInfoPage, infoPageSlugs } from "@/i18n/info-content";
 import {
   brandedTitle,
+  faqPageStructuredData,
   indexingRobots,
   localizedAlternates,
   localizedOpenGraph,
@@ -49,12 +50,25 @@ export default async function InformationPage({ params }: Props) {
   const page = getInfoPage(locale, infoSlug);
   if (!page) notFound();
   const dictionary = getDictionary(locale);
+  const faqStructuredData =
+    infoSlug === "faq" ? faqPageStructuredData(page.sections) : null;
   const navigation = infoPageSlugs.flatMap((slug) => {
     const item = getInfoPage(locale, slug);
     return item ? [{ slug, title: item.title }] : [];
   });
   return (
     <article className="information-page">
+      {faqStructuredData ? (
+        <script
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqStructuredData).replaceAll(
+              "<",
+              "\\u003c",
+            ),
+          }}
+          type="application/ld+json"
+        />
+      ) : null}
       <header className="information-hero">
         <div className="container narrow-container">
           <span className="eyebrow">{page.eyebrow}</span>

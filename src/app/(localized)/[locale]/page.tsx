@@ -14,11 +14,12 @@ import {
   getPublicCategories,
 } from "@/lib/catalog/public-query";
 import { storefrontScope } from "@/lib/catalog/scope";
-import { isDatabaseConfigured } from "@/lib/env";
+import { getServerConfig, isDatabaseConfigured } from "@/lib/env";
 import {
   indexingRobots,
   localizedAlternates,
   localizedOpenGraph,
+  websiteStructuredData,
 } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -203,9 +204,16 @@ export default async function LocalizedHome({
   const dictionary = getDictionary(locale);
   const content = getStorefrontContent(locale);
   const scope = storefrontScope();
+  const website = websiteStructuredData(getServerConfig().siteUrl);
 
   return (
     <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(website).replaceAll("<", "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
       <section className="hero home-hero">
         <Image
           alt=""

@@ -1,0 +1,40 @@
+# Andrelook
+
+Andrelook is a Tallinn-based pre-order fashion service with a curated public selection of Moncler and Parajumpers products. Andrelook provides personal sizing support, handover in Tallinn and delivery in Europe. Public service is available in Estonian, Russian and English.
+
+Canonical website: https://www.andrelook.store
+
+## Estonian
+
+- Home: https://www.andrelook.store/et
+- Catalog: https://www.andrelook.store/et/catalog
+- How to order: https://www.andrelook.store/et/how-to-order
+- Delivery and payment: https://www.andrelook.store/et/delivery-payment
+- Pre-order: https://www.andrelook.store/et/pre-order
+- FAQ: https://www.andrelook.store/et/faq
+- About: https://www.andrelook.store/et/about
+- Contact: https://www.andrelook.store/et/contact
+
+## Russian
+
+- Home: https://www.andrelook.store/ru
+- Catalog: https://www.andrelook.store/ru/catalog
+- How to order: https://www.andrelook.store/ru/how-to-order
+- Delivery and payment: https://www.andrelook.store/ru/delivery-payment
+- Pre-order: https://www.andrelook.store/ru/pre-order
+- FAQ: https://www.andrelook.store/ru/faq
+- About: https://www.andrelook.store/ru/about
+- Contact: https://www.andrelook.store/ru/contact
+
+## English
+
+- Home: https://www.andrelook.store/en
+- Catalog: https://www.andrelook.store/en/catalog
+- How to order: https://www.andrelook.store/en/how-to-order
+- Delivery and payment: https://www.andrelook.store/en/delivery-payment
+- Pre-order: https://www.andrelook.store/en/pre-order
+- FAQ: https://www.andrelook.store/en/faq
+- About: https://www.andrelook.store/en/about
+- Contact: https://www.andrelook.store/en/contact
+
+Submitting a request does not charge payment or automatically complete a purchase. Availability, timing, payment, delivery and the conditions applicable to an order are confirmed personally before payment.
