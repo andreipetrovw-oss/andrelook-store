@@ -8,10 +8,10 @@ const label = {
   ru: "Настройки приватности",
 } satisfies Record<Locale, string>;
 
-export function PrivacySettingsButton({ locale }: { locale: Locale }) {
+export function FooterPrivacySettingsButton({ locale }: { locale: Locale }) {
   return (
     <button
-      className="privacy-settings-trigger"
+      className="footer-privacy-settings-trigger"
       onClick={() =>
         window.dispatchEvent(new Event("andrelook:privacy-settings"))
       }

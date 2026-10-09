@@ -3669,7 +3669,7 @@ button:disabled {
   text-underline-offset: 0.2em;
 }
 
-.privacy-settings-trigger {
+.footer-privacy-settings-trigger {
   background: transparent;
   border: 0;
   color: inherit;
