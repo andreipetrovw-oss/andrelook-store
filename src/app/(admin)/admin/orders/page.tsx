@@ -8,15 +8,18 @@ import {
   orderStatusLabels,
   russianDate,
 } from "@/lib/admin/labels";
+import { trafficSourceLabels } from "@/lib/admin/traffic-labels";
+import { trafficSources } from "@/lib/attribution/types";
 
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; source?: string; status?: string }>;
 }) {
   const filters = await searchParams;
   const orders = await getAdminOrders({
     query: filters.q,
+    source: filters.source,
     status: filters.status,
   });
   return (
@@ -31,6 +34,17 @@ export default async function AdminOrdersPage({
             name="q"
             placeholder="Номер, клиент или товар"
           />
+        </label>
+        <label>
+          <span>Источник</span>
+          <select defaultValue={filters.source ?? ""} name="source">
+            <option value="">Все источники</option>
+            {trafficSources.map((source) => (
+              <option key={source} value={source}>
+                {trafficSourceLabels[source]}
+              </option>
+            ))}
+          </select>
         </label>
         <label>
           <span>Статус</span>
@@ -74,7 +88,11 @@ export default async function AdminOrdersPage({
                 <td>{order.customer.name}</td>
                 <td>{order.items[0]?.productNameSnapshot ?? "—"}</td>
                 <td>{orderStatusLabels[order.status]}</td>
-                <td>{acquisitionChannelLabels[order.acquisitionChannel]}</td>
+                <td>
+                  {order.source
+                    ? trafficSourceLabels[order.source.source]
+                    : acquisitionChannelLabels[order.acquisitionChannel]}
+                </td>
                 <td>
                   {order.notification
                     ? notificationStatusLabels[order.notification.status]

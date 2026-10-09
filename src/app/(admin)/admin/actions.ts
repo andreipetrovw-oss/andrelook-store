@@ -40,6 +40,25 @@ const productCommercialSchema = z.object({
   retailPrice: z.string().trim().max(20),
 });
 
+const spendSchema = z.object({
+  amount: z.coerce.number().positive().max(1_000_000),
+  campaignName: z.string().trim().max(200).optional(),
+  date: z.iso.date(),
+  source: z.enum(["META_ADS", "GOOGLE_ADS"]),
+});
+
+const statusBusinessEvent = {
+  AWAITING_PAYMENT: "AWAITING_PAYMENT",
+  CANCELLED: "CANCELLED",
+  CONFIRMED: "LEAD_CONFIRMED",
+  CONTACTED: "LEAD_CONTACTED",
+  DELIVERED: "DELIVERED",
+  IN_TRANSIT: "IN_TRANSIT",
+  ORDERED: "ORDERED",
+  PAID: "PAID",
+  READY: "READY",
+} as const;
+
 async function adminId() {
   const identity = await requireOwner();
   const admin = await getPrisma().adminUser.upsert({
@@ -66,7 +85,12 @@ export async function updateOrderStatus(formData: FormData) {
   const prisma = getPrisma();
   await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUniqueOrThrow({
-      select: { status: true },
+      select: {
+        confirmedTotalMinor: true,
+        currency: true,
+        items: { select: { quantity: true, unitPriceMinor: true } },
+        status: true,
+      },
       where: { id: parsed.data.orderId },
     });
     if (order.status === parsed.data.status) return;
@@ -84,6 +108,35 @@ export async function updateOrderStatus(formData: FormData) {
       },
       where: { id: parsed.data.orderId },
     });
+    if (parsed.data.status === "PAID") {
+      const itemTotal = order.items.every(
+        (item) => item.unitPriceMinor !== null,
+      )
+        ? order.items.reduce(
+            (sum, item) => sum + item.unitPriceMinor! * item.quantity,
+            0,
+          )
+        : null;
+      await tx.orderBusinessEvent.upsert({
+        create: {
+          amountMinor: order.confirmedTotalMinor ?? itemTotal,
+          currency: order.currency,
+          eventKey: `paid:${parsed.data.orderId}`,
+          eventType: "PAID",
+          orderId: parsed.data.orderId,
+        },
+        update: {},
+        where: { eventKey: `paid:${parsed.data.orderId}` },
+      });
+    } else if (parsed.data.status !== "NEW") {
+      await tx.orderBusinessEvent.create({
+        data: {
+          eventKey: `status:${parsed.data.orderId}:${parsed.data.status}:${crypto.randomUUID()}`,
+          eventType: statusBusinessEvent[parsed.data.status],
+          orderId: parsed.data.orderId,
+        },
+      });
+    }
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
@@ -107,6 +160,41 @@ export async function recordPayment(formData: FormData) {
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
+}
+
+export async function recordAdvertisingSpend(formData: FormData) {
+  const parsed = spendSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid advertising spend entry.");
+  const recordedByAdminId = await adminId();
+  const prisma = getPrisma();
+  const campaign = parsed.data.campaignName
+    ? await prisma.campaign.upsert({
+        create: {
+          campaignName: parsed.data.campaignName,
+          source: parsed.data.source,
+        },
+        update: {},
+        where: {
+          source_campaignName: {
+            campaignName: parsed.data.campaignName,
+            source: parsed.data.source,
+          },
+        },
+      })
+    : null;
+  await prisma.adSpend.create({
+    data: {
+      campaignId: campaign?.id,
+      campaignName: parsed.data.campaignName || null,
+      currency: "EUR",
+      date: new Date(`${parsed.data.date}T00:00:00.000Z`),
+      importSource: "MANUAL",
+      recordedByAdminId,
+      source: parsed.data.source,
+      spendMinor: Math.round(parsed.data.amount * 100),
+    },
+  });
+  revalidatePath("/admin/advertising");
 }
 
 export async function retryOrderNotification(formData: FormData) {

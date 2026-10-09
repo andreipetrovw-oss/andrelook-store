@@ -40,6 +40,7 @@ export async function submitOrderRequest(
     const result = await createOrderRequest(parsed.data, {
       initialReferrer: referrer?.slice(0, 1000) ?? null,
       landingPath,
+      siteHost: requestHeaders.get("host"),
     });
     if (!result.duplicate) {
       try {

@@ -4,6 +4,8 @@ import Link from "next/link";
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 
+import { PrivacySettingsButton } from "./privacy-settings-button";
+
 export function SiteFooter({
   dictionary,
   locale,
@@ -63,6 +65,7 @@ export function SiteFooter({
           <Link href={`/${locale}/about`}>{dictionary.about}</Link>
           <Link href={`/${locale}/privacy`}>{dictionary.privacy}</Link>
           <Link href={`/${locale}/terms`}>{dictionary.terms}</Link>
+          <PrivacySettingsButton locale={locale} />
         </div>
       </div>
       <div className="container footer-bottom">

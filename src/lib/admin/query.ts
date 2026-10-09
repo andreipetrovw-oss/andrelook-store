@@ -5,6 +5,7 @@ import { OrderStatus, Prisma } from "@prisma/client";
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 import { calculateFinancials } from "@/lib/orders/financials";
+import { buildAdvertisingRows } from "@/lib/measurement/reporting";
 
 import { businessOrderWhere, isInternalTestOrder } from "./test-orders";
 
@@ -35,6 +36,7 @@ export async function getAdminOverview() {
 
 export async function getAdminOrders(filters: {
   query?: string;
+  source?: string;
   status?: string;
 }) {
   await requireOwner();
@@ -66,6 +68,19 @@ export async function getAdminOrders(filters: {
     orderBy: { orderDate: "desc" },
     select: {
       acquisitionChannel: true,
+      attribution: {
+        select: {
+          touches: {
+            orderBy: { occurredAt: "desc" },
+            select: {
+              campaignName: true,
+              source: true,
+              sourceGroup: true,
+              touchType: true,
+            },
+          },
+        },
+      },
       confirmedTotalMinor: true,
       currency: true,
       customer: { select: { name: true } },
@@ -81,11 +96,23 @@ export async function getAdminOrders(filters: {
     take: 200,
     where,
   });
-  return orders.map((order) => ({
-    ...order,
-    ...calculateFinancials(order.confirmedTotalMinor, order.payments),
-    isTest: isInternalTestOrder(order.displayNumber),
-  }));
+  return orders
+    .map((order) => ({
+      ...order,
+      ...calculateFinancials(order.confirmedTotalMinor, order.payments),
+      isTest: isInternalTestOrder(order.displayNumber),
+      source:
+        order.attribution?.touches.find(
+          (touch) => touch.touchType === "LAST",
+        ) ??
+        order.attribution?.touches.find(
+          (touch) => touch.touchType === "FIRST",
+        ) ??
+        null,
+    }))
+    .filter(
+      (order) => !filters.source || order.source?.source === filters.source,
+    );
 }
 
 export async function getAdminOrder(id: string) {
@@ -93,6 +120,10 @@ export async function getAdminOrder(id: string) {
   const order = await getPrisma().order.findUnique({
     include: {
       customer: true,
+      attribution: {
+        include: { touches: { orderBy: { occurredAt: "asc" } } },
+      },
+      businessEvents: { orderBy: { occurredAt: "asc" } },
       items: true,
       notification: true,
       payments: { orderBy: { receivedAt: "desc" } },
@@ -107,6 +138,79 @@ export async function getAdminOrder(id: string) {
         isTest: isInternalTestOrder(order.displayNumber),
       }
     : null;
+}
+
+export async function getAdvertisingReport(input: { from: Date; to: Date }) {
+  await requireOwner();
+  const prisma = getPrisma();
+  const [orders, spend] = await Promise.all([
+    prisma.order.findMany({
+      select: {
+        attribution: {
+          select: {
+            touches: {
+              select: {
+                campaignName: true,
+                source: true,
+                sourceGroup: true,
+                touchType: true,
+              },
+            },
+          },
+        },
+        businessEvents: {
+          select: {
+            amountMinor: true,
+            eventKey: true,
+            eventType: true,
+            occurredAt: true,
+          },
+          where: { occurredAt: { gte: input.from, lt: input.to } },
+        },
+        displayNumber: true,
+        orderDate: true,
+        status: true,
+      },
+      where: {
+        ...businessOrderWhere,
+        OR: [
+          { orderDate: { gte: input.from, lt: input.to } },
+          {
+            businessEvents: {
+              some: { occurredAt: { gte: input.from, lt: input.to } },
+            },
+          },
+        ],
+      },
+    }),
+    prisma.adSpend.findMany({
+      select: {
+        campaignName: true,
+        date: true,
+        source: true,
+        spendMinor: true,
+      },
+      where: { date: { gte: input.from, lt: input.to } },
+    }),
+  ]);
+  return buildAdvertisingRows({
+    from: input.from,
+    orders: orders.map((order) => {
+      const touch =
+        order.attribution?.touches.find((item) => item.touchType === "LAST") ??
+        order.attribution?.touches.find((item) => item.touchType === "FIRST") ??
+        null;
+      return {
+        displayNumber: order.displayNumber,
+        events: order.businessEvents,
+        orderDate: order.orderDate,
+        status: order.status,
+        touch,
+      };
+    }),
+    spend,
+    to: input.to,
+  });
 }
 
 export async function getAdminCatalog() {

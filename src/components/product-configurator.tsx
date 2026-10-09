@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
+import { trackPublicEvent } from "@/lib/measurement/client";
 
 import { useProductInteraction } from "./product-interaction-context";
 
@@ -123,7 +124,10 @@ export function ProductConfigurator({
           <button
             aria-pressed={size === SIZE_HELP_VALUE}
             className="option-chip sizing-help-chip"
-            onClick={() => setSize(SIZE_HELP_VALUE)}
+            onClick={() => {
+              setSize(SIZE_HELP_VALUE);
+              trackPublicEvent("size_help");
+            }}
             type="button"
           >
             {labels.help}

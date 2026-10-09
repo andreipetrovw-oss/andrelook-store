@@ -5,6 +5,12 @@ import { randomBytes } from "node:crypto";
 import { Prisma } from "@prisma/client";
 
 import { databaseLocale } from "@/config/locales";
+import {
+  orderAttributionForStorage,
+  parseOrderAttribution,
+  safeContextualAttribution,
+} from "@/lib/attribution/server";
+import type { AttributionTouchData } from "@/lib/attribution/types";
 import { getPrisma } from "@/lib/db";
 import { getServerConfig } from "@/lib/env";
 
@@ -39,31 +45,30 @@ function displayNumber() {
 export type RequestContext = {
   initialReferrer: string | null;
   landingPath: string | null;
+  siteHost?: string | null;
 };
 
-function acquisitionChannel(input: RequestOrderInput, referrer: string | null) {
-  const source = input.utmSource?.toLowerCase() ?? "";
-  const medium = input.utmMedium?.toLowerCase() ?? "";
-  const referringHost = (() => {
-    try {
-      return referrer ? new URL(referrer).hostname.toLowerCase() : "";
-    } catch {
-      return "";
-    }
-  })();
-  if (
-    input.utmCampaign ||
-    ["cpc", "paid", "paid_social", "social_paid"].includes(medium) ||
-    ["meta", "facebook_ads", "instagram_ads"].includes(source)
-  ) {
+function acquisitionChannel(source: AttributionTouchData["source"]) {
+  if (source === "META_ADS" || source === "GOOGLE_ADS") {
     return "ADVERTISING" as const;
   }
-  if (source.includes("instagram") || referringHost.includes("instagram.com")) {
-    return "INSTAGRAM" as const;
-  }
-  if (source.includes("marketplace")) return "MARKETPLACE" as const;
-  if (source || referrer) return "REFERRAL" as const;
-  return "DIRECT" as const;
+  if (source === "INSTAGRAM_ORGANIC") return "INSTAGRAM" as const;
+  if (source === "MARKETPLACE") return "MARKETPLACE" as const;
+  if (source === "DIRECT") return "DIRECT" as const;
+  if (source === "OTHER" || source === "UNKNOWN") return "OTHER" as const;
+  return "REFERRAL" as const;
+}
+
+function touchForCreate(
+  touch: AttributionTouchData,
+  touchType: "FIRST" | "LAST",
+) {
+  return {
+    ...touch,
+    locale: databaseLocale[touch.locale],
+    occurredAt: new Date(touch.occurredAt),
+    touchType,
+  };
 }
 
 export async function createOrderRequest(
@@ -145,6 +150,16 @@ export async function createOrderRequest(
     phone: input.phone ?? null,
     telegramHandle: input.contactMethod === "TELEGRAM" ? socialHandle : null,
   };
+  const attribution = orderAttributionForStorage(
+    parseOrderAttribution(input.orderAttribution),
+    safeContextualAttribution({
+      landingPath: context.landingPath,
+      locale: input.locale,
+      referrer: context.initialReferrer,
+      siteHost: context.siteHost ?? null,
+    }),
+  );
+  const lastTouch = attribution.lastTouch ?? attribution.firstTouch;
 
   try {
     const order = await prisma.$transaction(async (tx) => {
@@ -159,10 +174,7 @@ export async function createOrderRequest(
       });
       const created = await tx.order.create({
         data: {
-          acquisitionChannel: acquisitionChannel(
-            input,
-            input.initialReferrer ?? context.initialReferrer,
-          ),
+          acquisitionChannel: acquisitionChannel(lastTouch.source),
           addressLine1:
             input.fulfilmentMethod === "DELIVERY"
               ? (input.addressLine1 ?? null)
@@ -185,9 +197,9 @@ export async function createOrderRequest(
           customerId: customer.id,
           displayNumber: displayNumber(),
           fulfilmentMethod: input.fulfilmentMethod,
-          initialReferrer: input.initialReferrer ?? context.initialReferrer,
+          initialReferrer: attribution.firstTouch.referrer,
           internalNotes: input.comment ?? null,
-          landingPath: input.landingPath ?? context.landingPath,
+          landingPath: attribution.firstTouch.landingPage,
           paymentPreference: input.paymentPreference,
           postalCode:
             input.fulfilmentMethod === "DELIVERY"
@@ -211,12 +223,35 @@ export async function createOrderRequest(
               unitPriceMinor: product.retailPriceMinor,
             },
           },
+          attribution: {
+            create: {
+              analyticsConsent: attribution.analyticsConsent,
+              attributionWindowDays: 30,
+              consentVersion: attribution.consentVersion,
+              marketingConsent: attribution.marketingConsent,
+              touches: {
+                create: [
+                  touchForCreate(attribution.firstTouch, "FIRST"),
+                  ...(attribution.lastTouch
+                    ? [touchForCreate(attribution.lastTouch, "LAST")]
+                    : []),
+                ],
+              },
+            },
+          },
+          businessEvents: {
+            create: {
+              currency: product.currency,
+              eventKey: `lead:${input.requestKey}`,
+              eventType: "LEAD_CREATED",
+            },
+          },
           statusHistory: { create: { toStatus: "NEW" } },
-          utmCampaign: input.utmCampaign ?? null,
-          utmContent: input.utmContent ?? null,
-          utmMedium: input.utmMedium ?? null,
-          utmSource: input.utmSource ?? null,
-          utmTerm: input.utmTerm ?? null,
+          utmCampaign: lastTouch.utmCampaign,
+          utmContent: lastTouch.utmContent,
+          utmMedium: lastTouch.utmMedium,
+          utmSource: lastTouch.utmSource,
+          utmTerm: lastTouch.utmTerm,
         },
         select: { displayNumber: true, id: true },
       });

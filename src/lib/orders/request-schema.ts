@@ -36,6 +36,7 @@ export const requestOrderSchema = z
     lastName: optionalText(80),
     locale: z.enum(locales),
     measurements: optionalText(500),
+    orderAttribution: optionalText(15_000),
     paymentPreference: z.enum([
       "DEPOSIT_30_BALANCE_ON_HANDOVER",
       "FULL_ADVANCE",
@@ -137,6 +138,7 @@ export function requestOrderInput(formData: FormData) {
     lastName: formData.get("lastName"),
     locale: formData.get("locale"),
     measurements: formData.get("measurements"),
+    orderAttribution: formData.get("orderAttribution"),
     paymentPreference: formData.get("paymentPreference"),
     phone: formData.get("phone"),
     postalCode: formData.get("postalCode"),

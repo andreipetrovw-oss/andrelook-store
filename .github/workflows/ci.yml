@@ -18,6 +18,7 @@ on:
       - final-storefront-perfection
       - codex/business-readiness-closeout
       - growth-g1-seo-geo
+      - growth-g2-measurement-attribution
 
 permissions:
   contents: read

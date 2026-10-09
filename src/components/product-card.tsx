@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import type { Locale } from "@/config/locales";
 import { getStorefrontContent } from "@/i18n/storefront-content";
@@ -7,6 +6,7 @@ import type { PublicProductDto } from "@/lib/catalog/public-dto";
 import { getProductDisplayName } from "@/lib/catalog/presentation";
 
 import { ProductPlaceholder } from "./product-placeholder";
+import { TrackedProductLink } from "./measurement-events";
 
 function formatAdditionalColours(locale: Locale, count: number) {
   if (locale === "et") return count === 1 ? "värv" : "värvi";
@@ -63,10 +63,21 @@ export function ProductCard({
 
   return (
     <article className="product-card">
-      <Link
-        aria-label={product.name}
+      <TrackedProductLink
+        ariaLabel={product.name}
         className="product-card-link"
         href={`/${locale}/catalog/${product.category.slug}/${product.slug}`}
+        item={{
+          currency: product.currency,
+          item_brand: product.brand?.name ?? null,
+          item_category: product.category.name,
+          item_id: product.id,
+          item_name: displayName,
+          price:
+            product.retailPriceMinor === null
+              ? null
+              : product.retailPriceMinor / 100,
+        }}
       >
         <div className="product-card-image">
           {primaryImage ? (
@@ -127,7 +138,7 @@ export function ProductCard({
             <span className="product-card-cta">{dictionary.viewProduct} ↗</span>
           </div>
         </div>
-      </Link>
+      </TrackedProductLink>
     </article>
   );
 }

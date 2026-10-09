@@ -63,6 +63,65 @@ enum AcquisitionChannel {
   OTHER
 }
 
+enum TrafficSource {
+  UNKNOWN
+  META_ADS
+  GOOGLE_ADS
+  INSTAGRAM_ORGANIC
+  FACEBOOK_ORGANIC
+  TELEGRAM
+  GOOGLE_ORGANIC
+  BING_ORGANIC
+  AI_CHATGPT
+  REFERRAL
+  DIRECT
+  OTHER
+  EMAIL
+  PARTNER
+  MARKETPLACE
+}
+
+enum SourceGroup {
+  PAID
+  ORGANIC
+  OWNED
+  REFERRAL
+  DIRECT
+  OTHER
+  UNKNOWN
+}
+
+enum AttributionTouchType {
+  FIRST
+  LAST
+}
+
+enum BusinessEventType {
+  LEAD_CREATED
+  LEAD_CONTACTED
+  LEAD_CONFIRMED
+  AWAITING_PAYMENT
+  PAID
+  ORDERED
+  IN_TRANSIT
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+enum CampaignStatus {
+  UNKNOWN
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
+enum SpendImportSource {
+  MANUAL
+  CSV
+  API
+}
+
 enum PaymentKind {
   DEPOSIT
   BALANCE
@@ -387,6 +446,8 @@ model Order {
   items               OrderItem[]
   payments            Payment[]
   statusHistory       OrderStatusHistory[]
+  attribution         OrderAttribution?
+  businessEvents      OrderBusinessEvent[]
   notification        OrderNotification?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
@@ -394,6 +455,110 @@ model Order {
   @@index([status, nextActionAt])
   @@index([acquisitionChannel, orderDate])
   @@index([customerId, orderDate])
+}
+
+model OrderAttribution {
+  id                    String             @id @default(cuid())
+  orderId               String             @unique
+  order                 Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  attributionWindowDays Int                @default(30)
+  consentVersion        String
+  analyticsConsent      Boolean            @default(false)
+  marketingConsent      Boolean            @default(false)
+  capturedAt            DateTime           @default(now())
+  touches               AttributionTouch[]
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+}
+
+model AttributionTouch {
+  id                 String               @id @default(cuid())
+  orderAttributionId String
+  orderAttribution   OrderAttribution     @relation(fields: [orderAttributionId], references: [id], onDelete: Cascade)
+  touchType          AttributionTouchType
+  source             TrafficSource
+  sourceGroup        SourceGroup
+  campaignName       String?
+  adSetName          String?
+  adName             String?
+  contentLabel       String?
+  landingPage        String?
+  referrer           String?
+  locale             Locale
+  utmSource          String?
+  utmMedium          String?
+  utmCampaign        String?
+  utmContent         String?
+  utmTerm            String?
+  gclid              String?
+  fbclid             String?
+  fbp                String?
+  fbc                String?
+  gaClientId         String?
+  gaSessionId        String?
+  eventId            String?
+  occurredAt         DateTime
+  createdAt          DateTime             @default(now())
+
+  @@unique([orderAttributionId, touchType])
+  @@index([source, occurredAt])
+  @@index([campaignName, occurredAt])
+}
+
+model OrderBusinessEvent {
+  id          String            @id @default(cuid())
+  orderId     String
+  order       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  eventType   BusinessEventType
+  eventKey    String            @unique
+  amountMinor Int?
+  currency    String?           @db.Char(3)
+  occurredAt  DateTime          @default(now())
+  createdAt   DateTime          @default(now())
+
+  @@index([eventType, occurredAt])
+  @@index([orderId, occurredAt])
+}
+
+model Campaign {
+  id                 String         @id @default(cuid())
+  source             TrafficSource
+  externalCampaignId String?
+  campaignName       String
+  status             CampaignStatus @default(UNKNOWN)
+  startDate          DateTime?
+  endDate            DateTime?
+  currency           String         @default("EUR") @db.Char(3)
+  spendEntries       AdSpend[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@unique([source, campaignName])
+  @@index([source, status])
+}
+
+model AdSpend {
+  id                String            @id @default(cuid())
+  date              DateTime
+  source            TrafficSource
+  campaignId        String?
+  campaign          Campaign?         @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  campaignName      String?
+  externalAdSetId   String?
+  adSetName         String?
+  externalAdId      String?
+  adName            String?
+  currency          String            @db.Char(3)
+  spendMinor        Int
+  importSource      SpendImportSource @default(MANUAL)
+  externalRecordId  String?           @unique
+  recordedByAdminId String?
+  recordedByAdmin   AdminUser?        @relation("SpendRecorder", fields: [recordedByAdminId], references: [id], onDelete: SetNull)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([date, source])
+  @@index([campaignId, date])
 }
 
 model OrderItem {
@@ -477,6 +642,7 @@ model AdminUser {
   isActive        Boolean              @default(true)
   payments        Payment[]            @relation("PaymentRecorder")
   statusChanges   OrderStatusHistory[] @relation("StatusChanger")
+  spendEntries    AdSpend[]            @relation("SpendRecorder")
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 

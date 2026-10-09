@@ -2,6 +2,7 @@ import { OrderStatus, PaymentKind } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { getAdminOrder } from "@/lib/admin/query";
+import { trafficSourceLabels } from "@/lib/admin/traffic-labels";
 import {
   acquisitionChannelLabels,
   contactMethodLabels,
@@ -28,6 +29,12 @@ export default async function AdminOrderPage({
   const { id } = await params;
   const order = await getAdminOrder(id);
   if (!order) notFound();
+  const firstTouch = order.attribution?.touches.find(
+    (touch) => touch.touchType === "FIRST",
+  );
+  const lastTouch =
+    order.attribution?.touches.find((touch) => touch.touchType === "LAST") ??
+    firstTouch;
   return (
     <>
       <span className="eyebrow">{order.displayNumber}</span>
@@ -146,33 +153,51 @@ export default async function AdminOrderPage({
           </dl>
         </section>
         <section className="admin-panel">
-          <h2>Источник обращения</h2>
+          <h2>Источник клиента</h2>
           <dl>
             <div>
-              <dt>Канал</dt>
-              <dd>{acquisitionChannelLabels[order.acquisitionChannel]}</dd>
-            </div>
-            <div>
-              <dt>UTM</dt>
+              <dt>Первый источник</dt>
               <dd>
-                {[
-                  order.utmSource,
-                  order.utmMedium,
-                  order.utmCampaign,
-                  order.utmContent,
-                  order.utmTerm,
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || "Прямой переход / нет"}
+                {firstTouch
+                  ? trafficSourceLabels[firstTouch.source]
+                  : acquisitionChannelLabels[order.acquisitionChannel]}
               </dd>
             </div>
             <div>
-              <dt>Страница входа</dt>
-              <dd>{order.landingPath ?? "—"}</dd>
+              <dt>Последний значимый источник</dt>
+              <dd>{lastTouch ? trafficSourceLabels[lastTouch.source] : "—"}</dd>
             </div>
             <div>
-              <dt>Исходный реферер</dt>
-              <dd>{order.initialReferrer ?? "—"}</dd>
+              <dt>Кампания</dt>
+              <dd>{lastTouch?.campaignName ?? "—"}</dd>
+            </div>
+            {lastTouch?.contentLabel || lastTouch?.adName ? (
+              <div>
+                <dt>Объявление / креатив</dt>
+                <dd>{lastTouch.adName ?? lastTouch.contentLabel}</dd>
+              </div>
+            ) : null}
+            {firstTouch?.landingPage ? (
+              <div>
+                <dt>Первая страница</dt>
+                <dd>{firstTouch.landingPage}</dd>
+              </div>
+            ) : null}
+            {firstTouch ? (
+              <div>
+                <dt>Дата первого визита</dt>
+                <dd>{russianDateTime.format(firstTouch.occurredAt)}</dd>
+              </div>
+            ) : null}
+            {lastTouch ? (
+              <div>
+                <dt>Последнее касание</dt>
+                <dd>{russianDateTime.format(lastTouch.occurredAt)}</dd>
+              </div>
+            ) : null}
+            <div>
+              <dt>Согласие на аналитику</dt>
+              <dd>{order.attribution?.analyticsConsent ? "Да" : "Нет"}</dd>
             </div>
           </dl>
         </section>

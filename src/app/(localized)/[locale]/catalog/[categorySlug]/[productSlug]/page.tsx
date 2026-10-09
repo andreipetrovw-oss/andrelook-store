@@ -8,6 +8,7 @@ import { ProductConfigurator } from "@/components/product-configurator";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductInteractionProvider } from "@/components/product-interaction-context";
 import { MobileProductCta } from "@/components/mobile-product-cta";
+import { ProductViewMeasurement } from "@/components/measurement-events";
 import { RequestForm } from "@/components/request-form";
 import { SizeGuide } from "@/components/size-guide";
 import { isLocale, locales } from "@/config/locales";
@@ -227,8 +228,32 @@ export default async function ProductPage({ params }: Props) {
 
       <ProductInteractionProvider
         colourCodes={product.colors.map((colour) => colour.code)}
+        measurementItem={{
+          currency: product.currency,
+          item_brand: product.brand?.name ?? null,
+          item_category: product.category.name,
+          item_id: product.id,
+          item_name: displayName,
+          price:
+            product.retailPriceMinor === null
+              ? null
+              : product.retailPriceMinor / 100,
+        }}
         sizes={sizes}
       >
+        <ProductViewMeasurement
+          item={{
+            currency: product.currency,
+            item_brand: product.brand?.name ?? null,
+            item_category: product.category.name,
+            item_id: product.id,
+            item_name: displayName,
+            price:
+              product.retailPriceMinor === null
+                ? null
+                : product.retailPriceMinor / 100,
+          }}
+        />
         <article className="container product-detail phase6e-product-detail">
           <nav aria-label={dictionary.breadcrumb} className="breadcrumb">
             <Link href={`/${locale}`}>{dictionary.home}</Link>

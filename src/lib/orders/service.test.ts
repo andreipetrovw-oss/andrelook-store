@@ -78,8 +78,44 @@ describe("transactional assisted-order service", () => {
       }),
     );
 
+    const touch = {
+      adName: "Maya video",
+      adSetName: "Jackets",
+      campaignName: "Autumn",
+      contentLabel: "maya_video_01",
+      eventId: "event-attribution-1",
+      fbc: null,
+      fbclid: null,
+      fbp: null,
+      gaClientId: null,
+      gaSessionId: null,
+      gclid: null,
+      landingPage: "/en/catalog",
+      locale: "en",
+      occurredAt: "2026-10-01T10:00:00.000Z",
+      referrer: "https://instagram.com/andrelook.store",
+      source: "META_ADS",
+      sourceGroup: "PAID",
+      utmCampaign: "Autumn",
+      utmContent: "maya_video_01",
+      utmMedium: "paid_social",
+      utmSource: "instagram",
+      utmTerm: null,
+    };
     await expect(
-      createOrderRequest(input, { initialReferrer: null, landingPath: "/en" }),
+      createOrderRequest(
+        {
+          ...input,
+          orderAttribution: JSON.stringify({
+            analyticsConsent: true,
+            consentVersion: "g2-consent-v1",
+            firstTouch: touch,
+            lastTouch: touch,
+            marketingConsent: false,
+          }),
+        },
+        { initialReferrer: null, landingPath: "/en" },
+      ),
     ).resolves.toEqual({
       duplicate: false,
       orderId: "order_1",
@@ -93,6 +129,20 @@ describe("transactional assisted-order service", () => {
       unitPriceMinor: 25_000,
     });
     expect(data.statusHistory.create).toEqual({ toStatus: "NEW" });
+    expect(data.attribution.create).toMatchObject({
+      analyticsConsent: true,
+      marketingConsent: false,
+      touches: {
+        create: [
+          expect.objectContaining({ source: "META_ADS", touchType: "FIRST" }),
+          expect.objectContaining({ source: "META_ADS", touchType: "LAST" }),
+        ],
+      },
+    });
+    expect(data.businessEvents.create).toMatchObject({
+      eventKey: `lead:${input.requestKey}`,
+      eventType: "LEAD_CREATED",
+    });
   });
 
   it("returns the original reference when the request key is repeated", async () => {

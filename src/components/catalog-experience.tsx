@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { getStorefrontContent } from "@/i18n/storefront-content";
 import type { PublicProductDto } from "@/lib/catalog/public-dto";
 import { formatProductCount } from "@/lib/catalog/presentation";
+import { trackPublicEvent } from "@/lib/measurement/client";
 
 import { ProductCard } from "./product-card";
 
@@ -60,6 +62,16 @@ export function CatalogExperience({
   const content = getStorefrontContent(locale);
   const visibleProducts = filterAndSortProducts(products, params);
   const hasFilters = Boolean(params.q || params.sort);
+  useEffect(() => {
+    const send = () =>
+      trackPublicEvent("view_item_list", {
+        item_count: visibleProducts.length,
+        locale,
+      });
+    send();
+    window.addEventListener("andrelook:consent", send);
+    return () => window.removeEventListener("andrelook:consent", send);
+  }, [locale, visibleProducts.length]);
   return (
     <section aria-label={dictionary.catalog} className="catalog-results">
       <div className="catalog-discovery" id="catalog-controls">

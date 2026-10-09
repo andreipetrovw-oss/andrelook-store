@@ -39,6 +39,7 @@ export default async function AdminLayout({
                 <Link href="/admin">Обзор</Link>
                 <Link href="/admin/orders">Заказы</Link>
                 <Link href="/admin/catalog">Каталог</Link>
+                <Link href="/admin/advertising">Реклама</Link>
               </nav>
               <small>{access.identity.email}</small>
             </aside>

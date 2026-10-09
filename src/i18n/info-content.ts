@@ -198,6 +198,14 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
           body: "Чтобы связаться с вами, подтвердить детали, выполнить заказ, вести историю обслуживания и решать вопросы по заказу.",
         },
         {
+          title: "Аналитика и атрибуция",
+          body: "Необходимое хранилище поддерживает работу сайта и ваш выбор приватности. Необязательная аналитика и маркетинговые измерения включаются только после вашего выбора. Если они разрешены, мы можем сохранить первый и последний значимый источник обращения в пределах 30 дней и записать его в заявку.",
+        },
+        {
+          title: "Изменить выбор",
+          body: "Настройки можно изменить в любой момент через ссылку «Настройки приватности» на сайте. Отказ не мешает просматривать каталог или отправлять заявку.",
+        },
+        {
           title: "Ваш вопрос о данных",
           body: "По вопросам о доступе, исправлении или удалении ваших данных напишите на info.andrelook@gmail.com.",
         },
@@ -400,6 +408,14 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
           body: "Et sinuga ühendust võtta, detailid kinnitada, tellimus täita, teenindusajalugu hoida ja tellimusküsimusi lahendada.",
         },
         {
+          title: "Analüütika ja omistamine",
+          body: "Vajalik salvestus toetab veebilehe tööd ja sinu privaatsusvalikut. Valikuline analüütika ning turundusmõõtmine käivituvad alles pärast sinu valikut. Loa korral võime säilitada esimese ja viimase olulise päringuallika 30 päeva jooksul ning lisada selle päringule.",
+        },
+        {
+          title: "Valiku muutmine",
+          body: "Valikut saab igal ajal muuta veebilehe lingi „Privaatsusseaded“ kaudu. Keeldumine ei takista kataloogi vaatamist ega päringu saatmist.",
+        },
+        {
           title: "Sinu andmeküsimus",
           body: "Andmetele ligipääsu, parandamise või kustutamise küsimustes kirjuta info.andrelook@gmail.com.",
         },
@@ -600,6 +616,14 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         {
           title: "Why we use it",
           body: "To contact you, confirm details, fulfil the order, maintain service history and resolve order-related questions.",
+        },
+        {
+          title: "Analytics and attribution",
+          body: "Necessary storage supports the site and remembers your privacy choice. Optional analytics and marketing measurement start only after your choice. If allowed, we may retain the first and last meaningful enquiry source within a 30-day window and attach that snapshot to your request.",
+        },
+        {
+          title: "Change your choice",
+          body: "You can change your choice at any time through the “Privacy settings” link on the site. Declining does not prevent catalog browsing or request submission.",
         },
         {
           title: "Questions about your data",

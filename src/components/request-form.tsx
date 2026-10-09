@@ -9,6 +9,13 @@ import {
 } from "@/app/(localized)/[locale]/catalog/actions";
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
+import {
+  attributionStorageKey,
+  consentStorageKey,
+  parseConsentPreferences,
+  parseStoredAttribution,
+} from "@/lib/attribution/state";
+import { trackPublicEvent } from "@/lib/measurement/client";
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
 import { selectionSummary } from "@/lib/orders/selection-summary";
 
@@ -261,18 +268,7 @@ function FieldError({
   return errors?.length ? <span className="field-error">{message}</span> : null;
 }
 
-type Campaign = Record<
-  | "initialReferrer"
-  | "landingPath"
-  | "utmCampaign"
-  | "utmContent"
-  | "utmMedium"
-  | "utmSource"
-  | "utmTerm",
-  string
->;
-
-const campaignFields: Array<keyof Campaign> = [
+const legacyCampaignFields = [
   "initialReferrer",
   "landingPath",
   "utmCampaign",
@@ -280,7 +276,7 @@ const campaignFields: Array<keyof Campaign> = [
   "utmMedium",
   "utmSource",
   "utmTerm",
-];
+] as const;
 
 export function RequestForm({
   availability,
@@ -378,21 +374,55 @@ export function RequestForm({
   useEffect(() => {
     if (state.status === "success") {
       successRef.current?.focus({ preventScroll: true });
+      trackPublicEvent("preorder_submit", {
+        item_id: productId,
+        item_name: productName,
+        locale,
+      });
     }
-  }, [state.status]);
-  useEffect(() => {
+  }, [locale, productId, productName, state.status]);
+  const refreshAttributionFields = () => {
     try {
-      const stored = JSON.parse(
-        sessionStorage.getItem("andrelookCampaign") ?? "{}",
-      ) as Partial<Campaign>;
-      for (const name of campaignFields) {
+      const consent = parseConsentPreferences(
+        localStorage.getItem(consentStorageKey),
+      );
+      const state =
+        consent?.analytics || consent?.marketing
+          ? parseStoredAttribution(localStorage.getItem(attributionStorageKey))
+          : null;
+      const first = state?.firstTouch;
+      const orderAttribution =
+        formRef.current?.elements.namedItem("orderAttribution");
+      if (orderAttribution instanceof HTMLInputElement) {
+        orderAttribution.value = consent
+          ? JSON.stringify({
+              analyticsConsent: consent.analytics,
+              consentVersion: consent.version,
+              firstTouch: state?.firstTouch ?? null,
+              lastTouch: state?.lastTouch ?? null,
+              marketingConsent: consent.marketing,
+            })
+          : "";
+      }
+      const legacyValues = {
+        initialReferrer: first?.referrer ?? "",
+        landingPath: first?.landingPage ?? "",
+        utmCampaign: first?.utmCampaign ?? "",
+        utmContent: first?.utmContent ?? "",
+        utmMedium: first?.utmMedium ?? "",
+        utmSource: first?.utmSource ?? "",
+        utmTerm: first?.utmTerm ?? "",
+      };
+      for (const name of legacyCampaignFields) {
         const field = formRef.current?.elements.namedItem(name);
-        if (field instanceof HTMLInputElement) field.value = stored[name] ?? "";
+        if (field instanceof HTMLInputElement) {
+          field.value = legacyValues[name];
+        }
       }
     } catch {
-      // A blocked session store must never block the order form.
+      // A blocked browser store must never block the order form.
     }
-  }, []);
+  };
 
   if (state.status === "success") {
     return (
@@ -525,6 +555,7 @@ export function RequestForm({
           action={action}
           className="request-form"
           onSubmit={() => {
+            refreshAttributionFields();
             if (requestKeyRef.current && !requestKeyRef.current.value) {
               requestKeyRef.current.value = crypto.randomUUID();
             }
@@ -535,7 +566,8 @@ export function RequestForm({
           <input name="productId" type="hidden" value={productId} />
           <input name="productVersion" type="hidden" value={productVersion} />
           <input name="requestKey" ref={requestKeyRef} type="hidden" />
-          {campaignFields.map((name) => (
+          <input defaultValue="" name="orderAttribution" type="hidden" />
+          {legacyCampaignFields.map((name) => (
             <input defaultValue="" key={name} name={name} type="hidden" />
           ))}
 

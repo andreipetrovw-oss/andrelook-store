@@ -33,6 +33,13 @@ export async function sendNewOrderNotification(orderId: string) {
       addressLine1: true,
       addressLine2: true,
       acquisitionChannel: true,
+      attribution: {
+        select: {
+          touches: {
+            select: { campaignName: true, source: true, touchType: true },
+          },
+        },
+      },
       currency: true,
       customer: {
         select: {
@@ -58,16 +65,9 @@ export async function sendNewOrderNotification(orderId: string) {
           unitPriceMinor: true,
         },
       },
-      initialReferrer: true,
-      landingPath: true,
       postalCode: true,
       requestedLocale: true,
       paymentPreference: true,
-      utmCampaign: true,
-      utmContent: true,
-      utmMedium: true,
-      utmSource: true,
-      utmTerm: true,
     },
     where: { id: orderId },
   });
@@ -123,16 +123,12 @@ export async function sendNewOrderNotification(orderId: string) {
     ]
       .filter(Boolean)
       .join(", ") || "—";
-  const attribution = [
-    order.acquisitionChannel,
-    order.utmSource ? `source=${order.utmSource}` : null,
-    order.utmMedium ? `medium=${order.utmMedium}` : null,
-    order.utmCampaign ? `campaign=${order.utmCampaign}` : null,
-    order.utmContent ? `content=${order.utmContent}` : null,
-    order.utmTerm ? `term=${order.utmTerm}` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const lastTouch =
+    order.attribution?.touches.find((touch) => touch.touchType === "LAST") ??
+    order.attribution?.touches.find((touch) => touch.touchType === "FIRST");
+  const attribution = lastTouch
+    ? [lastTouch.source, lastTouch.campaignName].filter(Boolean).join(" · ")
+    : order.acquisitionChannel;
   const rows = [
     ["Reference", order.displayNumber],
     ["Customer", order.customer.name],
@@ -155,8 +151,6 @@ export async function sendNewOrderNotification(orderId: string) {
     ],
     ["Language", order.requestedLocale],
     ["Source / attribution", attribution],
-    ["Landing path", order.landingPath ?? "—"],
-    ["Initial referrer", order.initialReferrer ?? "—"],
   ];
   const text = [
     `New Andrelook order request ${order.displayNumber}`,

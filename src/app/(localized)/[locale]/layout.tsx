@@ -86,7 +86,7 @@ export default async function LocalizedLayout({
       lang={locale}
     >
       <body>
-        <CampaignCapture />
+        <CampaignCapture locale={locale} />
         <a className="skip-link" href="#main-content">
           {dictionary.skipToContent}
         </a>

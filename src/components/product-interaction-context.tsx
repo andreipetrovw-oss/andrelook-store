@@ -11,6 +11,9 @@ import {
 } from "react";
 
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
+import { trackPublicEvent } from "@/lib/measurement/client";
+
+import type { MeasurementItem } from "./measurement-events";
 
 type SelectionError = "colour" | "size" | null;
 
@@ -33,10 +36,12 @@ const ProductInteractionContext = createContext<ProductInteractionValue | null>(
 export function ProductInteractionProvider({
   children,
   colourCodes,
+  measurementItem,
   sizes,
 }: {
   children: ReactNode;
   colourCodes: string[];
+  measurementItem: MeasurementItem;
   sizes: string[];
 }) {
   const [colour, setColourState] = useState(
@@ -74,9 +79,18 @@ export function ProductInteractionProvider({
       triggerRef.current = trigger ?? null;
       setSelectionError(null);
       setDrawerOpen(true);
+      trackPublicEvent("preorder_open", {
+        ...(measurementItem.currency
+          ? { currency: measurementItem.currency }
+          : {}),
+        items: [measurementItem],
+        ...(measurementItem.price !== null
+          ? { value: measurementItem.price }
+          : {}),
+      });
       return true;
     },
-    [colour, colourCodes.length, size, sizes.length],
+    [colour, colourCodes.length, measurementItem, size, sizes.length],
   );
   const closeOrder = useCallback(() => setDrawerOpen(false), []);
   const restoreFocus = useCallback(
