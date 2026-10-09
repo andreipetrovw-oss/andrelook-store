@@ -22,32 +22,32 @@ const copy = {
     accept: "Allow analytics",
     analytics: "Analytics",
     description:
-      "We use necessary storage for the site and optional analytics to understand which campaigns lead to enquiries. Marketing measurement is off unless you allow it.",
-    marketing: "Marketing measurement",
+      "We use necessary cookies for the site to work. Analytics and marketing are optional.",
+    marketing: "Marketing",
     necessary: "Necessary",
     reject: "Necessary only",
     save: "Save choices",
-    title: "Your privacy choices",
+    title: "Privacy settings",
   },
   et: {
     accept: "Luba analüütika",
     analytics: "Analüütika",
     description:
-      "Kasutame veebilehe jaoks vajalikku salvestust ning valikulist analüütikat, et mõista, millised kampaaniad toovad päringuid. Turundusmõõtmine on väljas, kuni selle lubate.",
-    marketing: "Turundusmõõtmine",
-    necessary: "Vajalik",
-    reject: "Ainult vajalik",
+      "Kasutame vajalikke küpsiseid saidi toimimiseks. Analüütika ja turundus on valikulised.",
+    marketing: "Turundus",
+    necessary: "Vajalikud",
+    reject: "Ainult vajalikud",
     save: "Salvesta valikud",
-    title: "Teie privaatsusvalikud",
+    title: "Privaatsusvalikud",
   },
   ru: {
     accept: "Разрешить аналитику",
     analytics: "Аналитика",
     description:
-      "Мы используем необходимое хранилище для работы сайта и, с вашего согласия, аналитику, чтобы понимать, какие кампании приводят обращения. Маркетинговые измерения отключены, пока вы их не разрешите.",
-    marketing: "Маркетинговые измерения",
-    necessary: "Необходимое",
-    reject: "Только необходимое",
+      "Используем необходимые файлы cookie для работы сайта. Аналитика и маркетинг — по желанию.",
+    marketing: "Маркетинг",
+    necessary: "Необходимые",
+    reject: "Только необходимые",
     save: "Сохранить выбор",
     title: "Настройки приватности",
   },
@@ -191,8 +191,8 @@ export function CampaignCapture({ locale }: { locale: Locale }) {
           aria-live="polite"
           className="privacy-consent"
         >
-          <div>
-            <strong>{labels.title}</strong>
+          <div className="privacy-consent-copy">
+            <h2>{labels.title}</h2>
             <p>{labels.description}</p>
           </div>
           <div className="privacy-consent-options">
