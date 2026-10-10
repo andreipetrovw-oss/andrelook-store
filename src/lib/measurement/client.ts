@@ -2,10 +2,19 @@
 
 import type { ConsentPreferences } from "@/lib/attribution/types";
 
+type MetaPixelBootstrap = ((...args: unknown[]) => void) & {
+  callMethod?: (...args: unknown[]) => void;
+  loaded: boolean;
+  push: (...args: unknown[]) => void;
+  queue: unknown[][];
+  version: "2.0";
+};
+
 declare global {
   interface Window {
+    _fbq?: MetaPixelBootstrap;
     dataLayer?: unknown[];
-    fbq?: (...args: unknown[]) => void;
+    fbq?: MetaPixelBootstrap;
   }
 }
 
@@ -14,6 +23,7 @@ const enabled = process.env.NEXT_PUBLIC_MEASUREMENT_ENABLED === "true";
 const gaId = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 let analyticsConsentGranted = false;
+let marketingConsentGranted = false;
 
 export function measurementAllowedForHost(
   host: string,
@@ -26,6 +36,10 @@ export function validGaMeasurementId(value: string | undefined) {
   return value && /^G-[A-Z0-9]+$/.test(value) ? value : null;
 }
 
+export function validMetaPixelId(value: string | undefined) {
+  return value && /^\d{10,20}$/.test(value) ? value : null;
+}
+
 export function analyticsMeasurementAllowedForHost(
   host: string,
   analyticsConsent: boolean,
@@ -35,6 +49,19 @@ export function analyticsMeasurementAllowedForHost(
   return Boolean(
     analyticsConsent &&
     validGaMeasurementId(measurementId) &&
+    measurementAllowedForHost(host, measurementEnabled),
+  );
+}
+
+export function marketingMeasurementAllowedForHost(
+  host: string,
+  marketingConsent: boolean,
+  pixelId = metaPixelId,
+  measurementEnabled = enabled,
+) {
+  return Boolean(
+    marketingConsent &&
+    validMetaPixelId(pixelId) &&
     measurementAllowedForHost(host, measurementEnabled),
   );
 }
@@ -76,18 +103,53 @@ function updateGoogleAnalyticsConsent(granted: boolean) {
 }
 
 function loadMetaPixel() {
-  if (!metaPixelId || window.fbq) return;
-  const queue = (...args: unknown[]) => {
-    (queue as unknown as { q: unknown[] }).q.push(args);
-  };
-  (queue as unknown as { q: unknown[] }).q = [];
-  window.fbq = queue;
+  const pixelId = validMetaPixelId(metaPixelId);
+  if (
+    !pixelId ||
+    window.fbq ||
+    document.querySelector(`[data-andrelook-meta="${pixelId}"]`)
+  )
+    return;
+  const bootstrap = ((...args: unknown[]) => {
+    if (bootstrap.callMethod) bootstrap.callMethod(...args);
+    else bootstrap.queue.push(args);
+  }) as MetaPixelBootstrap;
+  bootstrap.push = bootstrap;
+  bootstrap.loaded = true;
+  bootstrap.version = "2.0";
+  bootstrap.queue = [];
+  window.fbq = bootstrap;
+  window._fbq ??= bootstrap;
   const script = document.createElement("script");
   script.async = true;
+  script.dataset.andrelookMeta = pixelId;
   script.src = "https://connect.facebook.net/en_US/fbevents.js";
   document.head.append(script);
-  window.fbq("init", metaPixelId);
+  window.fbq("init", pixelId);
   window.fbq("track", "PageView");
+}
+
+function metaProductPayload(
+  parameters: Record<
+    string,
+    boolean | number | string | Array<Record<string, number | string | null>>
+  >,
+) {
+  const firstItem = Array.isArray(parameters.items)
+    ? parameters.items[0]
+    : undefined;
+  const itemId = firstItem?.item_id ?? parameters.item_id;
+  const itemName = firstItem?.item_name ?? parameters.item_name;
+
+  return {
+    ...(typeof itemId === "string" ? { content_ids: [itemId] } : {}),
+    ...(typeof itemName === "string" ? { content_name: itemName } : {}),
+    content_type: "product",
+    ...(typeof parameters.value === "number"
+      ? { value: parameters.value }
+      : {}),
+    ...(parameters.currency === "EUR" ? { currency: "EUR" } : {}),
+  };
 }
 
 export function applyMeasurementConsent(consent: ConsentPreferences) {
@@ -95,10 +157,14 @@ export function applyMeasurementConsent(consent: ConsentPreferences) {
     window.location.hostname,
     consent.analytics,
   );
+  marketingConsentGranted = marketingMeasurementAllowedForHost(
+    window.location.hostname,
+    consent.marketing,
+  );
   if (!productionMeasurementAllowed()) return;
   if (analyticsConsentGranted) loadGoogleAnalytics();
   updateGoogleAnalyticsConsent(analyticsConsentGranted);
-  if (consent.marketing) loadMetaPixel();
+  if (marketingConsentGranted) loadMetaPixel();
 }
 
 export function trackPublicEvent(
@@ -124,13 +190,11 @@ export function trackPublicEvent(
   ) {
     gtag("event", name, parameters);
   }
-  if (metaPixelId && window.fbq) {
+  if (marketingConsentGranted && validMetaPixelId(metaPixelId) && window.fbq) {
     if (name === "preorder_submit") {
-      window.fbq("track", "Lead", parameters);
+      window.fbq("track", "Lead", metaProductPayload(parameters));
     } else if (name === "view_item") {
-      window.fbq("track", "ViewContent", parameters);
-    } else {
-      window.fbq("trackCustom", name, parameters);
+      window.fbq("track", "ViewContent", metaProductPayload(parameters));
     }
   }
 }
