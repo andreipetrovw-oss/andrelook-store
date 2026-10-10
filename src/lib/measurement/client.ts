@@ -13,6 +13,7 @@ const productionHosts = new Set(["andrelook.store", "www.andrelook.store"]);
 const enabled = process.env.NEXT_PUBLIC_MEASUREMENT_ENABLED === "true";
 const gaId = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+let analyticsConsentGranted = false;
 
 export function measurementAllowedForHost(
   host: string,
@@ -21,21 +22,57 @@ export function measurementAllowedForHost(
   return measurementEnabled && productionHosts.has(host);
 }
 
+export function validGaMeasurementId(value: string | undefined) {
+  return value && /^G-[A-Z0-9]+$/.test(value) ? value : null;
+}
+
+export function analyticsMeasurementAllowedForHost(
+  host: string,
+  analyticsConsent: boolean,
+  measurementId = gaId,
+  measurementEnabled = enabled,
+) {
+  return Boolean(
+    analyticsConsent &&
+    validGaMeasurementId(measurementId) &&
+    measurementAllowedForHost(host, measurementEnabled),
+  );
+}
+
 function productionMeasurementAllowed() {
   return measurementAllowedForHost(window.location.hostname);
 }
 
+function gtag(...args: unknown[]) {
+  window.dataLayer?.push(args);
+}
+
 function loadGoogleAnalytics() {
-  if (!gaId || document.querySelector(`[data-andrelook-ga="${gaId}"]`)) return;
+  const measurementId = validGaMeasurementId(gaId);
+  if (
+    !measurementId ||
+    document.querySelector(`[data-andrelook-ga="${measurementId}"]`)
+  )
+    return;
   const script = document.createElement("script");
   script.async = true;
-  script.dataset.andrelookGa = gaId;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+  script.dataset.andrelookGa = measurementId;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
   document.head.append(script);
   window.dataLayer = window.dataLayer ?? [];
-  const gtag = (...args: unknown[]) => window.dataLayer?.push(args);
+  gtag("consent", "default", { analytics_storage: "granted" });
   gtag("js", new Date());
-  gtag("config", gaId, { anonymize_ip: true, send_page_view: true });
+  gtag("config", measurementId, {
+    anonymize_ip: true,
+    send_page_view: true,
+  });
+}
+
+function updateGoogleAnalyticsConsent(granted: boolean) {
+  if (!validGaMeasurementId(gaId) || !window.dataLayer) return;
+  gtag("consent", "update", {
+    analytics_storage: granted ? "granted" : "denied",
+  });
 }
 
 function loadMetaPixel() {
@@ -54,8 +91,13 @@ function loadMetaPixel() {
 }
 
 export function applyMeasurementConsent(consent: ConsentPreferences) {
+  analyticsConsentGranted = analyticsMeasurementAllowedForHost(
+    window.location.hostname,
+    consent.analytics,
+  );
   if (!productionMeasurementAllowed()) return;
-  if (consent.analytics) loadGoogleAnalytics();
+  if (analyticsConsentGranted) loadGoogleAnalytics();
+  updateGoogleAnalyticsConsent(analyticsConsentGranted);
   if (consent.marketing) loadMetaPixel();
 }
 
@@ -75,8 +117,12 @@ export function trackPublicEvent(
   > = {},
 ) {
   if (!productionMeasurementAllowed()) return;
-  if (gaId && window.dataLayer) {
-    window.dataLayer.push(["event", name, parameters]);
+  if (
+    analyticsConsentGranted &&
+    validGaMeasurementId(gaId) &&
+    window.dataLayer
+  ) {
+    gtag("event", name, parameters);
   }
   if (metaPixelId && window.fbq) {
     if (name === "preorder_submit") {
