@@ -217,6 +217,7 @@ describe("measurement environment isolation", () => {
     vi.stubEnv("NEXT_PUBLIC_MEASUREMENT_ENABLED", "true");
     vi.stubEnv("NEXT_PUBLIC_META_PIXEL_ID", "3334309000107146");
     const browserWindow: {
+      _fbq?: ((...args: unknown[]) => void) & { queue: unknown[][] };
       fbq?: ((...args: unknown[]) => void) & { queue: unknown[][] };
       location: { hostname: string };
     } = {
@@ -258,6 +259,7 @@ describe("measurement environment isolation", () => {
       ["init", "3334309000107146"],
       ["track", "PageView"],
     ]);
+    expect(browserWindow._fbq).toBe(browserWindow.fbq);
 
     measurement.applyMeasurementConsent({
       ...necessaryOnly,

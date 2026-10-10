@@ -12,6 +12,7 @@ type MetaPixelBootstrap = ((...args: unknown[]) => void) & {
 
 declare global {
   interface Window {
+    _fbq?: MetaPixelBootstrap;
     dataLayer?: unknown[];
     fbq?: MetaPixelBootstrap;
   }
@@ -118,6 +119,7 @@ function loadMetaPixel() {
   bootstrap.version = "2.0";
   bootstrap.queue = [];
   window.fbq = bootstrap;
+  window._fbq ??= bootstrap;
   const script = document.createElement("script");
   script.async = true;
   script.dataset.andrelookMeta = pixelId;
