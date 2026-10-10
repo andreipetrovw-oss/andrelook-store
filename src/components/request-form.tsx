@@ -323,6 +323,7 @@ export function RequestForm({
   const formRef = useRef<HTMLFormElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const requestKeyRef = useRef<HTMLInputElement>(null);
+  const submittedEventIdRef = useRef<string | null>(null);
   const successRef = useRef<HTMLElement>(null);
 
   const selectedColour = colours.find((item) => item.code === colour)?.name;
@@ -374,11 +375,15 @@ export function RequestForm({
   useEffect(() => {
     if (state.status === "success") {
       successRef.current?.focus({ preventScroll: true });
-      trackPublicEvent("preorder_submit", {
-        item_id: productId,
-        item_name: productName,
-        locale,
-      });
+      trackPublicEvent(
+        "preorder_submit",
+        {
+          item_id: productId,
+          item_name: productName,
+          locale,
+        },
+        { eventId: submittedEventIdRef.current ?? undefined },
+      );
     }
   }, [locale, productId, productName, state.status]);
   const refreshAttributionFields = () => {
@@ -559,6 +564,7 @@ export function RequestForm({
             if (requestKeyRef.current && !requestKeyRef.current.value) {
               requestKeyRef.current.value = crypto.randomUUID();
             }
+            submittedEventIdRef.current = requestKeyRef.current?.value ?? null;
           }}
           ref={formRef}
         >

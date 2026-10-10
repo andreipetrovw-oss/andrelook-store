@@ -2,9 +2,10 @@
 
 import { headers } from "next/headers";
 
+import { sendMetaLeadForOrder } from "@/lib/measurement/meta-capi";
+import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
 import { RequestRejectedError, createOrderRequest } from "@/lib/orders/service";
 import { requestOrderInput } from "@/lib/orders/request-schema";
-import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
 
 export type RequestFormState = {
   errors?: Record<string, string[]>;
@@ -43,6 +44,14 @@ export async function submitOrderRequest(
       siteHost: requestHeaders.get("host"),
     });
     if (!result.duplicate) {
+      try {
+        const metaResult = await sendMetaLeadForOrder(result.orderId, referrer);
+        if (metaResult.status === "failed") {
+          console.error("Meta CAPI delivery failed after order creation.");
+        }
+      } catch {
+        console.error("Meta CAPI delivery failed after order creation.");
+      }
       try {
         await sendNewOrderNotification(result.orderId);
       } catch {

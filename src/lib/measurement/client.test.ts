@@ -298,11 +298,15 @@ describe("measurement environment isolation", () => {
       },
     ]);
 
-    measurement.trackPublicEvent("preorder_submit", {
-      item_id: "AL-LEGACY-001",
-      item_name: "Maya Down Jacket",
-      locale: "et",
-    });
+    measurement.trackPublicEvent(
+      "preorder_submit",
+      {
+        item_id: "AL-LEGACY-001",
+        item_name: "Maya Down Jacket",
+        locale: "et",
+      },
+      { eventId: "11111111-1111-4111-8111-111111111111" },
+    );
     expect(browserWindow.fbq?.queue).toContainEqual([
       "track",
       "Lead",
@@ -311,6 +315,7 @@ describe("measurement environment isolation", () => {
         content_name: "Maya Down Jacket",
         content_type: "product",
       },
+      { eventID: "11111111-1111-4111-8111-111111111111" },
     ]);
     expect(JSON.stringify(browserWindow.fbq?.queue)).not.toContain(
       "Private brand field",
