@@ -181,6 +181,7 @@ export function trackPublicEvent(
     string,
     boolean | number | string | Array<Record<string, number | string | null>>
   > = {},
+  options: { eventId?: string } = {},
 ) {
   if (!productionMeasurementAllowed()) return;
   if (
@@ -192,7 +193,12 @@ export function trackPublicEvent(
   }
   if (marketingConsentGranted && validMetaPixelId(metaPixelId) && window.fbq) {
     if (name === "preorder_submit") {
-      window.fbq("track", "Lead", metaProductPayload(parameters));
+      const payload = metaProductPayload(parameters);
+      if (options.eventId) {
+        window.fbq("track", "Lead", payload, { eventID: options.eventId });
+      } else {
+        window.fbq("track", "Lead", payload);
+      }
     } else if (name === "view_item") {
       window.fbq("track", "ViewContent", metaProductPayload(parameters));
     }
