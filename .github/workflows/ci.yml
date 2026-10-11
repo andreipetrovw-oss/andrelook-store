@@ -22,6 +22,7 @@ on:
       - codex/g3-acquisition-launch
       - codex/unit-economics-profitability
       - codex/meta-prelaunch-closeout
+      - codex/final-analytics-closeout
 
 permissions:
   contents: read
