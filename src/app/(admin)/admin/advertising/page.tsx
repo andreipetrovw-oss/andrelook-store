@@ -8,6 +8,7 @@ import { trafficSourceLabels } from "@/lib/admin/traffic-labels";
 import {
   getAdvertisingReport,
   getCampaignOperationLog,
+  getEconomicsProductOptions,
 } from "@/lib/admin/query";
 import type { AdvertisingRow } from "@/lib/measurement/reporting";
 
@@ -38,8 +39,11 @@ function aggregateRows(rows: AdvertisingRow[], level: "campaign" | "source") {
       adSet: null,
       campaign: level === "source" ? null : row.campaign,
       confirmed: 0,
+      contributionAfterAdsMinor: 0,
+      contributionBeforeAdsMinor: 0,
       leads: 0,
       paid: 0,
+      paymentCostEstimated: false,
       revenueMinor: 0,
       spendMinor: 0,
     };
@@ -48,6 +52,16 @@ function aggregateRows(rows: AdvertisingRow[], level: "campaign" | "source") {
     current.paid += row.paid;
     current.revenueMinor += row.revenueMinor;
     current.spendMinor += row.spendMinor;
+    current.paymentCostEstimated ||= row.paymentCostEstimated;
+    current.contributionBeforeAdsMinor =
+      current.contributionBeforeAdsMinor === null ||
+      row.contributionBeforeAdsMinor === null
+        ? null
+        : current.contributionBeforeAdsMinor + row.contributionBeforeAdsMinor;
+    current.contributionAfterAdsMinor =
+      current.contributionBeforeAdsMinor === null
+        ? null
+        : current.contributionBeforeAdsMinor - current.spendMinor;
     current.costPerLeadMinor =
       current.leads && current.spendMinor
         ? Math.round(current.spendMinor / current.leads)
@@ -90,9 +104,10 @@ export default async function AdvertisingPage({
   const from = date(filters.from, defaultFrom);
   const toDay = date(filters.to, new Date(tomorrow.getTime() - 86_400_000));
   const to = new Date(toDay.getTime() + 86_400_000);
-  const [allRows, operationLog] = await Promise.all([
+  const [allRows, operationLog, economicsProducts] = await Promise.all([
     getAdvertisingReport({ from, to }),
     getCampaignOperationLog(),
+    getEconomicsProductOptions(),
   ]);
   const rows = allRows.filter(
     (row) =>
@@ -109,11 +124,27 @@ export default async function AdvertisingPage({
       confirmed: sum.confirmed + row.confirmed,
       leads: sum.leads + row.leads,
       paid: sum.paid + row.paid,
+      contributionBeforeAdsMinor:
+        sum.contributionBeforeAdsMinor === null ||
+        row.contributionBeforeAdsMinor === null
+          ? null
+          : sum.contributionBeforeAdsMinor + row.contributionBeforeAdsMinor,
       revenueMinor: sum.revenueMinor + row.revenueMinor,
       spendMinor: sum.spendMinor + row.spendMinor,
     }),
-    { confirmed: 0, leads: 0, paid: 0, revenueMinor: 0, spendMinor: 0 },
+    {
+      confirmed: 0,
+      contributionBeforeAdsMinor: 0 as number | null,
+      leads: 0,
+      paid: 0,
+      revenueMinor: 0,
+      spendMinor: 0,
+    },
   );
+  const contributionAfterAds =
+    totals.contributionBeforeAdsMinor === null
+      ? null
+      : totals.contributionBeforeAdsMinor - totals.spendMinor;
   const costPerLead =
     totals.leads && totals.spendMinor
       ? Math.round(totals.spendMinor / totals.leads)
@@ -149,7 +180,10 @@ export default async function AdvertisingPage({
       <h1>Реклама</h1>
       <p className="admin-overview-note">
         Период лида определяется датой обращения, выручка — датой оплаты, расход
-        — датой рекламной записи. Тестовые заказы исключены.
+        — датой рекламной записи. Вклад до рекламы вычитает сохранённую landed
+        cost и фактическую комиссию оплаты; если комиссия не указана, для нового
+        заказа используется сохранённая расчётная ставка. Неполные исторические
+        данные отображаются как «—». Тестовые заказы исключены.
       </p>
       <form className="admin-filters">
         <label>
@@ -197,6 +231,8 @@ export default async function AdvertisingPage({
           ["Подтверждено", totals.confirmed],
           ["Оплачено", totals.paid],
           ["Выручка", money(totals.revenueMinor)],
+          ["Вклад до рекламы", money(totals.contributionBeforeAdsMinor)],
+          ["Вклад после рекламы", money(contributionAfterAds)],
           ["Цена лида", money(costPerLead)],
           ["Цена клиента", money(costPerCustomer)],
           ["ROAS", roas],
@@ -229,6 +265,8 @@ export default async function AdvertisingPage({
                 <th>Подтверждено</th>
                 <th>Оплачено</th>
                 <th>Выручка</th>
+                <th>Вклад до рекламы</th>
+                <th>Вклад после рекламы</th>
                 <th>Цена лида</th>
                 <th>Цена клиента</th>
                 <th>ROAS</th>
@@ -264,6 +302,8 @@ export default async function AdvertisingPage({
                   <td>{row.confirmed}</td>
                   <td>{row.paid}</td>
                   <td>{money(row.revenueMinor)}</td>
+                  <td>{money(row.contributionBeforeAdsMinor)}</td>
+                  <td>{money(row.contributionAfterAdsMinor)}</td>
                   <td>{money(row.costPerLeadMinor)}</td>
                   <td>{money(row.costPerCustomerMinor)}</td>
                   <td>{row.roas ?? "—"}</td>
@@ -300,6 +340,17 @@ export default async function AdvertisingPage({
               step="0.01"
               type="number"
             />
+          </label>
+          <label>
+            <span>Товар (только если расход относится к нему напрямую)</span>
+            <select name="productId">
+              <option value="">Не распределять на товар</option>
+              {economicsProducts.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.internalCode} · {product.translations[0]?.name}
+                </option>
+              ))}
+            </select>
           </label>
           <button type="submit">Сохранить расход</button>
         </form>

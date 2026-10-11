@@ -16,7 +16,16 @@ describe("advertising reporting", () => {
         {
           displayNumber: "AL-REAL",
           events: [event, event],
+          items: [
+            {
+              paymentRateBpsSnapshot: 300,
+              quantity: 1,
+              unitLandedCostMinorSnapshot: 8_000,
+              unitPriceMinor: 20_000,
+            },
+          ],
           orderDate: new Date("2026-10-04T12:00:00Z"),
+          payments: [{ kind: "FULL", processorFeeMinor: 600 }],
           status: "PAID",
           touch: {
             campaignName: "Autumn",
@@ -38,10 +47,13 @@ describe("advertising reporting", () => {
     expect(rows).toEqual([
       expect.objectContaining({
         confirmed: 1,
+        contributionAfterAdsMinor: 6_400,
+        contributionBeforeAdsMinor: 11_400,
         costPerCustomerMinor: 5_000,
         costPerLeadMinor: 5_000,
         leads: 1,
         paid: 1,
+        paymentCostEstimated: false,
         revenueMinor: 20_000,
         roas: 4,
         spendMinor: 5_000,

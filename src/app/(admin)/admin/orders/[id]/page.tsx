@@ -326,6 +326,13 @@ export default async function AdminOrderPage({
               name="currency"
               required
             />
+            <input
+              inputMode="decimal"
+              min="0"
+              name="processorFee"
+              placeholder="Фактическая комиссия, EUR (если известна)"
+              step="0.01"
+            />
             <input name="reference" placeholder="Номер / комментарий" />
             <button type="submit">Записать оплату</button>
           </form>
@@ -334,7 +341,11 @@ export default async function AdminOrderPage({
               <li key={payment.id}>
                 {paymentKindLabels[payment.kind]} ·{" "}
                 {(payment.amountMinor / 100).toFixed(2)} {payment.currency} ·{" "}
-                {russianDate.format(payment.receivedAt)}
+                комиссия{" "}
+                {payment.processorFeeMinor === null
+                  ? "не указана"
+                  : `${(payment.processorFeeMinor / 100).toFixed(2)} ${payment.currency}`}{" "}
+                · {russianDate.format(payment.receivedAt)}
               </li>
             ))}
           </ul>

@@ -122,6 +122,10 @@ enum SpendImportSource {
   API
 }
 
+enum EconomicsSourceType {
+  ESTIMATE
+}
+
 enum PaymentKind {
   DEPOSIT
   BALANCE
@@ -195,20 +199,20 @@ model Brand {
 }
 
 model Product {
-  id                   String               @id @default(cuid())
-  internalCode         String               @unique
-  slug                 String?              @unique
+  id                   String                    @id @default(cuid())
+  internalCode         String                    @unique
+  slug                 String?                   @unique
   categoryId           String?
-  category             Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category             Category?                 @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   brandId              String?
-  brand                Brand?               @relation(fields: [brandId], references: [id], onDelete: SetNull)
-  publicationStatus    PublicationStatus    @default(DRAFT)
+  brand                Brand?                    @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  publicationStatus    PublicationStatus         @default(DRAFT)
   availabilityType     AvailabilityType?
   retailPriceMinor     Int?
-  currency             String?              @db.Char(3)
+  currency             String?                   @db.Char(3)
   preorderEstimateText String?
-  isFeatured           Boolean              @default(false)
-  sortOrder            Int                  @default(0)
+  isFeatured           Boolean                   @default(false)
+  sortOrder            Int                       @default(0)
   publishedAt          DateTime?
   translations         ProductTranslation[]
   privateData          ProductPrivate?
@@ -218,11 +222,34 @@ model Product {
   sizeChart            SizeChart?
   variants             ProductVariant[]
   orderItems           OrderItem[]
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  economicsVersions    ProductEconomicsVersion[]
+  attributedAdSpend    AdSpend[]
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
 
   @@index([publicationStatus, categoryId, sortOrder])
   @@index([availabilityType])
+}
+
+model ProductEconomicsVersion {
+  id                      String              @id @default(cuid())
+  productId               String
+  product                 Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  purchaseEstimateMinor   Int
+  logisticsEstimateMinor  Int
+  landedCostEstimateMinor Int
+  retailSnapshotMinor     Int
+  paymentRateBps          Int
+  targetAdRateBps         Int
+  sourceType              EconomicsSourceType @default(ESTIMATE)
+  effectiveFrom           DateTime
+  version                 Int
+  notes                   String?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+
+  @@unique([productId, version])
+  @@index([productId, effectiveFrom])
 }
 
 model ProductTranslation {
@@ -521,19 +548,19 @@ model OrderBusinessEvent {
 }
 
 model Campaign {
-  id                 String         @id @default(cuid())
+  id                 String              @id @default(cuid())
   source             TrafficSource
   externalCampaignId String?
   campaignName       String
   utmCampaign        String?
-  status             CampaignStatus @default(UNKNOWN)
+  status             CampaignStatus      @default(UNKNOWN)
   startDate          DateTime?
   endDate            DateTime?
-  currency           String         @default("EUR") @db.Char(3)
+  currency           String              @default("EUR") @db.Char(3)
   spendEntries       AdSpend[]
   changeLogs         CampaignChangeLog[]
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   @@unique([source, campaignName])
   @@index([source, status])
@@ -562,6 +589,8 @@ model AdSpend {
   campaignId        String?
   campaign          Campaign?         @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   campaignName      String?
+  productId         String?
+  product           Product?          @relation(fields: [productId], references: [id], onDelete: SetNull)
   externalAdSetId   String?
   adSetName         String?
   externalAdId      String?
@@ -577,28 +606,34 @@ model AdSpend {
 
   @@index([date, source])
   @@index([campaignId, date])
+  @@index([productId, date])
 }
 
 model OrderItem {
-  id                          String            @id @default(cuid())
-  orderId                     String
-  order                       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId                   String?
-  product                     Product?          @relation(fields: [productId], references: [id], onDelete: SetNull)
-  productInternalCodeSnapshot String
-  productNameSnapshot         String
-  productSlugSnapshot         String?
-  colorSnapshot               String?
-  sizeSnapshot                String?
-  sizeHelpRequested           Boolean           @default(false)
-  measurementsNote            String?
-  availabilityTypeSnapshot    AvailabilityType?
-  quantity                    Int
-  unitPriceMinor              Int?
-  unitLandedCostMinorSnapshot Int?
-  internalNotes               String?
-  createdAt                   DateTime          @default(now())
-  updatedAt                   DateTime          @updatedAt
+  id                             String               @id @default(cuid())
+  orderId                        String
+  order                          Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId                      String?
+  product                        Product?             @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productInternalCodeSnapshot    String
+  productNameSnapshot            String
+  productSlugSnapshot            String?
+  colorSnapshot                  String?
+  sizeSnapshot                   String?
+  sizeHelpRequested              Boolean              @default(false)
+  measurementsNote               String?
+  availabilityTypeSnapshot       AvailabilityType?
+  quantity                       Int
+  unitPriceMinor                 Int?
+  unitLandedCostMinorSnapshot    Int?
+  unitPurchaseCostMinorSnapshot  Int?
+  unitLogisticsCostMinorSnapshot Int?
+  paymentRateBpsSnapshot         Int?
+  economicsVersionSnapshot       Int?
+  economicsSourceTypeSnapshot    EconomicsSourceType?
+  internalNotes                  String?
+  createdAt                      DateTime             @default(now())
+  updatedAt                      DateTime             @updatedAt
 
   @@index([orderId])
   @@index([productId])
@@ -627,6 +662,7 @@ model Payment {
   order             Order       @relation(fields: [orderId], references: [id], onDelete: Restrict)
   kind              PaymentKind
   amountMinor       Int
+  processorFeeMinor Int?
   currency          String      @db.Char(3)
   receivedAt        DateTime
   reference         String?

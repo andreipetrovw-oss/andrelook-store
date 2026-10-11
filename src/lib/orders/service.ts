@@ -77,6 +77,7 @@ export async function createOrderRequest(
 ): Promise<{ duplicate: boolean; orderId: string; reference: string }> {
   const prisma = getPrisma();
   const reviewMode = getServerConfig().storefrontReviewMode;
+  const requestedAt = new Date();
   const product = await prisma.product.findFirst({
     select: {
       availabilityType: true,
@@ -85,6 +86,19 @@ export async function createOrderRequest(
         where: { reviewStatus: "APPROVED" },
       },
       currency: true,
+      economicsVersions: {
+        orderBy: [{ effectiveFrom: "desc" }, { version: "desc" }],
+        select: {
+          landedCostEstimateMinor: true,
+          logisticsEstimateMinor: true,
+          paymentRateBps: true,
+          purchaseEstimateMinor: true,
+          sourceType: true,
+          version: true,
+        },
+        take: 1,
+        where: { effectiveFrom: { lte: requestedAt } },
+      },
       id: true,
       internalCode: true,
       privateData: { select: { landedCostMinor: true } },
@@ -160,6 +174,7 @@ export async function createOrderRequest(
     }),
   );
   const lastTouch = attribution.lastTouch ?? attribution.firstTouch;
+  const economics = product.economicsVersions?.[0] ?? null;
 
   try {
     const order = await prisma.$transaction(async (tx) => {
@@ -219,8 +234,15 @@ export async function createOrderRequest(
               quantity: input.quantity,
               sizeHelpRequested: input.size === SIZE_HELP_VALUE,
               sizeSnapshot: input.size === SIZE_HELP_VALUE ? null : input.size,
-              unitLandedCostMinorSnapshot: product.privateData?.landedCostMinor,
+              economicsSourceTypeSnapshot: economics?.sourceType,
+              economicsVersionSnapshot: economics?.version,
+              paymentRateBpsSnapshot: economics?.paymentRateBps,
+              unitLandedCostMinorSnapshot:
+                economics?.landedCostEstimateMinor ??
+                product.privateData?.landedCostMinor,
+              unitLogisticsCostMinorSnapshot: economics?.logisticsEstimateMinor,
               unitPriceMinor: product.retailPriceMinor,
+              unitPurchaseCostMinorSnapshot: economics?.purchaseEstimateMinor,
             },
           },
           attribution: {

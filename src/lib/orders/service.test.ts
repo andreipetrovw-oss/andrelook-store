@@ -46,6 +46,16 @@ const databaseProduct = {
   availabilityType: "PRE_ORDER" as const,
   colors: [{ code: "black" }],
   currency: "EUR",
+  economicsVersions: [
+    {
+      landedCostEstimateMinor: 10_000,
+      logisticsEstimateMinor: 2_000,
+      paymentRateBps: 300,
+      purchaseEstimateMinor: 8_000,
+      sourceType: "ESTIMATE" as const,
+      version: 1,
+    },
+  ],
   id: "product_1",
   internalCode: "AL-SRC-TEST",
   privateData: { landedCostMinor: 10_000 },
@@ -125,8 +135,13 @@ describe("transactional assisted-order service", () => {
     expect(data.items.create).toMatchObject({
       productInternalCodeSnapshot: "AL-SRC-TEST",
       productNameSnapshot: "Database product",
+      economicsSourceTypeSnapshot: "ESTIMATE",
+      economicsVersionSnapshot: 1,
+      paymentRateBpsSnapshot: 300,
       unitLandedCostMinorSnapshot: 10_000,
+      unitLogisticsCostMinorSnapshot: 2_000,
       unitPriceMinor: 25_000,
+      unitPurchaseCostMinorSnapshot: 8_000,
     });
     expect(data.statusHistory.create).toEqual({ toStatus: "NEW" });
     expect(data.attribution.create).toMatchObject({

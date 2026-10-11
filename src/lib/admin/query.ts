@@ -6,6 +6,11 @@ import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 import { calculateFinancials } from "@/lib/orders/financials";
 import { buildAdvertisingRows } from "@/lib/measurement/reporting";
+import {
+  applyRateBps,
+  calculateActualProfitability,
+  calculatePlanningEconomics,
+} from "@/lib/economics/calculation";
 
 import { businessOrderWhere, isInternalTestOrder } from "./test-orders";
 
@@ -170,7 +175,18 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
           where: { occurredAt: { gte: input.from, lt: input.to } },
         },
         displayNumber: true,
+        items: {
+          select: {
+            paymentRateBpsSnapshot: true,
+            quantity: true,
+            unitLandedCostMinorSnapshot: true,
+            unitPriceMinor: true,
+          },
+        },
         orderDate: true,
+        payments: {
+          select: { kind: true, processorFeeMinor: true },
+        },
         status: true,
       },
       where: {
@@ -207,7 +223,9 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
       return {
         displayNumber: order.displayNumber,
         events: order.businessEvents,
+        items: order.items,
         orderDate: order.orderDate,
+        payments: order.payments,
         status: order.status,
         touch,
       };
@@ -223,6 +241,196 @@ export async function getCampaignOperationLog() {
     include: { campaign: { select: { source: true, utmCampaign: true } } },
     orderBy: [{ changedAt: "desc" }, { createdAt: "desc" }],
     take: 50,
+  });
+}
+
+export async function getEconomicsProductOptions() {
+  await requireOwner();
+  return getPrisma().product.findMany({
+    orderBy: { internalCode: "asc" },
+    select: {
+      id: true,
+      internalCode: true,
+      translations: {
+        select: { name: true },
+        take: 1,
+        where: { locale: "EN" },
+      },
+    },
+    where: { economicsVersions: { some: {} } },
+  });
+}
+
+export async function getProfitabilityReport() {
+  await requireOwner();
+  const prisma = getPrisma();
+  const now = new Date();
+  const [products, orders, spend] = await Promise.all([
+    prisma.product.findMany({
+      orderBy: { internalCode: "asc" },
+      select: {
+        brand: { select: { displayName: true } },
+        economicsVersions: {
+          orderBy: [{ effectiveFrom: "desc" }, { version: "desc" }],
+          take: 1,
+          where: { effectiveFrom: { lte: now } },
+        },
+        id: true,
+        internalCode: true,
+        retailPriceMinor: true,
+        translations: {
+          select: { name: true },
+          take: 1,
+          where: { locale: "EN" },
+        },
+      },
+      where: { economicsVersions: { some: { effectiveFrom: { lte: now } } } },
+    }),
+    prisma.order.findMany({
+      select: {
+        businessEvents: {
+          select: { amountMinor: true, eventKey: true },
+          where: { eventType: "PAID" },
+        },
+        id: true,
+        items: {
+          select: {
+            paymentRateBpsSnapshot: true,
+            productId: true,
+            quantity: true,
+            unitLandedCostMinorSnapshot: true,
+            unitPriceMinor: true,
+          },
+        },
+        payments: {
+          select: { kind: true, processorFeeMinor: true },
+        },
+      },
+      where: {
+        ...businessOrderWhere,
+        businessEvents: { some: { eventType: "PAID" } },
+      },
+    }),
+    prisma.adSpend.findMany({
+      select: { productId: true, spendMinor: true },
+      where: { productId: { not: null } },
+    }),
+  ]);
+  const spendByProduct = new Map<string, number>();
+  for (const entry of spend) {
+    if (!entry.productId) continue;
+    spendByProduct.set(
+      entry.productId,
+      (spendByProduct.get(entry.productId) ?? 0) +
+        Math.max(0, entry.spendMinor),
+    );
+  }
+
+  return products.map((product) => {
+    const economics = product.economicsVersions[0]!;
+    const planning = calculatePlanningEconomics(economics);
+    let revenueMinor = 0;
+    let landedCostMinor = 0;
+    let paymentCostMinor = 0;
+    let actualDataComplete = true;
+    let paymentCostEstimated = false;
+    let paidCustomers = 0;
+
+    for (const order of orders) {
+      const matchingItems = order.items.filter(
+        (item) => item.productId === product.id,
+      );
+      if (!matchingItems.length) continue;
+      paidCustomers += 1;
+      const orderListMinor = order.items.reduce(
+        (sum, item) => sum + (item.unitPriceMinor ?? 0) * item.quantity,
+        0,
+      );
+      const productListMinor = matchingItems.reduce(
+        (sum, item) => sum + (item.unitPriceMinor ?? 0) * item.quantity,
+        0,
+      );
+      const paidMinor = new Map(
+        order.businessEvents.map((event) => [
+          event.eventKey,
+          event.amountMinor,
+        ]),
+      );
+      const orderRevenueMinor = [...paidMinor.values()].reduce<number>(
+        (sum, amount) => sum + Math.max(0, amount ?? 0),
+        0,
+      );
+      const share = orderListMinor > 0 ? productListMinor / orderListMinor : 0;
+      revenueMinor += Math.round(orderRevenueMinor * share);
+
+      if (
+        matchingItems.some((item) => item.unitLandedCostMinorSnapshot === null)
+      ) {
+        actualDataComplete = false;
+      } else {
+        landedCostMinor += matchingItems.reduce(
+          (sum, item) =>
+            sum + (item.unitLandedCostMinorSnapshot ?? 0) * item.quantity,
+          0,
+        );
+      }
+      const relevantPayments = order.payments.filter(
+        (payment) => payment.kind !== "REFUND",
+      );
+      if (
+        relevantPayments.length > 0 &&
+        relevantPayments.every((payment) => payment.processorFeeMinor !== null)
+      ) {
+        const orderFees = relevantPayments.reduce(
+          (sum, payment) => sum + (payment.processorFeeMinor ?? 0),
+          0,
+        );
+        paymentCostMinor += Math.round(orderFees * share);
+      } else if (
+        matchingItems.every(
+          (item) =>
+            item.unitPriceMinor !== null &&
+            item.paymentRateBpsSnapshot !== null,
+        )
+      ) {
+        paymentCostEstimated = true;
+        paymentCostMinor += matchingItems.reduce(
+          (sum, item) =>
+            sum +
+            applyRateBps(
+              (item.unitPriceMinor ?? 0) * item.quantity,
+              item.paymentRateBpsSnapshot ?? 0,
+            ),
+          0,
+        );
+      } else {
+        actualDataComplete = false;
+      }
+    }
+    const actualAdSpendMinor = spendByProduct.get(product.id) ?? 0;
+    const actual = actualDataComplete
+      ? calculateActualProfitability({
+          actualAdSpendMinor,
+          landedCostMinor,
+          paidCustomers,
+          paymentCostMinor,
+          revenueMinor,
+        })
+      : null;
+
+    return {
+      actual,
+      actualAdSpendMinor,
+      brand: product.brand?.displayName ?? "—",
+      economics,
+      internalCode: product.internalCode,
+      name: product.translations[0]?.name ?? product.internalCode,
+      paidCustomers,
+      paymentCostEstimated,
+      planning,
+      retailPriceMinor: product.retailPriceMinor,
+      revenueMinor,
+    };
   });
 }
 

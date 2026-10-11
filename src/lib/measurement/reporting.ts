@@ -12,6 +12,16 @@ export type ReportingOrder = {
     occurredAt: Date;
   }>;
   orderDate: Date;
+  items?: Array<{
+    paymentRateBpsSnapshot: number | null;
+    quantity: number;
+    unitLandedCostMinorSnapshot: number | null;
+    unitPriceMinor: number | null;
+  }>;
+  payments?: Array<{
+    kind: string;
+    processorFeeMinor: number | null;
+  }>;
   status: string;
   touch: {
     adName?: string | null;
@@ -36,10 +46,13 @@ export type AdvertisingRow = {
   adSet: string | null;
   campaign: string | null;
   confirmed: number;
+  contributionAfterAdsMinor: number | null;
+  contributionBeforeAdsMinor: number | null;
   costPerCustomerMinor: number | null;
   costPerLeadMinor: number | null;
   leads: number;
   paid: number;
+  paymentCostEstimated: boolean;
   revenueMinor: number;
   roas: number | null;
   source: TrafficSourceCode;
@@ -86,10 +99,13 @@ export function buildAdvertisingRows(input: {
       adSet,
       campaign,
       confirmed: 0,
+      contributionAfterAdsMinor: 0,
+      contributionBeforeAdsMinor: 0,
       costPerCustomerMinor: null,
       costPerLeadMinor: null,
       leads: 0,
       paid: 0,
+      paymentCostEstimated: false,
       revenueMinor: 0,
       roas: null,
       source,
@@ -132,8 +148,60 @@ export function buildAdvertisingRows(input: {
         .map((event) => [event.eventKey, event]),
     );
     if (paidEvents.size) target.paid += 1;
+    let paidRevenueMinor = 0;
     for (const event of paidEvents.values()) {
-      target.revenueMinor += Math.max(0, event.amountMinor ?? 0);
+      paidRevenueMinor += Math.max(0, event.amountMinor ?? 0);
+    }
+    target.revenueMinor += paidRevenueMinor;
+    if (paidEvents.size) {
+      const items = order.items ?? [];
+      const landedComplete =
+        items.length > 0 &&
+        items.every((item) => item.unitLandedCostMinorSnapshot !== null);
+      const estimatedPaymentComplete =
+        items.length > 0 &&
+        items.every(
+          (item) =>
+            item.paymentRateBpsSnapshot !== null &&
+            item.unitPriceMinor !== null,
+        );
+      const relevantPayments = (order.payments ?? []).filter(
+        (payment) => payment.kind !== "REFUND",
+      );
+      const actualPaymentComplete =
+        relevantPayments.length > 0 &&
+        relevantPayments.every((payment) => payment.processorFeeMinor !== null);
+      if (
+        !landedComplete ||
+        (!actualPaymentComplete && !estimatedPaymentComplete)
+      ) {
+        target.contributionBeforeAdsMinor = null;
+      } else if (target.contributionBeforeAdsMinor !== null) {
+        const landedCostMinor = items.reduce(
+          (sum, item) =>
+            sum + (item.unitLandedCostMinorSnapshot ?? 0) * item.quantity,
+          0,
+        );
+        const paymentCostMinor = actualPaymentComplete
+          ? relevantPayments.reduce(
+              (sum, payment) => sum + (payment.processorFeeMinor ?? 0),
+              0,
+            )
+          : items.reduce(
+              (sum, item) =>
+                sum +
+                Math.round(
+                  ((item.unitPriceMinor ?? 0) *
+                    item.quantity *
+                    (item.paymentRateBpsSnapshot ?? 0)) /
+                    10_000,
+                ),
+              0,
+            );
+        target.paymentCostEstimated ||= !actualPaymentComplete;
+        target.contributionBeforeAdsMinor +=
+          paidRevenueMinor - landedCostMinor - paymentCostMinor;
+      }
     }
   }
 
@@ -159,6 +227,10 @@ export function buildAdvertisingRows(input: {
     item.roas = item.spendMinor
       ? Number((item.revenueMinor / item.spendMinor).toFixed(2))
       : null;
+    item.contributionAfterAdsMinor =
+      item.contributionBeforeAdsMinor === null
+        ? null
+        : item.contributionBeforeAdsMinor - item.spendMinor;
   }
   return [...rows.values()].sort(
     (a, b) => b.revenueMinor - a.revenueMinor || b.leads - a.leads,

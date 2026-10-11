@@ -28,6 +28,9 @@ const paymentSchema = z.object({
     .transform((value) => value.toUpperCase()),
   kind: z.enum(PaymentKind),
   orderId: z.string().min(1),
+  processorFee: z
+    .union([z.literal(""), z.coerce.number().nonnegative().max(1_000_000)])
+    .optional(),
   reference: z.string().trim().max(200).optional(),
 });
 
@@ -44,6 +47,7 @@ const spendSchema = z.object({
   amount: z.coerce.number().positive().max(1_000_000),
   campaignName: z.string().trim().max(200).optional(),
   date: z.iso.date(),
+  productId: z.string().trim().optional(),
   source: z.enum(["META_ADS", "GOOGLE_ADS"]),
 });
 
@@ -160,6 +164,10 @@ export async function recordPayment(formData: FormData) {
       currency: parsed.data.currency,
       kind: parsed.data.kind,
       orderId: parsed.data.orderId,
+      processorFeeMinor:
+        typeof parsed.data.processorFee === "number"
+          ? Math.round(parsed.data.processorFee * 100)
+          : null,
       receivedAt: new Date(),
       recordedByAdminId,
       reference: parsed.data.reference || null,
@@ -174,6 +182,17 @@ export async function recordAdvertisingSpend(formData: FormData) {
   if (!parsed.success) throw new Error("Invalid advertising spend entry.");
   const recordedByAdminId = await adminId();
   const prisma = getPrisma();
+  if (parsed.data.productId) {
+    const productExists = await prisma.product.count({
+      where: {
+        economicsVersions: { some: {} },
+        id: parsed.data.productId,
+      },
+    });
+    if (productExists !== 1) {
+      throw new Error("Invalid product for advertising spend.");
+    }
+  }
   const campaign = parsed.data.campaignName
     ? await prisma.campaign.upsert({
         create: {
@@ -196,6 +215,7 @@ export async function recordAdvertisingSpend(formData: FormData) {
       currency: "EUR",
       date: new Date(`${parsed.data.date}T00:00:00.000Z`),
       importSource: "MANUAL",
+      productId: parsed.data.productId || null,
       recordedByAdminId,
       source: parsed.data.source,
       spendMinor: Math.round(parsed.data.amount * 100),
