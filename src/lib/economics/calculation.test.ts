@@ -57,4 +57,12 @@ describe("unit economics", () => {
       contributionBeforeAdsMinor: 12_223,
     });
   });
+
+  it("preserves the owner Jayden planning snapshot without rewriting catalog data", () => {
+    const jayden = ownerEconomics.find(
+      (row) => row.internalCode === "AL-LEGACY-015",
+    );
+    expect(jayden?.retailSnapshotMinor).toBe(18_900);
+    expect(calculatePlanningEconomics(jayden!).plannedProfitMinor).toBe(8_443);
+  });
 });

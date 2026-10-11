@@ -36,6 +36,11 @@ async function main() {
   const productByCode = new Map(
     products.map((product) => [product.internalCode, product]),
   );
+  const retailDiscrepancies: Array<{
+    catalogRetailMinor: number | null;
+    internalCode: string;
+    ownerRetailSnapshotMinor: number;
+  }> = [];
 
   await prisma.$transaction(
     ownerEconomics.map((row) => {
@@ -45,9 +50,11 @@ async function main() {
         throw new Error(`${row.internalCode} is not a launch product.`);
       }
       if (product.retailPriceMinor !== row.retailSnapshotMinor) {
-        throw new Error(
-          `${row.internalCode} retail mismatch: catalog=${product.retailPriceMinor}, owner=${row.retailSnapshotMinor}.`,
-        );
+        retailDiscrepancies.push({
+          catalogRetailMinor: product.retailPriceMinor,
+          internalCode: row.internalCode,
+          ownerRetailSnapshotMinor: row.retailSnapshotMinor,
+        });
       }
       if (product.translations[0]?.name !== row.productName) {
         throw new Error(
@@ -64,8 +71,14 @@ async function main() {
         effectiveFrom: new Date(ECONOMICS_EFFECTIVE_FROM),
         landedCostEstimateMinor: row.landedCostEstimateMinor,
         logisticsEstimateMinor: row.logisticsEstimateMinor,
-        notes:
+        notes: [
           "Owner-supplied approximate planning economics; not accounting truth.",
+          product.retailPriceMinor !== row.retailSnapshotMinor
+            ? `Planning retail snapshot differs from current public catalog price (${row.retailSnapshotMinor} vs ${product.retailPriceMinor ?? "null"} minor units); public price was not changed.`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" "),
         paymentRateBps: row.paymentRateBps,
         purchaseEstimateMinor: row.purchaseEstimateMinor,
         retailSnapshotMinor: row.retailSnapshotMinor,
@@ -96,6 +109,7 @@ async function main() {
     throw new Error(`Expected 22 seeded rows, found ${seeded}.`);
   console.log(
     JSON.stringify({
+      retailDiscrepancies,
       seeded,
       sourceType: "ESTIMATE",
       version: ECONOMICS_VERSION,

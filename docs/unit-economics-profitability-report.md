@@ -12,7 +12,11 @@
 
 ## Validation and discrepancy report
 
-All 22 supplied landed costs equal purchase plus logistics. No discrepancy exists in the owner-supplied base or landed values. The owner did not supply separate expected values for payment cost, target ad cost, planned profit, planned margin, break-even CAC or break-even ROAS; the values below are fresh formula outputs, not silent corrections to an owner-derived column.
+All 22 supplied landed costs equal purchase plus logistics. No discrepancy exists in the owner-supplied purchase, logistics or landed values.
+
+One retail discrepancy was found and is preserved rather than silently corrected: **AL-LEGACY-015 / Parajumpers Jayden Hybrid Cardigan has an owner planning retail snapshot of €189.00 while the current public catalog price is €219.00**. The private economics version uses the supplied €189.00 snapshot for its planning calculations. The public price remains €219.00 and is not overwritten. The CRM shows both values and flags the mismatch.
+
+The owner did not supply separate expected values for payment cost, target ad cost, planned profit, planned margin, break-even CAC or break-even ROAS; the values below are fresh formula outputs, not silent corrections to an owner-derived column.
 
 All money values are EUR. Margin is planned profit / retail. ROAS is retail / break-even CAC.
 

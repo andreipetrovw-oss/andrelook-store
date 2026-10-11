@@ -32,6 +32,7 @@ export default async function ProfitabilityPage() {
               <tr>
                 <th>Товар</th>
                 <th>Retail</th>
+                <th>Public price</th>
                 <th>Закупка</th>
                 <th>Логистика</th>
                 <th>Landed</th>
@@ -56,7 +57,17 @@ export default async function ProfitabilityPage() {
                     <br />
                     <small>{row.internalCode}</small>
                   </td>
-                  <td>{money(row.economics.retailSnapshotMinor)}</td>
+                  <td>
+                    {money(row.economics.retailSnapshotMinor)}
+                    {row.retailPriceMinor !==
+                    row.economics.retailSnapshotMinor ? (
+                      <>
+                        <br />
+                        <small>Отличается от public price</small>
+                      </>
+                    ) : null}
+                  </td>
+                  <td>{money(row.retailPriceMinor)}</td>
                   <td>{money(row.economics.purchaseEstimateMinor)}</td>
                   <td>{money(row.economics.logisticsEstimateMinor)}</td>
                   <td>{money(row.economics.landedCostEstimateMinor)}</td>
