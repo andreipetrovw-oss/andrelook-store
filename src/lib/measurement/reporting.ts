@@ -14,6 +14,8 @@ export type ReportingOrder = {
   orderDate: Date;
   status: string;
   touch: {
+    adName?: string | null;
+    adSetName?: string | null;
     campaignName: string | null;
     source: TrafficSourceCode;
     sourceGroup: SourceGroupCode;
@@ -21,6 +23,8 @@ export type ReportingOrder = {
 };
 
 export type ReportingSpend = {
+  adName?: string | null;
+  adSetName?: string | null;
   campaignName: string | null;
   date: Date;
   source: TrafficSourceCode;
@@ -28,6 +32,8 @@ export type ReportingSpend = {
 };
 
 export type AdvertisingRow = {
+  ad: string | null;
+  adSet: string | null;
   campaign: string | null;
   confirmed: number;
   costPerCustomerMinor: number | null;
@@ -50,8 +56,13 @@ const confirmedEventTypes = new Set([
   "DELIVERED",
 ]);
 
-function key(source: TrafficSourceCode, campaign: string | null) {
-  return `${source}\u0000${campaign ?? ""}`;
+function key(
+  source: TrafficSourceCode,
+  campaign: string | null,
+  adSet: string | null,
+  ad: string | null,
+) {
+  return `${source}\u0000${campaign ?? ""}\u0000${adSet ?? ""}\u0000${ad ?? ""}`;
 }
 
 export function buildAdvertisingRows(input: {
@@ -61,11 +72,18 @@ export function buildAdvertisingRows(input: {
   to: Date;
 }) {
   const rows = new Map<string, AdvertisingRow>();
-  const row = (source: TrafficSourceCode, campaign: string | null) => {
-    const rowKey = key(source, campaign);
+  const row = (
+    source: TrafficSourceCode,
+    campaign: string | null,
+    adSet: string | null,
+    ad: string | null,
+  ) => {
+    const rowKey = key(source, campaign, adSet, ad);
     const existing = rows.get(rowKey);
     if (existing) return existing;
     const created: AdvertisingRow = {
+      ad,
+      adSet,
       campaign,
       confirmed: 0,
       costPerCustomerMinor: null,
@@ -84,7 +102,12 @@ export function buildAdvertisingRows(input: {
   for (const order of input.orders) {
     const source = order.touch?.source ?? "UNKNOWN";
     const campaign = order.touch?.campaignName ?? null;
-    const target = row(source, campaign);
+    const target = row(
+      source,
+      campaign,
+      order.touch?.adSetName ?? null,
+      order.touch?.adName ?? null,
+    );
     if (order.orderDate >= input.from && order.orderDate < input.to) {
       target.leads += 1;
     }
@@ -116,10 +139,12 @@ export function buildAdvertisingRows(input: {
 
   for (const spend of input.spend) {
     if (spend.date < input.from || spend.date >= input.to) continue;
-    row(spend.source, spend.campaignName).spendMinor += Math.max(
-      0,
-      spend.spendMinor,
-    );
+    row(
+      spend.source,
+      spend.campaignName,
+      spend.adSetName ?? null,
+      spend.adName ?? null,
+    ).spendMinor += Math.max(0, spend.spendMinor);
   }
 
   for (const item of rows.values()) {

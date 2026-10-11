@@ -525,16 +525,34 @@ model Campaign {
   source             TrafficSource
   externalCampaignId String?
   campaignName       String
+  utmCampaign        String?
   status             CampaignStatus @default(UNKNOWN)
   startDate          DateTime?
   endDate            DateTime?
   currency           String         @default("EUR") @db.Char(3)
   spendEntries       AdSpend[]
+  changeLogs         CampaignChangeLog[]
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
   @@unique([source, campaignName])
   @@index([source, status])
+}
+
+model CampaignChangeLog {
+  id                String     @id @default(cuid())
+  campaignId        String?
+  campaign          Campaign?  @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  campaignName      String
+  change            String
+  reason            String?
+  changedAt         DateTime
+  recordedByAdminId String?
+  recordedByAdmin   AdminUser? @relation("CampaignChangeRecorder", fields: [recordedByAdminId], references: [id], onDelete: SetNull)
+  createdAt         DateTime   @default(now())
+
+  @@index([changedAt])
+  @@index([campaignId, changedAt])
 }
 
 model AdSpend {
@@ -643,6 +661,7 @@ model AdminUser {
   payments        Payment[]            @relation("PaymentRecorder")
   statusChanges   OrderStatusHistory[] @relation("StatusChanger")
   spendEntries    AdSpend[]            @relation("SpendRecorder")
+  campaignChanges CampaignChangeLog[]  @relation("CampaignChangeRecorder")
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 

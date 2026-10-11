@@ -19,6 +19,7 @@ on:
       - codex/business-readiness-closeout
       - growth-g1-seo-geo
       - growth-g2-measurement-attribution
+      - codex/g3-acquisition-launch
 
 permissions:
   contents: read

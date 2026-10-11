@@ -150,6 +150,8 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
           select: {
             touches: {
               select: {
+                adName: true,
+                adSetName: true,
                 campaignName: true,
                 source: true,
                 sourceGroup: true,
@@ -185,6 +187,8 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
     }),
     prisma.adSpend.findMany({
       select: {
+        adName: true,
+        adSetName: true,
         campaignName: true,
         date: true,
         source: true,
@@ -210,6 +214,15 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
     }),
     spend,
     to: input.to,
+  });
+}
+
+export async function getCampaignOperationLog() {
+  await requireOwner();
+  return getPrisma().campaignChangeLog.findMany({
+    include: { campaign: { select: { source: true, utmCampaign: true } } },
+    orderBy: [{ changedAt: "desc" }, { createdAt: "desc" }],
+    take: 50,
   });
 }
 

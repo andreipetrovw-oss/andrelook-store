@@ -1,8 +1,14 @@
 import Link from "next/link";
 
-import { recordAdvertisingSpend } from "@/app/(admin)/admin/actions";
+import {
+  recordAdvertisingSpend,
+  recordCampaignChange,
+} from "@/app/(admin)/admin/actions";
 import { trafficSourceLabels } from "@/lib/admin/traffic-labels";
-import { getAdvertisingReport } from "@/lib/admin/query";
+import {
+  getAdvertisingReport,
+  getCampaignOperationLog,
+} from "@/lib/admin/query";
 import type { AdvertisingRow } from "@/lib/measurement/reporting";
 
 function date(value: string | undefined, fallback: Date) {
@@ -19,12 +25,18 @@ function money(value: number | null) {
   return value === null ? "—" : `${(value / 100).toFixed(2)} EUR`;
 }
 
-function sourceRows(rows: AdvertisingRow[]) {
+function aggregateRows(rows: AdvertisingRow[], level: "campaign" | "source") {
   const grouped = new Map<string, AdvertisingRow>();
   for (const row of rows) {
-    const current = grouped.get(row.source) ?? {
+    const groupKey =
+      level === "source"
+        ? row.source
+        : `${row.source}\u0000${row.campaign ?? ""}`;
+    const current = grouped.get(groupKey) ?? {
       ...row,
-      campaign: null,
+      ad: null,
+      adSet: null,
+      campaign: level === "source" ? null : row.campaign,
       confirmed: 0,
       leads: 0,
       paid: 0,
@@ -47,7 +59,7 @@ function sourceRows(rows: AdvertisingRow[]) {
     current.roas = current.spendMinor
       ? Number((current.revenueMinor / current.spendMinor).toFixed(2))
       : null;
-    grouped.set(row.source, current);
+    grouped.set(groupKey, current);
   }
   return [...grouped.values()].sort(
     (left, right) =>
@@ -78,13 +90,20 @@ export default async function AdvertisingPage({
   const from = date(filters.from, defaultFrom);
   const toDay = date(filters.to, new Date(tomorrow.getTime() - 86_400_000));
   const to = new Date(toDay.getTime() + 86_400_000);
-  const allRows = await getAdvertisingReport({ from, to });
+  const [allRows, operationLog] = await Promise.all([
+    getAdvertisingReport({ from, to }),
+    getCampaignOperationLog(),
+  ]);
   const rows = allRows.filter(
     (row) =>
       (!filters.source || row.source === filters.source) &&
       (!filters.campaign || row.campaign === filters.campaign),
   );
-  const displayRows = filters.source ? rows : sourceRows(rows);
+  const displayRows = !filters.source
+    ? aggregateRows(rows, "source")
+    : !filters.campaign
+      ? aggregateRows(rows, "campaign")
+      : rows;
   const totals = rows.reduce(
     (sum, row) => ({
       confirmed: sum.confirmed + row.confirmed,
@@ -190,13 +209,21 @@ export default async function AdvertisingPage({
         ))}
       </div>
       <section className="admin-panel admin-panel-wide">
-        <h2>{filters.source ? "Кампании" : "Источники"}</h2>
+        <h2>
+          {filters.campaign
+            ? "Группы и объявления"
+            : filters.source
+              ? "Кампании"
+              : "Источники"}
+        </h2>
         <div className="admin-table-wrap" tabIndex={0}>
           <table className="admin-table">
             <thead>
               <tr>
                 <th>Источник</th>
                 <th>Кампания</th>
+                {filters.campaign ? <th>Группа объявлений</th> : null}
+                {filters.campaign ? <th>Объявление</th> : null}
                 <th>Расход</th>
                 <th>Лиды</th>
                 <th>Подтверждено</th>
@@ -209,7 +236,9 @@ export default async function AdvertisingPage({
             </thead>
             <tbody>
               {displayRows.map((row) => (
-                <tr key={`${row.source}:${row.campaign ?? ""}`}>
+                <tr
+                  key={`${row.source}:${row.campaign ?? ""}:${row.adSet ?? ""}:${row.ad ?? ""}`}
+                >
                   <td>
                     <Link
                       href={`/admin/advertising?from=${isoDay(from)}&to=${isoDay(toDay)}&source=${row.source}`}
@@ -228,6 +257,8 @@ export default async function AdvertisingPage({
                       "—"
                     )}
                   </td>
+                  {filters.campaign ? <td>{row.adSet ?? "—"}</td> : null}
+                  {filters.campaign ? <td>{row.ad ?? "—"}</td> : null}
                   <td>{money(row.spendMinor)}</td>
                   <td>{row.leads}</td>
                   <td>{row.confirmed}</td>
@@ -272,6 +303,64 @@ export default async function AdvertisingPage({
           </label>
           <button type="submit">Сохранить расход</button>
         </form>
+      </section>
+      <section className="admin-panel admin-panel-wide">
+        <h2>Журнал изменений кампаний</h2>
+        <p className="admin-overview-note">
+          Фиксируйте изменение, причину и дату. Это операционный журнал, а не
+          замена истории Meta Ads Manager.
+        </p>
+        <form action={recordCampaignChange} className="admin-stack-form">
+          <label>
+            <span>Дата</span>
+            <input
+              defaultValue={isoDay(calendarToday)}
+              name="changedAt"
+              required
+              type="date"
+            />
+          </label>
+          <label>
+            <span>Кампания / UTM</span>
+            <input maxLength={200} name="campaignName" required />
+          </label>
+          <label>
+            <span>Изменение</span>
+            <textarea maxLength={500} name="change" required rows={3} />
+          </label>
+          <label>
+            <span>Причина</span>
+            <textarea maxLength={500} name="reason" rows={3} />
+          </label>
+          <button type="submit">Записать изменение</button>
+        </form>
+        <div className="admin-table-wrap" tabIndex={0}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Кампания</th>
+                <th>Изменение</th>
+                <th>Причина</th>
+              </tr>
+            </thead>
+            <tbody>
+              {operationLog.map((entry) => (
+                <tr key={entry.id}>
+                  <td>{isoDay(entry.changedAt)}</td>
+                  <td>{entry.campaign?.utmCampaign ?? entry.campaignName}</td>
+                  <td>{entry.change}</td>
+                  <td>{entry.reason ?? "—"}</td>
+                </tr>
+              ))}
+              {operationLog.length === 0 ? (
+                <tr>
+                  <td colSpan={4}>Изменений пока нет.</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </section>
     </>
   );

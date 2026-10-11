@@ -47,6 +47,13 @@ const spendSchema = z.object({
   source: z.enum(["META_ADS", "GOOGLE_ADS"]),
 });
 
+const campaignChangeSchema = z.object({
+  campaignName: z.string().trim().min(1).max(200),
+  change: z.string().trim().min(1).max(500),
+  changedAt: z.iso.date(),
+  reason: z.string().trim().max(500).optional(),
+});
+
 const statusBusinessEvent = {
   AWAITING_PAYMENT: "AWAITING_PAYMENT",
   CANCELLED: "CANCELLED",
@@ -192,6 +199,33 @@ export async function recordAdvertisingSpend(formData: FormData) {
       recordedByAdminId,
       source: parsed.data.source,
       spendMinor: Math.round(parsed.data.amount * 100),
+    },
+  });
+  revalidatePath("/admin/advertising");
+}
+
+export async function recordCampaignChange(formData: FormData) {
+  const parsed = campaignChangeSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid campaign change entry.");
+  const recordedByAdminId = await adminId();
+  const prisma = getPrisma();
+  const campaign = await prisma.campaign.findFirst({
+    select: { id: true },
+    where: {
+      OR: [
+        { campaignName: parsed.data.campaignName },
+        { utmCampaign: parsed.data.campaignName },
+      ],
+    },
+  });
+  await prisma.campaignChangeLog.create({
+    data: {
+      campaignId: campaign?.id,
+      campaignName: parsed.data.campaignName,
+      change: parsed.data.change,
+      changedAt: new Date(`${parsed.data.changedAt}T00:00:00.000Z`),
+      reason: parsed.data.reason || null,
+      recordedByAdminId,
     },
   });
   revalidatePath("/admin/advertising");

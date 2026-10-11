@@ -75,4 +75,35 @@ describe("advertising reporting", () => {
       spendMinor: 0,
     });
   });
+
+  it("keeps campaign, ad set and ad rows separate", () => {
+    const rows = buildAdvertisingRows({
+      from: new Date("2026-10-01T00:00:00Z"),
+      orders: [],
+      spend: [
+        {
+          adName: "maya_video_01",
+          adSetName: "ee_men_core",
+          campaignName: "ee_meta_conv_winter_2026",
+          date: new Date("2026-10-10T00:00:00Z"),
+          source: "META_ADS",
+          spendMinor: 300,
+        },
+        {
+          adName: "tyrik_video_01",
+          adSetName: "ee_men_core",
+          campaignName: "ee_meta_conv_winter_2026",
+          date: new Date("2026-10-10T00:00:00Z"),
+          source: "META_ADS",
+          spendMinor: 250,
+        },
+      ],
+      to: new Date("2026-11-01T00:00:00Z"),
+    });
+    expect(rows).toHaveLength(2);
+    expect(rows.map((row) => row.ad)).toEqual([
+      "maya_video_01",
+      "tyrik_video_01",
+    ]);
+  });
 });

@@ -688,7 +688,8 @@ button:disabled {
 .admin-filters input,
 .admin-filters select,
 .admin-stack-form input,
-.admin-stack-form select {
+.admin-stack-form select,
+.admin-stack-form textarea {
   background: var(--color-background);
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
