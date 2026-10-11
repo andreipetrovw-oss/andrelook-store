@@ -139,6 +139,18 @@ describe("Meta Conversions API Lead delivery", () => {
       ),
     ).resolves.toEqual({ reason: "test-order", status: "skipped" });
 
+    findUnique.mockResolvedValueOnce({
+      ...order,
+      displayNumber: "AL-20261011-302FDC",
+    });
+    await expect(
+      sendMetaLeadForOrder(
+        "order_meta_verification",
+        "https://www.andrelook.store/et/catalog",
+        productionRuntime,
+      ),
+    ).resolves.toEqual({ reason: "test-order", status: "skipped" });
+
     await expect(
       sendMetaLeadForOrder(
         "order_preview",

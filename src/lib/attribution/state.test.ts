@@ -13,6 +13,27 @@ const base = {
 };
 
 describe("30-day attribution state", () => {
+  it("preserves the approved Meta campaign, ad set and creative labels", () => {
+    const state = updateAttributionState(null, {
+      ...base,
+      adName: "maya_video_01",
+      adSetName: "ee_men_23_44",
+      utmCampaign: "ee_meta_conv_winter_2026",
+      utmContent: "maya_video_01",
+      utmMedium: "paid_social",
+      utmSource: "meta",
+    });
+
+    expect(state.firstTouch).toMatchObject({
+      adName: "maya_video_01",
+      adSetName: "ee_men_23_44",
+      campaignName: "ee_meta_conv_winter_2026",
+      contentLabel: "maya_video_01",
+      source: "META_ADS",
+      sourceGroup: "PAID",
+    });
+  });
+
   it("preserves first touch and only changes last touch for a meaningful campaign", () => {
     const first = updateAttributionState(null, {
       ...base,

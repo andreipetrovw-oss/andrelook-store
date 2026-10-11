@@ -1,6 +1,9 @@
 import type { Prisma } from "@prisma/client";
 
-export const acceptanceTestOrderNumbers = ["AL-20261007-3C7477"] as const;
+export const acceptanceTestOrderNumbers = [
+  "AL-20261007-3C7477",
+  "AL-20261011-302FDC",
+] as const;
 
 const acceptanceTestOrderNumberSet = new Set<string>(
   acceptanceTestOrderNumbers,

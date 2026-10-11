@@ -47,14 +47,18 @@ describe("owner CRM data boundary", () => {
     expect(mocks.groupBy).toHaveBeenCalledWith(
       expect.objectContaining({
         where: {
-          displayNumber: { notIn: ["AL-20261007-3C7477"] },
+          displayNumber: {
+            notIn: ["AL-20261007-3C7477", "AL-20261011-302FDC"],
+          },
         },
       }),
     );
     expect(mocks.count).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          displayNumber: { notIn: ["AL-20261007-3C7477"] },
+          displayNumber: {
+            notIn: ["AL-20261007-3C7477", "AL-20261011-302FDC"],
+          },
         }),
       }),
     );
@@ -95,6 +99,20 @@ describe("owner CRM data boundary", () => {
     expect(mocks.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "acceptance-order-id" } }),
     );
+  });
+
+  it("keeps the Meta verification order accessible and clearly classified", async () => {
+    mocks.findUnique.mockResolvedValue({
+      confirmedTotalMinor: 25_900,
+      currency: "EUR",
+      displayNumber: "AL-20261011-302FDC",
+      payments: [],
+    });
+
+    await expect(getAdminOrder("meta-test-order-id")).resolves.toMatchObject({
+      displayNumber: "AL-20261011-302FDC",
+      isTest: true,
+    });
   });
 
   it("fails before private catalog data is read when authorization fails", async () => {
