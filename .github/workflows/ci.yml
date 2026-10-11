@@ -21,6 +21,7 @@ on:
       - growth-g2-measurement-attribution
       - codex/g3-acquisition-launch
       - codex/unit-economics-profitability
+      - codex/meta-prelaunch-closeout
 
 permissions:
   contents: read
