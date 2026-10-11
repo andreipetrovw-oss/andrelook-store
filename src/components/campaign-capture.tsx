@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { isLocale, type Locale } from "@/config/locales";
 import {
@@ -14,6 +15,7 @@ import type { ConsentPreferences } from "@/lib/attribution/types";
 import type { AttributionState } from "@/lib/attribution/types";
 import {
   applyMeasurementConsent,
+  trackFirstPartyPageView,
   trackPublicEvent,
 } from "@/lib/measurement/client";
 
@@ -87,6 +89,7 @@ function landingState(marketingConsent: boolean, reset = false) {
 }
 
 export function CampaignCapture({ locale }: { locale: Locale }) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
@@ -142,6 +145,13 @@ export function CampaignCapture({ locale }: { locale: Locale }) {
       document.removeEventListener("click", onClick);
     };
   }, []);
+
+  useEffect(() => {
+    const send = () => trackFirstPartyPageView();
+    send();
+    window.addEventListener("andrelook:consent", send);
+    return () => window.removeEventListener("andrelook:consent", send);
+  }, [pathname]);
 
   useEffect(() => {
     const showSettings = () => setOpen(true);

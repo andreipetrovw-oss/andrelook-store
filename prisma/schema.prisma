@@ -122,6 +122,15 @@ enum SpendImportSource {
   API
 }
 
+enum AnalyticsEventName {
+  PAGE_VIEW
+  VIEW_ITEM_LIST
+  SELECT_ITEM
+  VIEW_ITEM
+  PREORDER_OPEN
+  PREORDER_SUBMIT
+}
+
 enum EconomicsSourceType {
   ESTIMATE
 }
@@ -224,6 +233,7 @@ model Product {
   orderItems           OrderItem[]
   economicsVersions    ProductEconomicsVersion[]
   attributedAdSpend    AdSpend[]
+  analyticsEvents      AnalyticsEvent[]
   createdAt            DateTime                  @default(now())
   updatedAt            DateTime                  @updatedAt
 
@@ -597,6 +607,11 @@ model AdSpend {
   adName            String?
   currency          String            @db.Char(3)
   spendMinor        Int
+  impressions       Int?
+  reach             Int?
+  linkClicks        Int?
+  outboundClicks    Int?
+  landingPageViews  Int?
   importSource      SpendImportSource @default(MANUAL)
   externalRecordId  String?           @unique
   recordedByAdminId String?
@@ -607,6 +622,43 @@ model AdSpend {
   @@index([date, source])
   @@index([campaignId, date])
   @@index([productId, date])
+}
+
+model AnalyticsEvent {
+  id           String             @id @default(cuid())
+  eventId      String             @unique
+  sessionId    String
+  eventName    AnalyticsEventName
+  occurredAt   DateTime           @default(now())
+  source       TrafficSource
+  sourceGroup  SourceGroup
+  campaignName String?
+  adSetName    String?
+  adName       String?
+  contentLabel String?
+  landingPage  String?
+  pagePath     String
+  locale       Locale
+  productId    String?
+  product      Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  createdAt    DateTime           @default(now())
+
+  @@index([eventName, occurredAt])
+  @@index([source, occurredAt])
+  @@index([campaignName, occurredAt])
+  @@index([landingPage, occurredAt])
+  @@index([productId, occurredAt])
+  @@index([sessionId, occurredAt])
+}
+
+model AnalyticsDataSourceStatus {
+  source           String    @id
+  status           String
+  lastAttemptAt    DateTime
+  lastSuccessAt    DateTime?
+  lastImportedRows Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model OrderItem {

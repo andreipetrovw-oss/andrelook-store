@@ -5,7 +5,11 @@ import { OrderStatus, Prisma } from "@prisma/client";
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 import { calculateFinancials } from "@/lib/orders/financials";
-import { buildAdvertisingRows } from "@/lib/measurement/reporting";
+import {
+  buildAdvertisingRows,
+  buildLandingPerformance,
+  buildProductPerformance,
+} from "@/lib/measurement/reporting";
 import {
   applyRateBps,
   calculateActualProfitability,
@@ -148,7 +152,7 @@ export async function getAdminOrder(id: string) {
 export async function getAdvertisingReport(input: { from: Date; to: Date }) {
   await requireOwner();
   const prisma = getPrisma();
-  const [orders, spend] = await Promise.all([
+  const [orders, spend, analyticsEvents, metaStatus] = await Promise.all([
     prisma.order.findMany({
       select: {
         attribution: {
@@ -158,6 +162,7 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
                 adName: true,
                 adSetName: true,
                 campaignName: true,
+                landingPage: true,
                 source: true,
                 sourceGroup: true,
                 touchType: true,
@@ -178,6 +183,8 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
         items: {
           select: {
             paymentRateBpsSnapshot: true,
+            productId: true,
+            productNameSnapshot: true,
             quantity: true,
             unitLandedCostMinorSnapshot: true,
             unitPriceMinor: true,
@@ -207,32 +214,99 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
         adSetName: true,
         campaignName: true,
         date: true,
+        impressions: true,
+        landingPageViews: true,
+        linkClicks: true,
+        outboundClicks: true,
+        reach: true,
         source: true,
         spendMinor: true,
       },
       where: { date: { gte: input.from, lt: input.to } },
     }),
-  ]);
-  return buildAdvertisingRows({
-    from: input.from,
-    orders: orders.map((order) => {
-      const touch =
-        order.attribution?.touches.find((item) => item.touchType === "LAST") ??
-        order.attribution?.touches.find((item) => item.touchType === "FIRST") ??
-        null;
-      return {
-        displayNumber: order.displayNumber,
-        events: order.businessEvents,
-        items: order.items,
-        orderDate: order.orderDate,
-        payments: order.payments,
-        status: order.status,
-        touch,
-      };
+    prisma.analyticsEvent.findMany({
+      orderBy: { occurredAt: "asc" },
+      select: {
+        adName: true,
+        adSetName: true,
+        campaignName: true,
+        eventName: true,
+        landingPage: true,
+        occurredAt: true,
+        product: {
+          select: {
+            internalCode: true,
+            translations: {
+              select: { name: true },
+              take: 1,
+              where: { locale: "RU" },
+            },
+          },
+        },
+        productId: true,
+        sessionId: true,
+        source: true,
+      },
+      where: { occurredAt: { gte: input.from, lt: input.to } },
     }),
+    prisma.analyticsDataSourceStatus.findUnique({
+      where: { source: "META_INSIGHTS" },
+    }),
+  ]);
+  const reportingOrders = orders.map((order) => {
+    const touch =
+      order.attribution?.touches.find((item) => item.touchType === "LAST") ??
+      order.attribution?.touches.find((item) => item.touchType === "FIRST") ??
+      null;
+    return {
+      displayNumber: order.displayNumber,
+      events: order.businessEvents,
+      items: order.items.map((item) => ({
+        ...item,
+        productName: item.productNameSnapshot,
+      })),
+      orderDate: order.orderDate,
+      payments: order.payments,
+      status: order.status,
+      touch,
+    };
+  });
+  const reportingEvents = analyticsEvents.map((event) => ({
+    ...event,
+    eventName: event.eventName,
+    productName:
+      event.product?.translations[0]?.name ??
+      event.product?.internalCode ??
+      null,
+  }));
+  const rows = buildAdvertisingRows({
+    events: reportingEvents,
+    from: input.from,
+    orders: reportingOrders,
     spend,
     to: input.to,
   });
+  return {
+    diagnostics: {
+      generatedAt: new Date(),
+      metaLastImportedRows: metaStatus?.lastImportedRows ?? null,
+      metaLastSuccessAt: metaStatus?.lastSuccessAt ?? null,
+      metaStatus: metaStatus?.status ?? "UNAVAILABLE",
+    },
+    landingRows: buildLandingPerformance({
+      events: reportingEvents,
+      from: input.from,
+      orders: reportingOrders,
+      to: input.to,
+    }),
+    productRows: buildProductPerformance({
+      events: reportingEvents,
+      from: input.from,
+      orders: reportingOrders,
+      to: input.to,
+    }),
+    rows,
+  };
 }
 
 export async function getCampaignOperationLog() {

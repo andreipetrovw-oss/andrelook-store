@@ -11,6 +11,7 @@ import {
   getEconomicsProductOptions,
 } from "@/lib/admin/query";
 import type { AdvertisingRow } from "@/lib/measurement/reporting";
+import { conversionRate } from "@/lib/measurement/reporting";
 
 function date(value: string | undefined, fallback: Date) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return fallback;
@@ -26,6 +27,21 @@ function money(value: number | null) {
   return value === null ? "—" : `${(value / 100).toFixed(2)} EUR`;
 }
 
+function number(value: number | null) {
+  return value === null ? "—" : new Intl.NumberFormat("ru-RU").format(value);
+}
+
+function percent(value: number | null) {
+  return value === null ? "—" : `${value.toFixed(1)}%`;
+}
+
+function sumAvailable(rows: AdvertisingRow[], field: keyof AdvertisingRow) {
+  const values = rows.map((row) => row[field]);
+  return values.length && values.every((value) => typeof value === "number")
+    ? (values as number[]).reduce((sum, value) => sum + value, 0)
+    : null;
+}
+
 function aggregateRows(rows: AdvertisingRow[], level: "campaign" | "source") {
   const grouped = new Map<string, AdvertisingRow>();
   for (const row of rows) {
@@ -39,17 +55,34 @@ function aggregateRows(rows: AdvertisingRow[], level: "campaign" | "source") {
       adSet: null,
       campaign: level === "source" ? null : row.campaign,
       confirmed: 0,
+      clickToVisitRate: null,
+      clicks: null,
       contributionAfterAdsMinor: 0,
       contributionBeforeAdsMinor: 0,
+      cpcMinor: null,
+      cpmMinor: null,
+      ctr: null,
+      frequency: null,
+      impressions: null,
+      landingPageViews: null,
       leads: 0,
+      linkClicks: null,
+      outboundClicks: null,
       paid: 0,
       paymentCostEstimated: false,
       revenueMinor: 0,
+      reach: null,
+      preorderOpens: 0,
+      productViews: 0,
+      siteVisits: 0,
       spendMinor: 0,
     };
     current.confirmed += row.confirmed;
     current.leads += row.leads;
     current.paid += row.paid;
+    current.preorderOpens += row.preorderOpens;
+    current.productViews += row.productViews;
+    current.siteVisits += row.siteVisits;
     current.revenueMinor += row.revenueMinor;
     current.spendMinor += row.spendMinor;
     current.paymentCostEstimated ||= row.paymentCostEstimated;
@@ -73,6 +106,34 @@ function aggregateRows(rows: AdvertisingRow[], level: "campaign" | "source") {
     current.roas = current.spendMinor
       ? Number((current.revenueMinor / current.spendMinor).toFixed(2))
       : null;
+    const groupedRows = [...rows].filter((candidate) => {
+      if (level === "source") return candidate.source === current.source;
+      return (
+        candidate.source === current.source &&
+        candidate.campaign === current.campaign
+      );
+    });
+    current.impressions = sumAvailable(groupedRows, "impressions");
+    current.reach = sumAvailable(groupedRows, "reach");
+    current.linkClicks = sumAvailable(groupedRows, "linkClicks");
+    current.outboundClicks = sumAvailable(groupedRows, "outboundClicks");
+    current.landingPageViews = sumAvailable(groupedRows, "landingPageViews");
+    current.clicks = current.outboundClicks ?? current.linkClicks;
+    current.ctr = conversionRate(current.clicks ?? 0, current.impressions);
+    current.cpcMinor = current.clicks
+      ? Math.round(current.spendMinor / current.clicks)
+      : null;
+    current.cpmMinor = current.impressions
+      ? Math.round((current.spendMinor * 1_000) / current.impressions)
+      : null;
+    current.frequency =
+      current.impressions !== null && current.reach
+        ? Number((current.impressions / current.reach).toFixed(2))
+        : null;
+    current.clickToVisitRate = conversionRate(
+      current.siteVisits,
+      current.clicks,
+    );
     grouped.set(groupKey, current);
   }
   return [...grouped.values()].sort(
@@ -104,11 +165,12 @@ export default async function AdvertisingPage({
   const from = date(filters.from, defaultFrom);
   const toDay = date(filters.to, new Date(tomorrow.getTime() - 86_400_000));
   const to = new Date(toDay.getTime() + 86_400_000);
-  const [allRows, operationLog, economicsProducts] = await Promise.all([
+  const [report, operationLog, economicsProducts] = await Promise.all([
     getAdvertisingReport({ from, to }),
     getCampaignOperationLog(),
     getEconomicsProductOptions(),
   ]);
+  const allRows = report.rows;
   const rows = allRows.filter(
     (row) =>
       (!filters.source || row.source === filters.source) &&
@@ -122,6 +184,9 @@ export default async function AdvertisingPage({
   const totals = rows.reduce(
     (sum, row) => ({
       confirmed: sum.confirmed + row.confirmed,
+      preorderOpens: sum.preorderOpens + row.preorderOpens,
+      productViews: sum.productViews + row.productViews,
+      siteVisits: sum.siteVisits + row.siteVisits,
       leads: sum.leads + row.leads,
       paid: sum.paid + row.paid,
       contributionBeforeAdsMinor:
@@ -137,10 +202,28 @@ export default async function AdvertisingPage({
       contributionBeforeAdsMinor: 0 as number | null,
       leads: 0,
       paid: 0,
+      preorderOpens: 0,
+      productViews: 0,
       revenueMinor: 0,
       spendMinor: 0,
+      siteVisits: 0,
     },
   );
+  const metaRows = rows.filter((row) => row.source === "META_ADS");
+  const impressions = sumAvailable(metaRows, "impressions");
+  const reach = sumAvailable(metaRows, "reach");
+  const outboundClicks = sumAvailable(metaRows, "outboundClicks");
+  const linkClicks = sumAvailable(metaRows, "linkClicks");
+  const landingPageViews = sumAvailable(metaRows, "landingPageViews");
+  const metaSpendMinor = metaRows.reduce((sum, row) => sum + row.spendMinor, 0);
+  const metaSiteVisits = metaRows.reduce((sum, row) => sum + row.siteVisits, 0);
+  const clicks = outboundClicks ?? linkClicks;
+  const ctr = conversionRate(clicks ?? 0, impressions);
+  const cpc = clicks ? Math.round(metaSpendMinor / clicks) : null;
+  const cpm = impressions
+    ? Math.round((metaSpendMinor * 1_000) / impressions)
+    : null;
+  const frequency = impressions !== null && reach ? impressions / reach : null;
   const contributionAfterAds =
     totals.contributionBeforeAdsMinor === null
       ? null
@@ -224,12 +307,71 @@ export default async function AdvertisingPage({
           Всё время
         </Link>
       </nav>
+      <h2>Привлечение</h2>
       <div className="admin-cards">
         {[
           ["Расход", money(totals.spendMinor)],
+          ["Показы", number(impressions)],
+          ["Охват", number(reach)],
+          ["Клики", number(clicks)],
+          ["Meta LPV", number(landingPageViews)],
+          ["Визиты", totals.siteVisits],
+          ["CTR", percent(ctr)],
+          ["CPC", money(cpc)],
+          ["CPM", money(cpm)],
+          ["Частота", frequency === null ? "—" : frequency.toFixed(2)],
+        ].map(([label, value]) => (
+          <div className="admin-card" key={label}>
+            <strong>{label}</strong>
+            <p>{value}</p>
+          </div>
+        ))}
+      </div>
+      <h2>Воронка сайта</h2>
+      <div className="admin-cards">
+        {[
+          ["Визиты", totals.siteVisits],
+          ["Просмотры товаров", totals.productViews],
+          ["Открытия предзаказа", totals.preorderOpens],
           ["Лиды", totals.leads],
           ["Подтверждено", totals.confirmed],
           ["Оплачено", totals.paid],
+          ["Клик → визит", percent(conversionRate(metaSiteVisits, clicks))],
+          [
+            "Визит → товар",
+            percent(conversionRate(totals.productViews, totals.siteVisits)),
+          ],
+          [
+            "Товар → предзаказ",
+            percent(conversionRate(totals.preorderOpens, totals.productViews)),
+          ],
+          [
+            "Предзаказ → лид",
+            percent(conversionRate(totals.leads, totals.preorderOpens)),
+          ],
+          [
+            "Лид → подтверждено",
+            percent(conversionRate(totals.confirmed, totals.leads)),
+          ],
+          ["Лид → оплата", percent(conversionRate(totals.paid, totals.leads))],
+          [
+            "Визит → лид",
+            percent(conversionRate(totals.leads, totals.siteVisits)),
+          ],
+          [
+            "Визит → оплата",
+            percent(conversionRate(totals.paid, totals.siteVisits)),
+          ],
+        ].map(([label, value]) => (
+          <div className="admin-card" key={label}>
+            <strong>{label}</strong>
+            <p>{value}</p>
+          </div>
+        ))}
+      </div>
+      <h2>Бизнес-результат</h2>
+      <div className="admin-cards">
+        {[
           ["Выручка", money(totals.revenueMinor)],
           ["Вклад до рекламы", money(totals.contributionBeforeAdsMinor)],
           ["Вклад после рекламы", money(contributionAfterAds)],
@@ -261,6 +403,16 @@ export default async function AdvertisingPage({
                 {filters.campaign ? <th>Группа объявлений</th> : null}
                 {filters.campaign ? <th>Объявление</th> : null}
                 <th>Расход</th>
+                <th>Показы</th>
+                <th>Охват</th>
+                <th>Клики</th>
+                <th>Meta LPV</th>
+                <th>CTR</th>
+                <th>CPC</th>
+                <th>CPM</th>
+                <th>Визиты</th>
+                <th>Товары</th>
+                <th>Предзаказы</th>
                 <th>Лиды</th>
                 <th>Подтверждено</th>
                 <th>Оплачено</th>
@@ -298,6 +450,16 @@ export default async function AdvertisingPage({
                   {filters.campaign ? <td>{row.adSet ?? "—"}</td> : null}
                   {filters.campaign ? <td>{row.ad ?? "—"}</td> : null}
                   <td>{money(row.spendMinor)}</td>
+                  <td>{number(row.impressions)}</td>
+                  <td>{number(row.reach)}</td>
+                  <td>{number(row.clicks)}</td>
+                  <td>{number(row.landingPageViews)}</td>
+                  <td>{percent(row.ctr)}</td>
+                  <td>{money(row.cpcMinor)}</td>
+                  <td>{money(row.cpmMinor)}</td>
+                  <td>{row.siteVisits}</td>
+                  <td>{row.productViews}</td>
+                  <td>{row.preorderOpens}</td>
                   <td>{row.leads}</td>
                   <td>{row.confirmed}</td>
                   <td>{row.paid}</td>
@@ -312,6 +474,92 @@ export default async function AdvertisingPage({
             </tbody>
           </table>
         </div>
+      </section>
+      <section className="admin-panel admin-panel-wide">
+        <h2>Посадочные страницы</h2>
+        <p className="admin-overview-note">
+          Визит относится к первой странице сессии. Лиды и оплаты используют
+          сохранённый снимок атрибуции заказа; неизвестные исторические данные
+          не восстанавливаются оценками.
+        </p>
+        <div className="admin-table-wrap" tabIndex={0}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Страница</th>
+                <th>Визиты</th>
+                <th>Лиды</th>
+                <th>Оплачено</th>
+                <th>Выручка</th>
+                <th>Визит → лид</th>
+                <th>Визит → оплата</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.landingRows.map((item) => (
+                <tr key={item.landingPage}>
+                  <td>{item.landingPage}</td>
+                  <td>{item.visits}</td>
+                  <td>{item.leads}</td>
+                  <td>{item.paid}</td>
+                  <td>{money(item.revenueMinor)}</td>
+                  <td>{percent(item.leadConversionRate)}</td>
+                  <td>{percent(item.paidConversionRate)}</td>
+                </tr>
+              ))}
+              {report.landingRows.length === 0 ? (
+                <tr>
+                  <td colSpan={7}>Надёжных данных за период пока нет.</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section className="admin-panel admin-panel-wide">
+        <h2>Товарная воронка</h2>
+        <div className="admin-table-wrap" tabIndex={0}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Товар</th>
+                <th>Просмотры</th>
+                <th>Открытия предзаказа</th>
+                <th>Лиды</th>
+                <th>Оплачено</th>
+                <th>Выручка</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.productRows.map((item) => (
+                <tr key={item.productId}>
+                  <td>{item.productName}</td>
+                  <td>{item.productViews}</td>
+                  <td>{item.preorderOpens}</td>
+                  <td>{item.leads}</td>
+                  <td>{item.paid}</td>
+                  <td>{money(item.revenueMinor)}</td>
+                </tr>
+              ))}
+              {report.productRows.length === 0 ? (
+                <tr>
+                  <td colSpan={6}>Надёжных данных за период пока нет.</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section className="admin-panel">
+        <h2>Качество данных</h2>
+        <p className="admin-overview-note">
+          Meta Insights: {report.diagnostics.metaStatus}. Последняя успешная
+          синхронизация:{" "}
+          {report.diagnostics.metaLastSuccessAt?.toLocaleString("ru-RU") ?? "—"}
+          . Строк импортировано:{" "}
+          {report.diagnostics.metaLastImportedRows ?? "—"}. Отчёт рассчитан:{" "}
+          {report.diagnostics.generatedAt.toLocaleString("ru-RU")}.
+        </p>
       </section>
       <section className="admin-panel">
         <h2>Добавить рекламный расход</h2>

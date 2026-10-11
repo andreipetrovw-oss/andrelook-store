@@ -13,6 +13,7 @@ type Runtime = {
 };
 
 export type MetaInsight = {
+  actions?: Array<{ action_type?: string; value?: string }>;
   ad_id?: string;
   ad_name?: string;
   adset_id?: string;
@@ -20,8 +21,32 @@ export type MetaInsight = {
   campaign_id?: string;
   campaign_name?: string;
   date_start?: string;
+  impressions?: string;
+  inline_link_clicks?: string;
+  outbound_clicks?: Array<{ action_type?: string; value?: string }>;
+  reach?: string;
   spend?: string;
 };
+
+function optionalCount(value: string | undefined) {
+  if (value === undefined) return null;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function actionCount(actions: MetaInsight["actions"], actionType: string) {
+  if (actions === undefined) return null;
+  const action = actions.find((item) => item.action_type === actionType);
+  return optionalCount(action?.value) ?? 0;
+}
+
+export function metaSpendExternalRecordId(input: {
+  accountId: string;
+  adId: string;
+  date: string;
+}) {
+  return `meta:${input.accountId}:${input.date}:${input.adId}`;
+}
 
 function runtimeDefaults(): Required<Runtime> {
   return {
@@ -80,6 +105,11 @@ export function normalizeMetaInsight(insight: MetaInsight) {
     campaignId: insight.campaign_id?.trim() || null,
     campaignName,
     date,
+    impressions: optionalCount(insight.impressions),
+    landingPageViews: actionCount(insight.actions, "landing_page_view"),
+    linkClicks: optionalCount(insight.inline_link_clicks),
+    outboundClicks: actionCount(insight.outbound_clicks, "outbound_click"),
+    reach: optionalCount(insight.reach),
     spendMinor: Math.round(spend * 100),
     utmCampaign: normalizeCampaignKey(campaignName),
   };
@@ -112,7 +142,7 @@ export async function syncMetaSpend(input: {
 
   const params = new URLSearchParams({
     fields:
-      "campaign_id,campaign_name,adset_id,adset_name,ad_id,ad_name,spend,date_start",
+      "campaign_id,campaign_name,adset_id,adset_name,ad_id,ad_name,spend,impressions,reach,inline_link_clicks,outbound_clicks,actions,date_start",
     level: "ad",
     limit: "500",
     time_range: JSON.stringify({ since: input.date, until: input.date }),
@@ -128,6 +158,7 @@ export async function syncMetaSpend(input: {
     .map(normalizeMetaInsight)
     .filter((record) => record !== null);
   const prisma = getPrisma();
+  const attemptedAt = new Date();
   for (const record of records) {
     const campaign = await prisma.campaign.upsert({
       create: {
@@ -147,6 +178,11 @@ export async function syncMetaSpend(input: {
         },
       },
     });
+    const externalRecordId = metaSpendExternalRecordId({
+      accountId,
+      adId: record.adId,
+      date: record.date,
+    });
     await prisma.adSpend.upsert({
       create: {
         adName: record.adName,
@@ -157,8 +193,13 @@ export async function syncMetaSpend(input: {
         date: new Date(`${record.date}T00:00:00.000Z`),
         externalAdId: record.adId,
         externalAdSetId: record.adSetId,
-        externalRecordId: `meta:${accountId}:${record.date}:${record.adId}`,
+        externalRecordId,
+        impressions: record.impressions,
         importSource: "API",
+        landingPageViews: record.landingPageViews,
+        linkClicks: record.linkClicks,
+        outboundClicks: record.outboundClicks,
+        reach: record.reach,
         source: "META_ADS",
         spendMinor: record.spendMinor,
       },
@@ -167,12 +208,33 @@ export async function syncMetaSpend(input: {
         adSetName: record.adSetName,
         campaignId: campaign.id,
         campaignName: record.utmCampaign,
+        impressions: record.impressions,
+        landingPageViews: record.landingPageViews,
+        linkClicks: record.linkClicks,
+        outboundClicks: record.outboundClicks,
+        reach: record.reach,
         spendMinor: record.spendMinor,
       },
       where: {
-        externalRecordId: `meta:${accountId}:${record.date}:${record.adId}`,
+        externalRecordId,
       },
     });
   }
+  await prisma.analyticsDataSourceStatus.upsert({
+    create: {
+      lastAttemptAt: attemptedAt,
+      lastImportedRows: records.length,
+      lastSuccessAt: attemptedAt,
+      source: "META_INSIGHTS",
+      status: "READY",
+    },
+    update: {
+      lastAttemptAt: attemptedAt,
+      lastImportedRows: records.length,
+      lastSuccessAt: attemptedAt,
+      status: "READY",
+    },
+    where: { source: "META_INSIGHTS" },
+  });
   return { imported: records.length, status: "ok" as const };
 }

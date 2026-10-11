@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  attributionStorageKey,
+  parseStoredAttribution,
+} from "@/lib/attribution/state";
 import type { ConsentPreferences } from "@/lib/attribution/types";
 
 type MetaPixelBootstrap = ((...args: unknown[]) => void) & {
@@ -24,6 +28,9 @@ const gaId = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 let analyticsConsentGranted = false;
 let marketingConsentGranted = false;
+let firstPartyAnalyticsConsentGranted = false;
+const firstPartyViewKeys = new Set<string>();
+const analyticsSessionKey = "andrelookAnalyticsSessionV1";
 
 export function measurementAllowedForHost(
   host: string,
@@ -153,6 +160,8 @@ function metaProductPayload(
 }
 
 export function applyMeasurementConsent(consent: ConsentPreferences) {
+  firstPartyAnalyticsConsentGranted =
+    consent.analytics && productionMeasurementAllowed();
   analyticsConsentGranted = analyticsMeasurementAllowedForHost(
     window.location.hostname,
     consent.analytics,
@@ -165,6 +174,79 @@ export function applyMeasurementConsent(consent: ConsentPreferences) {
   if (analyticsConsentGranted) loadGoogleAnalytics();
   updateGoogleAnalyticsConsent(analyticsConsentGranted);
   if (marketingConsentGranted) loadMetaPixel();
+}
+
+type FirstPartyEventName =
+  | "PAGE_VIEW"
+  | "VIEW_ITEM_LIST"
+  | "SELECT_ITEM"
+  | "VIEW_ITEM"
+  | "PREORDER_OPEN"
+  | "PREORDER_SUBMIT";
+
+function analyticsSessionId() {
+  const current = sessionStorage.getItem(analyticsSessionKey);
+  if (current) return current;
+  const created = crypto.randomUUID();
+  sessionStorage.setItem(analyticsSessionKey, created);
+  return created;
+}
+
+function firstPartyEvent(
+  eventName: FirstPartyEventName,
+  parameters: Record<
+    string,
+    boolean | number | string | Array<Record<string, number | string | null>>
+  >,
+  eventId?: string,
+) {
+  if (!firstPartyAnalyticsConsentGranted) return;
+  const firstItem = Array.isArray(parameters.items)
+    ? parameters.items[0]
+    : undefined;
+  const productId = firstItem?.item_id ?? parameters.item_id;
+  const pagePath = window.location.pathname;
+  if (["PAGE_VIEW", "VIEW_ITEM_LIST", "VIEW_ITEM"].includes(eventName)) {
+    const key = `${eventName}:${pagePath}:${typeof productId === "string" ? productId : ""}`;
+    if (firstPartyViewKeys.has(key)) return;
+    firstPartyViewKeys.add(key);
+  }
+  try {
+    const state = parseStoredAttribution(
+      localStorage.getItem(attributionStorageKey),
+    );
+    const touch = state?.lastTouch ?? state?.firstTouch;
+    const localeSegment = pagePath.split("/")[1]?.toUpperCase();
+    const locale = ["RU", "ET", "EN"].includes(localeSegment ?? "")
+      ? localeSegment!
+      : "ET";
+    void fetch("/api/analytics/events", {
+      body: JSON.stringify({
+        adName: touch?.adName ?? null,
+        adSetName: touch?.adSetName ?? null,
+        campaignName: touch?.campaignName ?? null,
+        contentLabel: touch?.contentLabel ?? null,
+        eventId: eventId ?? crypto.randomUUID(),
+        eventName,
+        landingPage: touch?.landingPage?.split("?")[0] ?? pagePath,
+        locale,
+        pagePath,
+        productId: typeof productId === "string" ? productId : null,
+        sessionId: analyticsSessionId(),
+        source: touch?.source ?? "DIRECT",
+        sourceGroup: touch?.sourceGroup ?? "DIRECT",
+      }),
+      headers: { "content-type": "application/json" },
+      keepalive: true,
+      method: "POST",
+    }).catch(() => undefined);
+  } catch {
+    // Analytics must never interfere with storefront behavior.
+  }
+}
+
+export function trackFirstPartyPageView() {
+  firstPartyEvent("PAGE_VIEW", {});
 }
 
 export function trackPublicEvent(
@@ -184,6 +266,17 @@ export function trackPublicEvent(
   options: { eventId?: string } = {},
 ) {
   if (!productionMeasurementAllowed()) return;
+  const firstPartyName: FirstPartyEventName | undefined = (
+    {
+      preorder_open: "PREORDER_OPEN",
+      preorder_submit: "PREORDER_SUBMIT",
+      select_item: "SELECT_ITEM",
+      view_item: "VIEW_ITEM",
+      view_item_list: "VIEW_ITEM_LIST",
+    } as Partial<Record<typeof name, FirstPartyEventName>>
+  )[name];
+  if (firstPartyName)
+    firstPartyEvent(firstPartyName, parameters, options.eventId);
   if (
     analyticsConsentGranted &&
     validGaMeasurementId(gaId) &&

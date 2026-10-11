@@ -213,6 +213,59 @@ describe("measurement environment isolation", () => {
     ]);
   });
 
+  it("records first-party events only after analytics consent on a production host", async () => {
+    vi.stubEnv("NEXT_PUBLIC_MEASUREMENT_ENABLED", "true");
+    vi.stubEnv("NEXT_PUBLIC_GA4_MEASUREMENT_ID", "G-0NLE5DGQN2");
+    const request = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    const session = new Map<string, string>();
+    vi.stubGlobal("fetch", request);
+    vi.stubGlobal("localStorage", {
+      getItem: () => null,
+    });
+    vi.stubGlobal("sessionStorage", {
+      getItem: (key: string) => session.get(key) ?? null,
+      setItem: (key: string, value: string) => session.set(key, value),
+    });
+    vi.stubGlobal("window", {
+      location: {
+        hostname: "www.andrelook.store",
+        pathname: "/et/catalog/test",
+      },
+    });
+    vi.stubGlobal("document", {
+      createElement: () => ({ async: false, dataset: {}, src: "" }),
+      head: { append: vi.fn() },
+      querySelector: () => null,
+    });
+    vi.resetModules();
+    const measurement = await import("./client");
+    const consent = {
+      analytics: false,
+      marketing: false,
+      updatedAt: new Date(0).toISOString(),
+      version: "g2-consent-v1" as const,
+    };
+    measurement.applyMeasurementConsent(consent);
+    measurement.trackPublicEvent("view_item", { item_id: "product-one" });
+    expect(request).not.toHaveBeenCalled();
+
+    measurement.applyMeasurementConsent({ ...consent, analytics: true });
+    measurement.trackPublicEvent("view_item", { item_id: "product-one" });
+    expect(request).toHaveBeenCalledOnce();
+    expect(JSON.parse(request.mock.calls[0]![1].body as string)).toMatchObject({
+      eventName: "VIEW_ITEM",
+      pagePath: "/et/catalog/test",
+      productId: "product-one",
+      source: "DIRECT",
+    });
+
+    measurement.applyMeasurementConsent(consent);
+    measurement.trackPublicEvent("preorder_open", { item_id: "product-one" });
+    expect(request).toHaveBeenCalledOnce();
+  });
+
   it("loads Meta once after marketing consent, allowlists payloads and stops after revocation", async () => {
     vi.stubEnv("NEXT_PUBLIC_MEASUREMENT_ENABLED", "true");
     vi.stubEnv("NEXT_PUBLIC_META_PIXEL_ID", "3334309000107146");

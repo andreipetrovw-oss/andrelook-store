@@ -4,6 +4,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({ getPrisma: vi.fn() }));
 
 import {
+  metaSpendExternalRecordId,
   metaSpendSyncAllowedForRuntime,
   normalizeCampaignKey,
   normalizeMetaInsight,
@@ -45,7 +46,12 @@ describe("Meta spend synchronization", () => {
         campaign_id: "100",
         campaign_name: "EE_META_CONV_WINTER_2026",
         date_start: "2026-10-10",
+        impressions: "1000",
+        inline_link_clicks: "40",
+        outbound_clicks: [{ action_type: "outbound_click", value: "35" }],
+        reach: "800",
         spend: "3.10",
+        actions: [{ action_type: "landing_page_view", value: "29" }],
       }),
     ).toEqual({
       adId: "300",
@@ -55,9 +61,38 @@ describe("Meta spend synchronization", () => {
       campaignId: "100",
       campaignName: "EE_META_CONV_WINTER_2026",
       date: "2026-10-10",
+      impressions: 1000,
+      landingPageViews: 29,
+      linkClicks: 40,
+      outboundClicks: 35,
+      reach: 800,
       spendMinor: 310,
       utmCampaign: "ee_meta_conv_winter_2026",
     });
     expect(normalizeMetaInsight({ spend: "not-a-number" })).toBeNull();
+  });
+
+  it("keeps unavailable historical insight metrics null and builds a stable idempotency key", () => {
+    expect(
+      normalizeMetaInsight({
+        ad_id: "300",
+        campaign_name: "Campaign",
+        date_start: "2026-10-10",
+        spend: "0",
+      }),
+    ).toMatchObject({
+      impressions: null,
+      landingPageViews: null,
+      linkClicks: null,
+      outboundClicks: null,
+      reach: null,
+    });
+    expect(
+      metaSpendExternalRecordId({
+        accountId: "1410676904553483",
+        adId: "300",
+        date: "2026-10-10",
+      }),
+    ).toBe("meta:1410676904553483:2026-10-10:300");
   });
 });
