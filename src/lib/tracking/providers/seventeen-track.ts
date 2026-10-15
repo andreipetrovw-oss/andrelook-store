@@ -27,9 +27,47 @@ function trackingObject(payload: unknown) {
   return asRecord(accepted[0]) ?? asRecord(data) ?? null;
 }
 
+function providerError(payload: unknown) {
+  const root = asRecord(payload);
+  const data = asRecord(root?.data);
+  const rejected = asRecord(asArray(data?.rejected)[0]);
+  const rejectedError = asRecord(rejected?.error);
+  const rootError = asRecord(asArray(data?.errors)[0]);
+  const code = rejectedError?.code ?? rootError?.code ?? root?.code ?? null;
+  const message =
+    asString(rejectedError?.message) ??
+    asString(rootError?.message) ??
+    asString(root?.message);
+  if (typeof code !== "number" || code === 0) return null;
+  return {
+    carrierCode:
+      rejected?.carrier === undefined || rejected.carrier === null
+        ? null
+        : String(rejected.carrier),
+    code,
+    message,
+  };
+}
+
+function errorSyncStatus(code: number) {
+  if (code === -18019901) return "PENDING" as const;
+  if (code === -18019903 || code === -18019909) return "NOT_FOUND" as const;
+  if (code === -18019912 || code === -18019818) return "UNAVAILABLE" as const;
+  return "FAILURE" as const;
+}
+
 export function parseSeventeenTrackSnapshot(
   payload: unknown,
 ): ProviderSnapshot {
+  const error = providerError(payload);
+  if (error) {
+    return {
+      ...unavailableSnapshot("SEVENTEEN_TRACK", payload),
+      carrierCode: error.carrierCode,
+      rawStatus: [error.code, error.message].filter(Boolean).join(": "),
+      syncStatus: errorSyncStatus(error.code),
+    };
+  }
   const item = trackingObject(payload);
   if (!item) return unavailableSnapshot("SEVENTEEN_TRACK", payload);
   const trackInfo = asRecord(item.track_info) ?? asRecord(item.trackInfo);
@@ -37,17 +75,33 @@ export function parseSeventeenTrackSnapshot(
   const providers = asArray(
     trackInfo?.tracking && asRecord(trackInfo.tracking)?.providers,
   );
-  const provider = asRecord(providers[0]);
+  const requestedCarrier =
+    item.carrier === undefined || item.carrier === null
+      ? null
+      : String(item.carrier);
+  const provider =
+    providers.map(asRecord).find((candidate) => {
+      const key = asRecord(candidate?.provider)?.key;
+      return requestedCarrier !== null && String(key) === requestedCarrier;
+    }) ??
+    providers
+      .map(asRecord)
+      .find((candidate) => asArray(candidate?.events).length) ??
+    asRecord(providers[0]);
   const providerInfo = asRecord(provider?.provider);
-  const providerEvents = asArray(provider?.events);
+  const providerEvents = providers.flatMap((candidate) => {
+    const record = asRecord(candidate);
+    const key = asRecord(record?.provider)?.key;
+    return asArray(record?.events).map((event) => ({ event, key }));
+  });
   const fallbackLatest = asRecord(trackInfo?.latest_event);
   const rawEvents = providerEvents.length
     ? providerEvents
     : fallbackLatest
-      ? [fallbackLatest]
+      ? [{ event: fallbackLatest, key: providerInfo?.key }]
       : [];
   const events: ProviderEvent[] = rawEvents.flatMap((value, index) => {
-    const event = asRecord(value);
+    const event = asRecord(value.event);
     if (!event) return [];
     const occurredAt = asDate(event.time_utc) ?? asDate(event.time_iso);
     const status = asString(event.sub_status) ?? asString(event.stage);
@@ -59,6 +113,9 @@ export function parseSeventeenTrackSnapshot(
       {
         description,
         id: eventId([
+          value.key === undefined || value.key === null
+            ? null
+            : String(value.key),
           asString(event.time_utc) ?? asString(event.time_iso),
           status,
           description,
@@ -77,8 +134,8 @@ export function parseSeventeenTrackSnapshot(
   const rawStatus =
     asString(latestStatus?.sub_status) ??
     asString(latestStatus?.status) ??
-    asString(item.tracking_status) ??
-    asString(item.package_status);
+    asString(item.package_status) ??
+    asString(item.tracking_status);
   const notFound = rawStatus?.toLowerCase().includes("notfound") ?? false;
   const failed = latestSyncStatus?.toLowerCase() === "failure";
   const estimate = asRecord(
@@ -125,33 +182,23 @@ export class SeventeenTrackAdapter implements TrackingProviderAdapter {
 
   async register(input: RegisterShipmentInput) {
     const payload = await this.call("register", [providerInput(input)]);
-    const root = asRecord(payload);
-    const data = asRecord(root?.data);
-    const rejected = asArray(data?.rejected);
-    if (rejected.length) {
-      const error = asRecord(asRecord(rejected[0])?.error);
-      const code = error?.code;
-      const message = asString(error?.message);
-      return {
-        ...unavailableSnapshot("SEVENTEEN_TRACK", payload),
-        rawStatus: [code, message].filter(Boolean).join(": ") || "REJECTED",
-        syncStatus:
-          code === -18019903 || message?.toLowerCase().includes("carrier")
-            ? ("NOT_FOUND" as const)
-            : ("FAILURE" as const),
-      };
-    }
     return parseSeventeenTrackSnapshot(payload);
   }
 
   async getTracking(input: RegisterShipmentInput) {
     const details = await this.call("gettrackinfo", [providerInput(input)]);
     const parsed = parseSeventeenTrackSnapshot(details);
-    if (parsed.syncStatus !== "UNAVAILABLE") return parsed;
+    if (
+      parsed.syncStatus !== "UNAVAILABLE" &&
+      !(parsed.syncStatus === "NOT_FOUND" && !parsed.carrierCode)
+    ) {
+      return parsed;
+    }
     const list = await this.call("gettracklist", {
       number: input.trackingNumber,
     });
-    return parseSeventeenTrackSnapshot(list);
+    const listed = parseSeventeenTrackSnapshot(list);
+    return listed.syncStatus === "UNAVAILABLE" ? parsed : listed;
   }
 
   async getRealTimeTracking(input: RegisterShipmentInput) {

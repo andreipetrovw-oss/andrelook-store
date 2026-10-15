@@ -1,10 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { getServerConfig } from "@/lib/env";
-import { notifyLinkedOrders } from "@/lib/tracking/notifications";
 import { parseSeventeenTrackWebhook } from "@/lib/tracking/providers/seventeen-track";
 import { verifySeventeenTrackSignature } from "@/lib/tracking/security";
-import { ingestWebhookSnapshot } from "@/lib/tracking/service";
 
 export const dynamic = "force-dynamic";
 
@@ -24,14 +22,26 @@ export async function POST(request: Request) {
     return new NextResponse(null, { status: 400 });
   }
   const webhook = parseSeventeenTrackWebhook(payload);
-  for (const record of webhook.records) {
-    const result = await ingestWebhookSnapshot({
-      provider: "SEVENTEEN_TRACK",
-      snapshot: record.snapshot,
-      trackingNumber: record.number,
-    });
-    if (result)
-      await notifyLinkedOrders(result.shipmentId, result.newlyVisible);
-  }
+  after(async () => {
+    try {
+      const [{ notifyLinkedOrders }, { ingestWebhookSnapshot }] =
+        await Promise.all([
+          import("@/lib/tracking/notifications"),
+          import("@/lib/tracking/service"),
+        ]);
+      for (const record of webhook.records) {
+        const result = await ingestWebhookSnapshot({
+          provider: "SEVENTEEN_TRACK",
+          snapshot: record.snapshot,
+          trackingNumber: record.number,
+        });
+        if (result) {
+          await notifyLinkedOrders(result.shipmentId, result.newlyVisible);
+        }
+      }
+    } catch {
+      console.error("17TRACK webhook processing failed after acknowledgement.");
+    }
+  });
   return NextResponse.json({ accepted: true });
 }
