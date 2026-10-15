@@ -18,7 +18,11 @@ export type ServerConfig = {
   orderNotificationFrom: string | null;
   orderNotificationTo: string;
   resendApiKey: string | null;
+  seventeenTrackToken: string | null;
+  ship24ApiKey: string | null;
+  ship24WebhookSecret: string | null;
   siteUrl: URL;
+  trackingStaleDays: number;
 };
 
 function optionalValue(value: string | undefined): string | null {
@@ -80,7 +84,14 @@ export function getServerConfig(): ServerConfig {
       optionalValue(process.env.ORDER_NOTIFICATION_TO) ??
       "info.andrelook@gmail.com",
     resendApiKey: optionalValue(process.env.RESEND_API_KEY),
+    seventeenTrackToken: optionalValue(process.env.SEVENTEEN_TRACK_API_TOKEN),
+    ship24ApiKey: optionalValue(process.env.SHIP24_API_KEY),
+    ship24WebhookSecret: optionalValue(process.env.SHIP24_WEBHOOK_SECRET),
     siteUrl: new URL(rawSiteUrl),
+    trackingStaleDays: Math.max(
+      1,
+      Number.parseInt(process.env.TRACKING_STALE_DAYS ?? "7", 10) || 7,
+    ),
   };
 
   if (

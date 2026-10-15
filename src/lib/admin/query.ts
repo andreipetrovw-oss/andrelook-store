@@ -136,7 +136,23 @@ export async function getAdminOrder(id: string) {
       items: true,
       notification: true,
       payments: { orderBy: { receivedAt: "desc" } },
+      shipmentLinks: {
+        include: {
+          shipment: {
+            select: {
+              id: true,
+              kind: true,
+              normalizedStatus: true,
+              provider: true,
+              providerSyncStatus: true,
+              staleFlag: true,
+            },
+          },
+        },
+        orderBy: { sequence: "asc" },
+      },
       statusHistory: { orderBy: { createdAt: "desc" } },
+      trackingNotifications: { orderBy: { createdAt: "desc" } },
     },
     where: { id },
   });

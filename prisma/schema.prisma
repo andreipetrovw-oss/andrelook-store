@@ -148,6 +148,61 @@ enum FulfilmentMethod {
   DELIVERY
 }
 
+enum DeliveryMode {
+  PERSONAL_HANDOVER
+  ESTONIA_DELIVERY
+  INTERNATIONAL_DELIVERY
+}
+
+enum ShipmentKind {
+  INTERNATIONAL_INBOUND
+  LOCAL_OUTBOUND
+}
+
+enum ShipmentProvider {
+  SEVENTEEN_TRACK
+  SHIP24
+  LOCAL_CARRIER
+  MANUAL
+}
+
+enum ShipmentSyncStatus {
+  PENDING
+  SUCCESS
+  FAILURE
+  NOT_FOUND
+  UNAVAILABLE
+}
+
+enum ShipmentStatus {
+  ORDER_CONFIRMED
+  PREPARING_ORDER
+  QUALITY_CHECK_COMPLETE
+  HANDED_TO_LOGISTICS
+  INTERNATIONAL_TRANSIT
+  EUROPEAN_LOGISTICS
+  ARRIVED_AT_ANDRELOOK
+  READY_FOR_HANDOVER
+  LOCAL_CARRIER
+  LOCAL_DELIVERY
+  DELIVERED
+  DELAYED_OR_EXCEPTION
+}
+
+enum TrackingEvidenceSource {
+  OWNER_CONFIRMED
+  WAREHOUSE_CONFIRMED
+  PROVIDER_EVENT
+  LOCAL_CARRIER_EVENT
+  MANUAL_OVERRIDE
+}
+
+enum ShipmentRelationship {
+  MASTER_INBOUND
+  LOCAL_OUTBOUND
+  CARRIER_OUTBOUND
+}
+
 enum PaymentPreference {
   DEPOSIT_30_BALANCE_ON_HANDOVER
   FULL_ADVANCE
@@ -445,53 +500,208 @@ model Customer {
 }
 
 model Order {
-  id                  String               @id @default(cuid())
-  displayNumber       String               @unique
-  requestKey          String               @unique
-  customerId          String
-  customer            Customer             @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  status              OrderStatus          @default(NEW)
-  currency            String?              @db.Char(3)
-  confirmedTotalMinor Int?
-  fulfilmentMethod    FulfilmentMethod?
-  paymentPreference   PaymentPreference?
-  countryCode         String?              @db.Char(2)
-  city                String?
-  postalCode          String?
-  addressLine1        String?
-  addressLine2        String?
-  acquisitionChannel  AcquisitionChannel   @default(DIRECT)
-  utmSource           String?
-  utmMedium           String?
-  utmCampaign         String?
-  utmContent          String?
-  utmTerm             String?
-  initialReferrer     String?
-  landingPath         String?
-  requestedLocale     Locale
-  consentVersion      String
-  consentAt           DateTime
-  orderDate           DateTime             @default(now())
-  confirmedAt         DateTime?
-  supplierOrderedAt   DateTime?
-  etaText             String?
-  etaDate             DateTime?
-  trackingReference   String?
-  nextActionAt        DateTime?
-  internalNotes       String?
-  cancelledReason     String?
-  items               OrderItem[]
-  payments            Payment[]
-  statusHistory       OrderStatusHistory[]
-  attribution         OrderAttribution?
-  businessEvents      OrderBusinessEvent[]
-  notification        OrderNotification?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  id                    String                          @id @default(cuid())
+  displayNumber         String                          @unique
+  requestKey            String                          @unique
+  customerId            String
+  customer              Customer                        @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  status                OrderStatus                     @default(NEW)
+  currency              String?                         @db.Char(3)
+  confirmedTotalMinor   Int?
+  fulfilmentMethod      FulfilmentMethod?
+  deliveryMode          DeliveryMode?
+  paymentPreference     PaymentPreference?
+  countryCode           String?                         @db.Char(2)
+  city                  String?
+  postalCode            String?
+  addressLine1          String?
+  addressLine2          String?
+  acquisitionChannel    AcquisitionChannel              @default(DIRECT)
+  utmSource             String?
+  utmMedium             String?
+  utmCampaign           String?
+  utmContent            String?
+  utmTerm               String?
+  initialReferrer       String?
+  landingPath           String?
+  requestedLocale       Locale
+  consentVersion        String
+  consentAt             DateTime
+  orderDate             DateTime                        @default(now())
+  confirmedAt           DateTime?
+  supplierOrderedAt     DateTime?
+  etaText               String?
+  etaDate               DateTime?
+  trackingReference     String?
+  publicTrackingToken   String?                         @unique
+  nextActionAt          DateTime?
+  internalNotes         String?
+  cancelledReason       String?
+  items                 OrderItem[]
+  payments              Payment[]
+  statusHistory         OrderStatusHistory[]
+  attribution           OrderAttribution?
+  businessEvents        OrderBusinessEvent[]
+  notification          OrderNotification?
+  shipmentLinks         OrderShipment[]
+  trackingNotifications TrackingMilestoneNotification[]
+  createdAt             DateTime                        @default(now())
+  updatedAt             DateTime                        @updatedAt
 
   @@index([status, nextActionAt])
   @@index([acquisitionChannel, orderDate])
   @@index([customerId, orderDate])
+}
+
+model Shipment {
+  id                           String                          @id @default(cuid())
+  kind                         ShipmentKind
+  provider                     ShipmentProvider
+  fallbackProvider             ShipmentProvider?
+  internalTrackingNumber       String                          @unique
+  providerTrackingId           String?
+  fallbackTrackingId           String?
+  detectedCarrierCode          String?
+  detectedCarrierName          String?
+  fallbackDetectedCarrierCode  String?
+  fallbackDetectedCarrierName  String?
+  normalizedStatus             ShipmentStatus                  @default(ORDER_CONFIRMED)
+  rawStatus                    String?
+  fallbackRawStatus            String?
+  providerSyncStatus           ShipmentSyncStatus              @default(PENDING)
+  providerLastError            String?
+  fallbackSyncStatus           ShipmentSyncStatus?
+  fallbackLastError            String?
+  estimatedDeliveryAt          DateTime?
+  etaSource                    TrackingEvidenceSource?
+  etaNote                      String?
+  etaConfirmedAt               DateTime?
+  lastProviderUpdateAt         DateTime?
+  fallbackLastProviderUpdateAt DateTime?
+  lastConfirmedEventAt         DateTime?
+  lastSyncAt                   DateTime?
+  lastSuccessfulSyncAt         DateTime?
+  fallbackLastSyncAt           DateTime?
+  fallbackLastSuccessfulSyncAt DateTime?
+  staleAfterDays               Int                             @default(7)
+  staleFlag                    Boolean                         @default(false)
+  deliveredAt                  DateTime?
+  publicCarrierName            String?
+  publicTrackingNumber         String?
+  exposePublicTracking         Boolean                         @default(false)
+  requiresOwnerReview          Boolean                         @default(false)
+  orderLinks                   OrderShipment[]
+  events                       TrackingEvent[]
+  providerRecords              TrackingProviderRecord[]
+  overrides                    ShipmentStatusOverride[]
+  notifications                TrackingMilestoneNotification[]
+  createdAt                    DateTime                        @default(now())
+  updatedAt                    DateTime                        @updatedAt
+
+  @@index([normalizedStatus, staleFlag])
+  @@index([providerSyncStatus, lastSyncAt])
+}
+
+model OrderShipment {
+  id              String               @id @default(cuid())
+  orderId         String
+  order           Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  shipmentId      String
+  shipment        Shipment             @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  relationship    ShipmentRelationship
+  sequence        Int                  @default(0)
+  customerVisible Boolean              @default(true)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@unique([orderId, shipmentId])
+  @@index([shipmentId, sequence])
+  @@index([orderId, sequence])
+}
+
+model TrackingProviderRecord {
+  id               String             @id @default(cuid())
+  shipmentId       String
+  shipment         Shipment           @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  provider         ShipmentProvider
+  providerRecordId String?
+  contentHash      String
+  syncStatus       ShipmentSyncStatus
+  carrierCode      String?
+  carrierName      String?
+  latestEventAt    DateTime?
+  payload          Json
+  receivedAt       DateTime           @default(now())
+
+  @@unique([shipmentId, provider, contentHash])
+  @@index([shipmentId, receivedAt])
+}
+
+model TrackingEvent {
+  id               String                 @id @default(cuid())
+  shipmentId       String
+  shipment         Shipment               @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  provider         ShipmentProvider?
+  providerEventId  String
+  evidenceSource   TrackingEvidenceSource
+  normalizedStatus ShipmentStatus
+  rawStatus        String?
+  rawDescription   String?
+  rawLocation      String?
+  rawTimestamp     DateTime?
+  publicTimestamp  DateTime?
+  customerVisible  Boolean                @default(true)
+  createdByAdminId String?
+  createdByAdmin   AdminUser?             @relation("TrackingEventCreator", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  createdAt        DateTime               @default(now())
+
+  @@unique([shipmentId, evidenceSource, providerEventId])
+  @@index([shipmentId, rawTimestamp])
+  @@index([shipmentId, publicTimestamp])
+}
+
+model ShipmentStatusOverride {
+  id               String                 @id @default(cuid())
+  shipmentId       String
+  shipment         Shipment               @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  fromStatus       ShipmentStatus
+  toStatus         ShipmentStatus
+  evidenceSource   TrackingEvidenceSource
+  reason           String
+  changedByAdminId String
+  changedByAdmin   AdminUser              @relation("ShipmentOverrideCreator", fields: [changedByAdminId], references: [id], onDelete: Restrict)
+  createdAt        DateTime               @default(now())
+
+  @@index([shipmentId, createdAt])
+}
+
+model TrackingMilestoneNotification {
+  id                String             @id @default(cuid())
+  orderId           String
+  order             Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  shipmentId        String?
+  shipment          Shipment?          @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  milestone         ShipmentStatus
+  status            NotificationStatus @default(PENDING)
+  recipient         String
+  provider          String             @default("resend")
+  providerMessageId String?
+  attempts          Int                @default(0)
+  lastError         String?
+  sentAt            DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([orderId, shipmentId, milestone])
+  @@index([status, updatedAt])
+}
+
+model TrackingLookupBucket {
+  keyHash     String   @id
+  windowStart DateTime
+  attempts    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model OrderAttribution {
@@ -741,17 +951,19 @@ model OrderStatusHistory {
 }
 
 model AdminUser {
-  id              String               @id @default(cuid())
-  provider        String
-  providerSubject String
-  email           String               @unique
-  isActive        Boolean              @default(true)
-  payments        Payment[]            @relation("PaymentRecorder")
-  statusChanges   OrderStatusHistory[] @relation("StatusChanger")
-  spendEntries    AdSpend[]            @relation("SpendRecorder")
-  campaignChanges CampaignChangeLog[]  @relation("CampaignChangeRecorder")
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  id                String                   @id @default(cuid())
+  provider          String
+  providerSubject   String
+  email             String                   @unique
+  isActive          Boolean                  @default(true)
+  payments          Payment[]                @relation("PaymentRecorder")
+  statusChanges     OrderStatusHistory[]     @relation("StatusChanger")
+  spendEntries      AdSpend[]                @relation("SpendRecorder")
+  campaignChanges   CampaignChangeLog[]      @relation("CampaignChangeRecorder")
+  trackingEvents    TrackingEvent[]          @relation("TrackingEventCreator")
+  shipmentOverrides ShipmentStatusOverride[] @relation("ShipmentOverrideCreator")
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
 
   @@unique([provider, providerSubject])
 }

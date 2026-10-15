@@ -38,6 +38,7 @@ export default async function AdminLayout({
               <nav aria-label="Навигация владельца">
                 <Link href="/admin">Обзор</Link>
                 <Link href="/admin/orders">Заказы</Link>
+                <Link href="/admin/logistics">Логистика</Link>
                 <Link href="/admin/catalog">Каталог</Link>
                 <Link href="/admin/advertising">Реклама</Link>
                 <Link href="/admin/profitability">Экономика</Link>

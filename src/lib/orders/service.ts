@@ -13,6 +13,7 @@ import {
 import type { AttributionTouchData } from "@/lib/attribution/types";
 import { getPrisma } from "@/lib/db";
 import { getServerConfig } from "@/lib/env";
+import { createTrackingToken } from "@/lib/tracking/security";
 
 import { SIZE_HELP_VALUE } from "./request-constants";
 import type { RequestOrderInput } from "./request-schema";
@@ -37,7 +38,7 @@ function chartSizes(chartData: Prisma.JsonValue | null | undefined): string[] {
     : [];
 }
 
-function displayNumber() {
+export function createDisplayNumber() {
   const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
   return `AL-${date}-${randomBytes(3).toString("hex").toUpperCase()}`;
 }
@@ -210,12 +211,19 @@ export async function createOrderRequest(
               : input.countryCode,
           currency: product.currency,
           customerId: customer.id,
-          displayNumber: displayNumber(),
+          deliveryMode:
+            input.fulfilmentMethod === "PERSONAL_HANDOVER"
+              ? "PERSONAL_HANDOVER"
+              : input.countryCode === "EE"
+                ? "ESTONIA_DELIVERY"
+                : "INTERNATIONAL_DELIVERY",
+          displayNumber: createDisplayNumber(),
           fulfilmentMethod: input.fulfilmentMethod,
           initialReferrer: attribution.firstTouch.referrer,
           internalNotes: input.comment ?? null,
           landingPath: attribution.firstTouch.landingPage,
           paymentPreference: input.paymentPreference,
+          publicTrackingToken: createTrackingToken(),
           postalCode:
             input.fulfilmentMethod === "DELIVERY"
               ? (input.postalCode ?? null)

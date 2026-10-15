@@ -1,7 +1,10 @@
 import { OrderStatus, PaymentKind } from "@prisma/client";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 import { getAdminOrder } from "@/lib/admin/query";
+import { getServerConfig } from "@/lib/env";
+import { shipmentStatusLabels } from "@/lib/tracking/admin";
 import { trafficSourceLabels } from "@/lib/admin/traffic-labels";
 import {
   acquisitionChannelLabels,
@@ -18,6 +21,7 @@ import {
 import {
   recordPayment,
   retryOrderNotification,
+  rotateOrderTrackingLink,
   updateOrderStatus,
 } from "../../actions";
 
@@ -35,6 +39,12 @@ export default async function AdminOrderPage({
   const lastTouch =
     order.attribution?.touches.find((touch) => touch.touchType === "LAST") ??
     firstTouch;
+  const trackingUrl = order.publicTrackingToken
+    ? new URL(
+        `/track/${order.publicTrackingToken}`,
+        getServerConfig().siteUrl,
+      ).toString()
+    : null;
   return (
     <>
       <span className="eyebrow">{order.displayNumber}</span>
@@ -272,6 +282,78 @@ export default async function AdminOrderPage({
               <dd>{order.internalNotes ?? "—"}</dd>
             </div>
           </dl>
+        </section>
+        <section className="admin-panel admin-panel-wide">
+          <h2>Логистика и отслеживание</h2>
+          <dl>
+            <div>
+              <dt>Публичная ссылка</dt>
+              <dd>
+                {trackingUrl ? (
+                  <a href={trackingUrl} rel="noreferrer" target="_blank">
+                    Открыть защищённую страницу ↗
+                  </a>
+                ) : (
+                  "Не создана"
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Маршрут</dt>
+              <dd>
+                {order.deliveryMode ?? "Определяется из способа получения"}
+              </dd>
+            </div>
+          </dl>
+          <form action={rotateOrderTrackingLink} className="admin-stack-form">
+            <input name="orderId" type="hidden" value={order.id} />
+            <button type="submit">
+              {trackingUrl
+                ? "Перевыпустить защищённую ссылку"
+                : "Создать защищённую ссылку"}
+            </button>
+          </form>
+          <ul className="timeline">
+            {order.shipmentLinks.map((link) => (
+              <li key={link.id}>
+                <Link href={`/admin/logistics/${link.shipment.id}`}>
+                  <strong>{link.shipment.kind}</strong>
+                </Link>
+                <span>
+                  {shipmentStatusLabels[link.shipment.normalizedStatus]} ·{" "}
+                  {link.shipment.providerSyncStatus}
+                  {link.shipment.staleFlag ? " · данные устарели" : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {!order.shipmentLinks.length ? (
+            <p className="admin-readiness-note">
+              Посылки пока не привязаны. Создайте или откройте её в разделе
+              «Логистика» и прикрепите этот заказ.
+            </p>
+          ) : null}
+          {order.trackingNotifications.length ? (
+            <>
+              <h3>Уведомления клиенту</h3>
+              <ul className="timeline">
+                {order.trackingNotifications.map((notification) => (
+                  <li key={notification.id}>
+                    <strong>
+                      {shipmentStatusLabels[notification.milestone]}
+                    </strong>
+                    <span>
+                      {notification.status} · {notification.recipient} ·{" "}
+                      {russianDateTime.format(notification.createdAt)}
+                    </span>
+                    {notification.lastError ? (
+                      <p>{notification.lastError}</p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </section>
         <section className="admin-panel">
           <h2>Статус</h2>

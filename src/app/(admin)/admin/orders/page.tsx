@@ -25,7 +25,12 @@ export default async function AdminOrdersPage({
   return (
     <>
       <span className="eyebrow">Продажи с сопровождением</span>
-      <h1>Заказы</h1>
+      <div className="admin-title-row">
+        <h1>Заказы</h1>
+        <Link className="admin-primary-link" href="/admin/orders/new">
+          + Создать заказ
+        </Link>
+      </div>
       <form className="admin-filters">
         <label>
           <span>Поиск</span>

@@ -23,6 +23,7 @@ on:
       - codex/unit-economics-profitability
       - codex/meta-prelaunch-closeout
       - codex/final-analytics-closeout
+      - codex/order-tracking-logistics-v1
 
 permissions:
   contents: read
