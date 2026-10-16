@@ -86,6 +86,47 @@ describe("operational tracking evidence", () => {
     expect(result.newlyVisible).toEqual([]);
   });
 
+  it("uses the same provider-event identity when an InfoReceived webhook is retried", async () => {
+    findShipment.mockResolvedValue({
+      kind: "INTERNATIONAL_INBOUND",
+      lastConfirmedEventAt: null,
+      normalizedStatus: "ORDER_CONFIRMED",
+      provider: "SEVENTEEN_TRACK",
+      requiresOwnerReview: false,
+    });
+    const snapshot = {
+      carrierCode: "7041",
+      carrierName: "DHL Paket",
+      estimatedDeliveryAt: null,
+      estimatedDeliveryFrom: null,
+      estimatedDeliveryTo: null,
+      events: [
+        {
+          description: "Electronic shipment data received",
+          id: "event-info",
+          location: null,
+          occurredAt: new Date("2026-10-04T09:00:00Z"),
+          stage: "InfoReceived",
+          status: "InfoReceived",
+        },
+      ],
+      provider: "SEVENTEEN_TRACK" as const,
+      providerTrackingId: null,
+      raw: { private: true },
+      rawStatus: "InfoReceived",
+      syncStatus: "SUCCESS" as const,
+    };
+
+    await ingestProviderSnapshot("shipment", snapshot);
+    await ingestProviderSnapshot("shipment", snapshot);
+
+    expect(upsertEvent).toHaveBeenCalledTimes(2);
+    expect(upsertEvent.mock.calls[0]?.[0].where).toEqual(
+      upsertEvent.mock.calls[1]?.[0].where,
+    );
+    expect(upsertEvent.mock.calls[0]?.[0].update).toEqual({});
+  });
+
   it("persists a provider-supported ETA window without creating one otherwise", async () => {
     findShipment.mockResolvedValue({
       kind: "INTERNATIONAL_INBOUND",

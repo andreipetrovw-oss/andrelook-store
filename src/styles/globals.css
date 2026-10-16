@@ -115,9 +115,20 @@ button:disabled {
 }
 
 .primary-nav a:hover,
+.primary-nav a:focus-visible,
 .language-link:hover,
+.language-link:focus-visible,
 .language-link[aria-current="page"] {
   color: var(--color-ink);
+}
+
+.primary-nav .tracking-nav-link {
+  opacity: 0.72;
+}
+
+.primary-nav .tracking-nav-link:hover,
+.primary-nav .tracking-nav-link:focus-visible {
+  opacity: 1;
 }
 
 .language-switcher {
@@ -2328,6 +2339,13 @@ button:disabled {
   line-height: 1.1;
   min-height: 3.5rem;
   padding-block: 0.8rem;
+}
+
+.mobile-menu-panel nav .tracking-nav-link {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .mobile-menu-panel .language-switcher {

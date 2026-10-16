@@ -40,7 +40,7 @@ const statusLabels: Record<
     DELIVERED: "Kohale toimetatud",
     IN_TRANSIT: "Teel",
     LOCAL_DELIVERY: "Kohalik tarne",
-    LOGISTICS_REGISTERED: "Logistikaandmed edastatud",
+    LOGISTICS_REGISTERED: "Logistikaandmed on edastatud",
     ORDER_CONFIRMED: "Tellimus kinnitatud",
     PREPARING: "Valmistame tellimust ette",
     READY_FOR_HANDOVER: "Valmis üleandmiseks",
@@ -222,8 +222,23 @@ export async function getPublicTrackingOrder(
               },
               exposePublicTracking: true,
               normalizedStatus: true,
+              provider: true,
+              providerRecords: {
+                orderBy: [{ latestEventAt: "desc" }, { receivedAt: "desc" }],
+                select: {
+                  latestEventAt: true,
+                  provider: true,
+                  syncStatus: true,
+                },
+                where: {
+                  latestEventAt: { not: null },
+                  syncStatus: "SUCCESS",
+                },
+              },
+              providerSyncStatus: true,
               publicCarrierName: true,
               publicTrackingNumber: true,
+              rawStatus: true,
             },
           },
         },
@@ -241,6 +256,17 @@ export async function getPublicTrackingOrder(
   const locale =
     requestedLocale ?? (order.requestedLocale as PublicTrackingLocale);
   const activeShipment = order.shipmentLinks.at(-1)?.shipment ?? null;
+  const providerRegistration =
+    activeShipment?.providerSyncStatus === "SUCCESS" &&
+    isLogisticsRegistration(activeShipment.rawStatus)
+      ? {
+          occurredAt:
+            activeShipment.providerRecords
+              .find((record) => record.provider === activeShipment.provider)
+              ?.latestEventAt?.toISOString() ?? null,
+          status: "LOGISTICS_REGISTERED" as const,
+        }
+      : null;
   const confirmed = order.trackingMilestones.some(
     (milestone) => milestone.kind === "ORDER_CONFIRMED",
   );
@@ -274,6 +300,7 @@ export async function getPublicTrackingOrder(
           : [];
       }),
     ),
+    ...(providerRegistration ? [providerRegistration] : []),
   ];
   const deduplicated = new Map<
     PublicTrackingStatus,

@@ -33,6 +33,9 @@ export function SiteHeader({
           <Link href={`/${locale}/catalog`}>{dictionary.catalog}</Link>
           <Link href={`/${locale}/how-to-order`}>{dictionary.howToOrder}</Link>
           <Link href={`/${locale}/contact`}>{dictionary.contact}</Link>
+          <Link className="tracking-nav-link" href={`/track?lang=${locale}`}>
+            {dictionary.trackOrder}
+          </Link>
         </nav>
         <div className="header-actions">
           <LanguageSwitcher

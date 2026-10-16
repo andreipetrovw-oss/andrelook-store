@@ -58,6 +58,9 @@ export function MobileMenu({
               {dictionary.howToOrder}
             </Link>
             <Link href={`/${locale}/contact`}>{dictionary.contact}</Link>
+            <Link className="tracking-nav-link" href={`/track?lang=${locale}`}>
+              {dictionary.trackOrder}
+            </Link>
           </nav>
           <LanguageSwitcher
             currentLocale={locale}

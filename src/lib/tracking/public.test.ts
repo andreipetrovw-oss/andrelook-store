@@ -71,7 +71,13 @@ describe("public tracking presentation", () => {
       }),
     ).toBe("ESTONIA_DELIVERY");
     expect(publicStatusLabel("ET", "LOGISTICS_REGISTERED")).toBe(
-      "Logistikaandmed edastatud",
+      "Logistikaandmed on edastatud",
+    );
+    expect(publicStatusLabel("RU", "LOGISTICS_REGISTERED")).toBe(
+      "Логистическая информация передана",
+    );
+    expect(publicStatusLabel("EN", "LOGISTICS_REGISTERED")).toBe(
+      "Logistics information received",
     );
     expect(publicStatusLabel("RU", "READY_FOR_HANDOVER")).not.toContain(
       "17TRACK",
@@ -119,6 +125,104 @@ describe("public tracking presentation", () => {
       "ORDER_CONFIRMED",
       "PREPARING",
     ]);
+  });
+
+  it("surfaces one evidence-timestamped InfoReceived milestone without advancing the main status", async () => {
+    findUnique.mockResolvedValue(
+      trackedOrder({
+        shipmentLinks: [
+          {
+            sequence: 0,
+            shipment: {
+              estimatedDeliveryAt: null,
+              etaFrom: null,
+              etaTo: null,
+              events: [
+                {
+                  normalizedStatus: "ORDER_CONFIRMED",
+                  publicTimestamp: new Date("2026-10-04T09:00:00Z"),
+                  rawStatus: "InfoReceived",
+                },
+              ],
+              exposePublicTracking: false,
+              normalizedStatus: "ORDER_CONFIRMED",
+              provider: "SEVENTEEN_TRACK",
+              providerRecords: [
+                {
+                  latestEventAt: new Date("2026-10-04T09:00:00Z"),
+                  provider: "SEVENTEEN_TRACK",
+                  syncStatus: "SUCCESS",
+                },
+                {
+                  latestEventAt: new Date("2026-10-04T09:00:00Z"),
+                  provider: "SEVENTEEN_TRACK",
+                  syncStatus: "SUCCESS",
+                },
+              ],
+              providerSyncStatus: "SUCCESS",
+              publicCarrierName: null,
+              publicTrackingNumber: null,
+              rawStatus: "InfoReceived",
+            },
+          },
+        ],
+      }),
+    );
+
+    const result = await getPublicTrackingOrder("f".repeat(43), "ET");
+
+    expect(result?.status).toBe("TRACKING_ADDED");
+    expect(
+      result?.timeline.filter(
+        ({ status }) => status === "LOGISTICS_REGISTERED",
+      ),
+    ).toEqual([
+      {
+        label: "Logistikaandmed on edastatud",
+        occurredAt: "2026-10-04T09:00:00.000Z",
+        status: "LOGISTICS_REGISTERED",
+      },
+    ]);
+    expect(result?.lastUpdatedAt).toBe("2026-10-04T09:00:00.000Z");
+    expect(JSON.stringify(result)).not.toMatch(
+      /17TRACK|DHL|InfoReceived|SEVENTEEN_TRACK/,
+    );
+  });
+
+  it("omits the InfoReceived timestamp when successful provider evidence has no event time", async () => {
+    findUnique.mockResolvedValue(
+      trackedOrder({
+        requestedLocale: "EN",
+        shipmentLinks: [
+          {
+            sequence: 0,
+            shipment: {
+              estimatedDeliveryAt: null,
+              etaFrom: null,
+              etaTo: null,
+              events: [],
+              exposePublicTracking: false,
+              normalizedStatus: "ORDER_CONFIRMED",
+              provider: "SEVENTEEN_TRACK",
+              providerRecords: [],
+              providerSyncStatus: "SUCCESS",
+              publicCarrierName: null,
+              publicTrackingNumber: null,
+              rawStatus: "InfoReceived",
+            },
+          },
+        ],
+      }),
+    );
+
+    const result = await getPublicTrackingOrder("g".repeat(43), "EN");
+
+    expect(result?.timeline.at(-1)).toEqual({
+      label: "Logistics information received",
+      occurredAt: null,
+      status: "LOGISTICS_REGISTERED",
+    });
+    expect(result?.status).toBe("TRACKING_ADDED");
   });
 
   it("returns a safe DTO without master-shipment or provider secrets", async () => {
