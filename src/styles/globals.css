@@ -3082,6 +3082,42 @@ button:disabled {
   line-height: 1.6;
 }
 
+.admin-correction-block + .admin-correction-block,
+.admin-payment-list,
+.admin-correction-details {
+  margin-top: 1rem;
+}
+
+.admin-correction-details {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.8rem;
+}
+
+.admin-correction-details summary {
+  cursor: pointer;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-warning-note {
+  background: color-mix(in srgb, var(--color-background) 82%, #b68c4d 18%);
+  border: 1px solid var(--color-border);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  padding: 0.75rem;
+}
+
+.admin-confirm-checkbox {
+  align-items: start;
+  grid-template-columns: auto 1fr !important;
+}
+
+.admin-confirm-checkbox input {
+  min-height: auto;
+  width: 1rem;
+}
+
 .admin-primary-link,
 .admin-inline-actions button {
   align-items: center;

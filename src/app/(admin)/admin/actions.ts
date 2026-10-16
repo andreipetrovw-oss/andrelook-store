@@ -5,6 +5,7 @@ import {
   AvailabilityType,
   ContactMethod,
   DeliveryMode,
+  FulfilmentMethod,
   Locale,
   OrderTrackingMilestoneKind,
   OrderStatus,
@@ -23,6 +24,18 @@ import { z } from "zod";
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
+import {
+  addPaymentRecord,
+  correctAgreedPrice,
+  correctOrderDetails,
+  correctOrderItem,
+  editPaymentRecord,
+  voidPaymentRecord,
+} from "@/lib/orders/corrections";
+import {
+  effectiveTotalMinor,
+  itemSnapshotTotalMinor,
+} from "@/lib/orders/financials";
 import { createManualOrder as createManualOrderRecord } from "@/lib/orders/manual";
 import { notifyLinkedOrders } from "@/lib/tracking/notifications";
 import {
@@ -58,6 +71,40 @@ const paymentSchema = z.object({
     .union([z.literal(""), z.coerce.number().nonnegative().max(1_000_000)])
     .optional(),
   reference: z.string().trim().max(200).optional(),
+});
+
+const orderDetailsCorrectionSchema = z.object({
+  customerNotes: z.string().trim().max(2000),
+  deliveryMode: z.union([z.enum(DeliveryMode), z.literal("")]),
+  fulfilmentMethod: z.union([z.enum(FulfilmentMethod), z.literal("")]),
+  internalNotes: z.string().trim().max(2000),
+  orderId: z.string().min(1),
+});
+
+const orderItemCorrectionSchema = z.object({
+  color: z.string().trim().max(160),
+  itemId: z.string().min(1),
+  measurementsNote: z.string().trim().max(1000),
+  orderId: z.string().min(1),
+  productId: z.string().min(1),
+  productName: z.string().trim().min(1).max(300),
+  quantity: z.coerce.number().int().min(1).max(20),
+  size: z.string().trim().max(100),
+});
+
+const agreedPriceSchema = z.object({
+  agreedPrice: z.string().trim().max(20),
+  orderId: z.string().min(1),
+});
+
+const paymentEditSchema = paymentSchema.extend({
+  paymentId: z.string().min(1),
+});
+
+const paymentResetSchema = z.object({
+  orderId: z.string().min(1),
+  paymentId: z.string().min(1),
+  reason: z.string().trim().min(3).max(500),
 });
 
 const productCommercialSchema = z.object({
@@ -519,6 +566,7 @@ export async function updateOrderStatus(formData: FormData) {
   await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUniqueOrThrow({
       select: {
+        agreedTotalMinor: true,
         confirmedTotalMinor: true,
         currency: true,
         items: { select: { quantity: true, unitPriceMinor: true } },
@@ -542,26 +590,29 @@ export async function updateOrderStatus(formData: FormData) {
       where: { id: parsed.data.orderId },
     });
     if (parsed.data.status === "PAID") {
-      const itemTotal = order.items.every(
-        (item) => item.unitPriceMinor !== null,
-      )
-        ? order.items.reduce(
-            (sum, item) => sum + item.unitPriceMinor! * item.quantity,
-            0,
-          )
-        : null;
+      const effectiveTotal = effectiveTotalMinor({
+        agreedTotalMinor: order.agreedTotalMinor,
+        confirmedTotalMinor: order.confirmedTotalMinor,
+        itemTotalMinor: itemSnapshotTotalMinor(order.items),
+      });
       await tx.orderBusinessEvent.upsert({
         create: {
-          amountMinor: order.confirmedTotalMinor ?? itemTotal,
+          amountMinor: effectiveTotal,
           currency: order.currency,
           eventKey: `paid:${parsed.data.orderId}`,
           eventType: "PAID",
+          isActive: true,
           orderId: parsed.data.orderId,
         },
-        update: {},
+        update: {
+          amountMinor: effectiveTotal,
+          currency: order.currency,
+          isActive: true,
+        },
         where: { eventKey: `paid:${parsed.data.orderId}` },
       });
-    } else if (parsed.data.status !== "NEW") {
+    } else {
+      if (parsed.data.status === "NEW") return;
       await tx.orderBusinessEvent.create({
         data: {
           eventKey: `status:${parsed.data.orderId}:${parsed.data.status}:${crypto.randomUUID()}`,
@@ -580,23 +631,117 @@ export async function recordPayment(formData: FormData) {
   const parsed = paymentSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid payment.");
   const recordedByAdminId = await adminId();
-  await getPrisma().payment.create({
-    data: {
-      amountMinor: Math.round(parsed.data.amount * 100),
-      currency: parsed.data.currency,
-      kind: parsed.data.kind,
-      orderId: parsed.data.orderId,
-      processorFeeMinor:
-        typeof parsed.data.processorFee === "number"
-          ? Math.round(parsed.data.processorFee * 100)
-          : null,
-      receivedAt: new Date(),
-      recordedByAdminId,
-      reference: parsed.data.reference || null,
-    },
+  await addPaymentRecord({
+    actorId: recordedByAdminId,
+    amountMinor: Math.round(parsed.data.amount * 100),
+    currency: parsed.data.currency,
+    kind: parsed.data.kind,
+    orderId: parsed.data.orderId,
+    processorFeeMinor:
+      typeof parsed.data.processorFee === "number"
+        ? Math.round(parsed.data.processorFee * 100)
+        : null,
+    reference: parsed.data.reference || null,
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+}
+
+export async function updateOrderDetails(formData: FormData) {
+  const parsed = orderDetailsCorrectionSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) throw new Error("Invalid order correction.");
+  const actorId = await adminId();
+  await correctOrderDetails({
+    actorId,
+    customerNotes: parsed.data.customerNotes || null,
+    deliveryMode: parsed.data.deliveryMode || null,
+    fulfilmentMethod: parsed.data.fulfilmentMethod || null,
+    internalNotes: parsed.data.internalNotes || null,
+    orderId: parsed.data.orderId,
+  });
+  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
+}
+
+export async function updateOrderItem(formData: FormData) {
+  const parsed = orderItemCorrectionSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) throw new Error("Invalid order item correction.");
+  const actorId = await adminId();
+  await correctOrderItem({
+    actorId,
+    color: parsed.data.color || null,
+    itemId: parsed.data.itemId,
+    measurementsNote: parsed.data.measurementsNote || null,
+    orderId: parsed.data.orderId,
+    productId: parsed.data.productId,
+    productName: parsed.data.productName,
+    quantity: parsed.data.quantity,
+    size: parsed.data.size || null,
+  });
+  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
+}
+
+export async function updateAgreedPrice(formData: FormData) {
+  const parsed = agreedPriceSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid agreed price.");
+  const value = parsed.data.agreedPrice
+    ? Number.parseFloat(parsed.data.agreedPrice.replace(",", "."))
+    : null;
+  if (value !== null && (!Number.isFinite(value) || value <= 0)) {
+    throw new Error("Invalid agreed price.");
+  }
+  const actorId = await adminId();
+  await correctAgreedPrice({
+    actorId,
+    agreedTotalMinor: value === null ? null : Math.round(value * 100),
+    existingPaymentsAcknowledged:
+      formData.get("existingPaymentsAcknowledged") === "true",
+    orderId: parsed.data.orderId,
+  });
+  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+}
+
+export async function updatePayment(formData: FormData) {
+  const parsed = paymentEditSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid payment correction.");
+  const actorId = await adminId();
+  await editPaymentRecord({
+    actorId,
+    amountMinor: Math.round(parsed.data.amount * 100),
+    currency: parsed.data.currency,
+    kind: parsed.data.kind,
+    orderId: parsed.data.orderId,
+    paymentId: parsed.data.paymentId,
+    processorFeeMinor:
+      typeof parsed.data.processorFee === "number"
+        ? Math.round(parsed.data.processorFee * 100)
+        : null,
+    reference: parsed.data.reference || null,
+  });
+  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+}
+
+export async function resetPayment(formData: FormData) {
+  const parsed = paymentResetSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid payment reset.");
+  const actorId = await adminId();
+  await voidPaymentRecord({
+    actorId,
+    orderId: parsed.data.orderId,
+    paymentId: parsed.data.paymentId,
+    reason: parsed.data.reason,
+  });
+  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
 }
 
 export async function recordAdvertisingSpend(formData: FormData) {

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateFinancials } from "./financials";
+import {
+  calculateFinancials,
+  effectiveTotalMinor,
+  recalculatedCommercialStatus,
+  requiredPrepaymentMinor,
+} from "./financials";
 
 describe("CRM payment summary", () => {
   it("calculates paid and balance values including refunds", () => {
@@ -18,5 +23,73 @@ describe("CRM payment summary", () => {
       balanceMinor: null,
       paidMinor: 0,
     });
+  });
+
+  it("uses agreed price without overwriting the original total", () => {
+    const original = 24_900;
+    const effective = effectiveTotalMinor({
+      agreedTotalMinor: 24_000,
+      confirmedTotalMinor: original,
+      itemTotalMinor: original,
+    });
+    expect(original).toBe(24_900);
+    expect(effective).toBe(24_000);
+    expect(calculateFinancials(effective, [])).toEqual({
+      balanceMinor: 24_000,
+      paidMinor: 0,
+    });
+  });
+
+  it("falls back to the preserved original total after removing agreed price", () => {
+    expect(
+      effectiveTotalMinor({
+        agreedTotalMinor: null,
+        confirmedTotalMinor: 24_900,
+        itemTotalMinor: 24_900,
+      }),
+    ).toBe(24_900);
+  });
+
+  it("preserves partial payment and excludes voided payment from calculations", () => {
+    expect(
+      calculateFinancials(24_000, [
+        { amountMinor: 7_200, kind: "DEPOSIT", status: "ACTIVE" },
+      ]),
+    ).toEqual({ balanceMinor: 16_800, paidMinor: 7_200 });
+    expect(
+      calculateFinancials(24_000, [
+        { amountMinor: 7_200, kind: "DEPOSIT", status: "VOIDED" },
+      ]),
+    ).toEqual({ balanceMinor: 24_000, paidMinor: 0 });
+  });
+
+  it("recalculates only commercial states and leaves fulfilment states intact", () => {
+    expect(
+      recalculatedCommercialStatus({
+        currentStatus: "AWAITING_PAYMENT",
+        effectiveTotalMinor: 24_000,
+        paidMinor: 24_000,
+        paymentPreference: "FULL_ADVANCE",
+      }),
+    ).toBe("PAID");
+    expect(
+      recalculatedCommercialStatus({
+        currentStatus: "PAID",
+        effectiveTotalMinor: 24_000,
+        paidMinor: 0,
+        paymentPreference: "FULL_ADVANCE",
+      }),
+    ).toBe("AWAITING_PAYMENT");
+    expect(
+      recalculatedCommercialStatus({
+        currentStatus: "IN_TRANSIT",
+        effectiveTotalMinor: 24_000,
+        paidMinor: 0,
+        paymentPreference: "FULL_ADVANCE",
+      }),
+    ).toBe("IN_TRANSIT");
+    expect(
+      requiredPrepaymentMinor(24_000, "DEPOSIT_30_BALANCE_ON_HANDOVER"),
+    ).toBe(7_200);
   });
 });

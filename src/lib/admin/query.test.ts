@@ -67,10 +67,19 @@ describe("owner CRM data boundary", () => {
   it("applies search/status filters and calculates order balances", async () => {
     mocks.findMany.mockResolvedValue([
       {
+        agreedTotalMinor: null,
         confirmedTotalMinor: 20_000,
         currency: "EUR",
         displayNumber: "AL-REAL-CUSTOMER",
-        payments: [{ amountMinor: 5_000, kind: "DEPOSIT" }],
+        items: [
+          {
+            productNameSnapshot: "Product",
+            quantity: 1,
+            unitPriceMinor: 20_000,
+          },
+        ],
+        paymentPreference: "FULL_ADVANCE",
+        payments: [{ amountMinor: 5_000, kind: "DEPOSIT", status: "ACTIVE" }],
       },
     ]);
     const orders = await getAdminOrders({ query: "Alice", status: "NEW" });
@@ -86,9 +95,12 @@ describe("owner CRM data boundary", () => {
 
   it("keeps the acceptance order accessible and clearly classified", async () => {
     mocks.findUnique.mockResolvedValue({
+      agreedTotalMinor: null,
       confirmedTotalMinor: 7_900,
       currency: "EUR",
       displayNumber: "AL-20261007-3C7477",
+      items: [{ quantity: 1, unitPriceMinor: 7_900 }],
+      paymentPreference: "FULL_ADVANCE",
       payments: [],
     });
 
@@ -103,9 +115,12 @@ describe("owner CRM data boundary", () => {
 
   it("keeps the Meta verification order accessible and clearly classified", async () => {
     mocks.findUnique.mockResolvedValue({
+      agreedTotalMinor: null,
       confirmedTotalMinor: 25_900,
       currency: "EUR",
       displayNumber: "AL-20261011-302FDC",
+      items: [{ quantity: 1, unitPriceMinor: 25_900 }],
+      paymentPreference: "FULL_ADVANCE",
       payments: [],
     });
 

@@ -26,6 +26,7 @@ on:
       - codex/order-tracking-logistics-v1
       - codex/customer-tracking-experience-v2
       - codex/info-received-navigation
+      - codex/crm-order-corrections
 
 permissions:
   contents: read

@@ -143,6 +143,11 @@ enum PaymentKind {
   ADJUSTMENT
 }
 
+enum PaymentStatus {
+  ACTIVE
+  VOIDED
+}
+
 enum FulfilmentMethod {
   PERSONAL_HANDOVER
   DELIVERY
@@ -531,6 +536,7 @@ model Order {
   status                       OrderStatus                     @default(NEW)
   currency                     String?                         @db.Char(3)
   confirmedTotalMinor          Int?
+  agreedTotalMinor             Int?
   fulfilmentMethod             FulfilmentMethod?
   deliveryMode                 DeliveryMode?
   paymentPreference            PaymentPreference?
@@ -562,6 +568,7 @@ model Order {
   trackingCredentialsRotatedAt DateTime?
   nextActionAt                 DateTime?
   internalNotes                String?
+  customerNotes                String?
   cancelledReason              String?
   items                        OrderItem[]
   payments                     Payment[]
@@ -572,6 +579,7 @@ model Order {
   shipmentLinks                OrderShipment[]
   trackingNotifications        TrackingMilestoneNotification[]
   trackingMilestones           OrderTrackingMilestone[]
+  correctionHistory            OrderCorrectionHistory[]
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime                        @updatedAt
 
@@ -808,6 +816,7 @@ model OrderBusinessEvent {
   eventKey    String            @unique
   amountMinor Int?
   currency    String?           @db.Char(3)
+  isActive    Boolean           @default(true)
   occurredAt  DateTime          @default(now())
   createdAt   DateTime          @default(now())
 
@@ -967,21 +976,41 @@ model OrderNotification {
 }
 
 model Payment {
-  id                String      @id @default(cuid())
+  id                String        @id @default(cuid())
   orderId           String
-  order             Order       @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Restrict)
   kind              PaymentKind
+  status            PaymentStatus @default(ACTIVE)
   amountMinor       Int
   processorFeeMinor Int?
-  currency          String      @db.Char(3)
+  currency          String        @db.Char(3)
   receivedAt        DateTime
   reference         String?
   internalNotes     String?
   recordedByAdminId String?
-  recordedByAdmin   AdminUser?  @relation("PaymentRecorder", fields: [recordedByAdminId], references: [id], onDelete: SetNull)
-  createdAt         DateTime    @default(now())
+  recordedByAdmin   AdminUser?    @relation("PaymentRecorder", fields: [recordedByAdminId], references: [id], onDelete: SetNull)
+  voidedAt          DateTime?
+  voidReason        String?
+  voidedByAdminId   String?
+  voidedByAdmin     AdminUser?    @relation("PaymentVoider", fields: [voidedByAdminId], references: [id], onDelete: SetNull)
+  createdAt         DateTime      @default(now())
 
   @@index([orderId, receivedAt])
+  @@index([orderId, status])
+}
+
+model OrderCorrectionHistory {
+  id               String     @id @default(cuid())
+  orderId          String
+  order            Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedField     String
+  previousValue    Json?
+  newValue         Json?
+  changedByAdminId String?
+  changedByAdmin   AdminUser? @relation("OrderCorrectionActor", fields: [changedByAdminId], references: [id], onDelete: SetNull)
+  createdAt        DateTime   @default(now())
+
+  @@index([orderId, createdAt])
 }
 
 model OrderStatusHistory {
@@ -1005,6 +1034,8 @@ model AdminUser {
   email                   String                   @unique
   isActive                Boolean                  @default(true)
   payments                Payment[]                @relation("PaymentRecorder")
+  voidedPayments          Payment[]                @relation("PaymentVoider")
+  orderCorrections        OrderCorrectionHistory[] @relation("OrderCorrectionActor")
   statusChanges           OrderStatusHistory[]     @relation("StatusChanger")
   spendEntries            AdSpend[]                @relation("SpendRecorder")
   campaignChanges         CampaignChangeLog[]      @relation("CampaignChangeRecorder")

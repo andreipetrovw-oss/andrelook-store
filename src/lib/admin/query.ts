@@ -5,7 +5,12 @@ import { OrderStatus, Prisma } from "@prisma/client";
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
 import { decryptTrackingAccessCode } from "@/lib/tracking/security";
-import { calculateFinancials } from "@/lib/orders/financials";
+import {
+  calculateFinancials,
+  effectiveTotalMinor,
+  itemSnapshotTotalMinor,
+  requiredPrepaymentMinor,
+} from "@/lib/orders/financials";
 import {
   buildAdvertisingRows,
   buildLandingPerformance,
@@ -91,35 +96,56 @@ export async function getAdminOrders(filters: {
           },
         },
       },
+      agreedTotalMinor: true,
       confirmedTotalMinor: true,
       currency: true,
       customer: { select: { name: true } },
       displayNumber: true,
       id: true,
-      items: { select: { productNameSnapshot: true }, take: 1 },
+      items: {
+        select: {
+          productNameSnapshot: true,
+          quantity: true,
+          unitPriceMinor: true,
+        },
+      },
       nextActionAt: true,
       notification: { select: { status: true } },
       orderDate: true,
-      payments: { select: { amountMinor: true, kind: true } },
+      paymentPreference: true,
+      payments: {
+        select: { amountMinor: true, kind: true, status: true },
+        where: { status: "ACTIVE" },
+      },
       status: true,
     },
     take: 200,
     where,
   });
   return orders
-    .map((order) => ({
-      ...order,
-      ...calculateFinancials(order.confirmedTotalMinor, order.payments),
-      isTest: isInternalTestOrder(order.displayNumber),
-      source:
-        order.attribution?.touches.find(
-          (touch) => touch.touchType === "LAST",
-        ) ??
-        order.attribution?.touches.find(
-          (touch) => touch.touchType === "FIRST",
-        ) ??
-        null,
-    }))
+    .map((order) => {
+      const storeTotalMinor = itemSnapshotTotalMinor(order.items);
+      const totalMinor = effectiveTotalMinor({
+        agreedTotalMinor: order.agreedTotalMinor,
+        confirmedTotalMinor: order.confirmedTotalMinor,
+        itemTotalMinor: storeTotalMinor,
+      });
+      return {
+        ...order,
+        ...calculateFinancials(totalMinor, order.payments),
+        effectiveTotalMinor: totalMinor,
+        isTest: isInternalTestOrder(order.displayNumber),
+        source:
+          order.attribution?.touches.find(
+            (touch) => touch.touchType === "LAST",
+          ) ??
+          order.attribution?.touches.find(
+            (touch) => touch.touchType === "FIRST",
+          ) ??
+          null,
+        storeTotalMinor,
+      };
+    })
     .filter(
       (order) => !filters.source || order.source?.source === filters.source,
     );
@@ -133,7 +159,14 @@ export async function getAdminOrder(id: string) {
       attribution: {
         include: { touches: { orderBy: { occurredAt: "asc" } } },
       },
-      businessEvents: { orderBy: { occurredAt: "asc" } },
+      businessEvents: {
+        orderBy: { occurredAt: "asc" },
+        where: { isActive: true },
+      },
+      correctionHistory: {
+        include: { changedByAdmin: { select: { email: true } } },
+        orderBy: { createdAt: "desc" },
+      },
       items: true,
       notification: true,
       payments: { orderBy: { receivedAt: "desc" } },
@@ -169,14 +202,46 @@ export async function getAdminOrder(id: string) {
     ...safeOrder
   } = order;
   void _trackingAccessCodeHash;
+  const storeTotalMinor = itemSnapshotTotalMinor(order.items);
+  const totalMinor = effectiveTotalMinor({
+    agreedTotalMinor: order.agreedTotalMinor,
+    confirmedTotalMinor: order.confirmedTotalMinor,
+    itemTotalMinor: storeTotalMinor,
+  });
   return {
     ...safeOrder,
     trackingAccessCode: trackingAccessCodeEncrypted
       ? decryptTrackingAccessCode(trackingAccessCodeEncrypted)
       : null,
-    ...calculateFinancials(order.confirmedTotalMinor, order.payments),
+    ...calculateFinancials(totalMinor, order.payments),
+    activePayments: order.payments.filter(
+      (payment) => payment.status === "ACTIVE",
+    ),
+    effectiveTotalMinor: totalMinor,
     isTest: isInternalTestOrder(order.displayNumber),
+    requiredPrepaymentMinor: requiredPrepaymentMinor(
+      totalMinor,
+      order.paymentPreference,
+    ),
+    storeTotalMinor,
   };
+}
+
+export async function getOrderCorrectionProductOptions() {
+  await requireOwner();
+  return getPrisma().product.findMany({
+    orderBy: [{ brand: { displayName: "asc" } }, { internalCode: "asc" }],
+    select: {
+      brand: { select: { displayName: true } },
+      id: true,
+      internalCode: true,
+      translations: {
+        select: { name: true },
+        take: 1,
+        where: { locale: "RU" },
+      },
+    },
+  });
 }
 
 export async function getAdvertisingReport(input: { from: Date; to: Date }) {
@@ -207,7 +272,10 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
             eventType: true,
             occurredAt: true,
           },
-          where: { occurredAt: { gte: input.from, lt: input.to } },
+          where: {
+            isActive: true,
+            occurredAt: { gte: input.from, lt: input.to },
+          },
         },
         displayNumber: true,
         items: {
@@ -223,6 +291,7 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
         orderDate: true,
         payments: {
           select: { kind: true, processorFeeMinor: true },
+          where: { status: "ACTIVE" },
         },
         status: true,
       },
@@ -232,7 +301,10 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
           { orderDate: { gte: input.from, lt: input.to } },
           {
             businessEvents: {
-              some: { occurredAt: { gte: input.from, lt: input.to } },
+              some: {
+                isActive: true,
+                occurredAt: { gte: input.from, lt: input.to },
+              },
             },
           },
         ],
@@ -394,7 +466,7 @@ export async function getProfitabilityReport() {
       select: {
         businessEvents: {
           select: { amountMinor: true, eventKey: true },
-          where: { eventType: "PAID" },
+          where: { eventType: "PAID", isActive: true },
         },
         id: true,
         items: {
@@ -408,11 +480,12 @@ export async function getProfitabilityReport() {
         },
         payments: {
           select: { kind: true, processorFeeMinor: true },
+          where: { status: "ACTIVE" },
         },
       },
       where: {
         ...businessOrderWhere,
-        businessEvents: { some: { eventType: "PAID" } },
+        businessEvents: { some: { eventType: "PAID", isActive: true } },
       },
     }),
     prisma.adSpend.findMany({
