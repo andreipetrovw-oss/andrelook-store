@@ -18,6 +18,8 @@ export type ProviderSnapshot = {
   carrierCode: string | null;
   carrierName: string | null;
   estimatedDeliveryAt: Date | null;
+  estimatedDeliveryFrom: Date | null;
+  estimatedDeliveryTo: Date | null;
   events: ProviderEvent[];
   provider: ShipmentProvider;
   providerTrackingId: string | null;
@@ -51,16 +53,28 @@ export type ShipmentForNormalization = {
 
 export type PublicTrackingLocale = "ET" | "RU" | "EN";
 
+export type PublicTrackingStatus =
+  | "TRACKING_ADDED"
+  | "ORDER_CONFIRMED"
+  | "PREPARING"
+  | "LOGISTICS_REGISTERED"
+  | "IN_TRANSIT"
+  | "ARRIVED_IN_ESTONIA"
+  | "READY_FOR_HANDOVER"
+  | "LOCAL_DELIVERY"
+  | "DELIVERED";
+
 export type PublicTrackingEvent = {
   label: string;
   occurredAt: string | null;
-  status: ShipmentStatus;
+  status: PublicTrackingStatus;
 };
 
 export type PublicTrackingOrder = {
   carrierName: string | null;
   deliveryMethod: string;
-  estimatedDeliveryAt: string | null;
+  estimatedDeliveryFrom: string | null;
+  estimatedDeliveryTo: string | null;
   items: Array<{
     colour: string | null;
     name: string;
@@ -70,7 +84,7 @@ export type PublicTrackingOrder = {
   lastUpdatedAt: string | null;
   locale: PublicTrackingLocale;
   reference: string;
-  status: ShipmentStatus;
+  status: PublicTrackingStatus;
   statusLabel: string;
   timeline: PublicTrackingEvent[];
   trackingNumber: string | null;

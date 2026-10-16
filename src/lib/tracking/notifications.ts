@@ -7,7 +7,7 @@ import { getPrisma } from "@/lib/db";
 import { getServerConfig } from "@/lib/env";
 
 import { isMeaningfulMilestone } from "./normalization";
-import { publicStatusLabel } from "./public";
+import { publicStatusForShipment, publicStatusLabel } from "./public";
 import { createTrackingToken, safeProviderError } from "./security";
 
 function html(value: string) {
@@ -80,7 +80,9 @@ export async function sendTrackingMilestoneNotification(input: {
     });
     return { status: "disabled" };
   }
-  const label = publicStatusLabel(order.requestedLocale, input.status);
+  const publicStatus = publicStatusForShipment(input.status);
+  if (!publicStatus) return { status: "not-required" };
+  const label = publicStatusLabel(order.requestedLocale, publicStatus);
   const trackingUrl = new URL(`/track/${token}`, config.siteUrl).toString();
   try {
     const resend = new Resend(config.resendApiKey);

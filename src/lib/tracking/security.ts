@@ -1,10 +1,17 @@
 import "server-only";
 
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
-export function createTrackingToken() {
-  return randomBytes(32).toString("base64url");
-}
+export {
+  createTrackingAccessCode,
+  createTrackingCredentials,
+  createTrackingToken,
+  decryptTrackingAccessCode,
+  encryptTrackingAccessCode,
+  formatTrackingAccessCode,
+  hashTrackingAccessCode,
+  normalizeTrackingAccessCode,
+} from "./credentials";
 
 export function hashLookupBucket(value: string) {
   return createHash("sha256").update(value).digest("hex");

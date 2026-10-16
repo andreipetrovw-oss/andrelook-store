@@ -71,15 +71,18 @@ function snapshot(payload: unknown): ProviderSnapshot {
     asString(shipment?.statusCode) ??
     asString(shipment?.statusCategory) ??
     asString(tracking.status);
+  const estimatedDeliveryAt =
+    asDate(delivery?.estimatedDeliveryDate) ??
+    asDate(delivery?.aiPredictiveDeliveryDate) ??
+    asDate(shipment?.deliveryDate) ??
+    asDate(shipment?.estimatedDeliveryDate) ??
+    null;
   return {
     carrierCode: asString(courier?.courierCode),
     carrierName: asString(courier?.courierName),
-    estimatedDeliveryAt:
-      asDate(delivery?.estimatedDeliveryDate) ??
-      asDate(delivery?.aiPredictiveDeliveryDate) ??
-      asDate(shipment?.deliveryDate) ??
-      asDate(shipment?.estimatedDeliveryDate) ??
-      null,
+    estimatedDeliveryAt,
+    estimatedDeliveryFrom: estimatedDeliveryAt,
+    estimatedDeliveryTo: estimatedDeliveryAt,
     events: sortEvents(events),
     provider: "SHIP24",
     providerTrackingId:

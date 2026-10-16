@@ -14,6 +14,7 @@ import {
   getOrdersForShipmentLinking,
   shipmentStatusLabels,
 } from "@/lib/tracking/admin";
+import { tallinnDateInput } from "@/lib/tracking/time";
 
 const dateTime = new Intl.DateTimeFormat("ru-RU", {
   dateStyle: "medium",
@@ -102,12 +103,20 @@ export default async function AdminShipmentPage({
               <dd>{stamp(shipment.lastConfirmedEventAt)}</dd>
             </div>
             <div>
-              <dt>ETA</dt>
-              <dd>{stamp(shipment.estimatedDeliveryAt)}</dd>
+              <dt>Окно ETA</dt>
+              <dd>
+                {shipment.etaFrom && shipment.etaTo
+                  ? `${dateTime.format(shipment.etaFrom)} — ${dateTime.format(shipment.etaTo)}`
+                  : "—"}
+              </dd>
             </div>
             <div>
               <dt>Источник ETA</dt>
-              <dd>{shipment.etaSource ?? "—"}</dd>
+              <dd>{shipment.etaWindowSource ?? shipment.etaSource ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Уверенность ETA</dt>
+              <dd>{shipment.etaConfidence ?? "—"}</dd>
             </div>
             <div>
               <dt>Устарело</dt>
@@ -135,20 +144,38 @@ export default async function AdminShipmentPage({
           <form action={updateShipmentEta} className="admin-stack-form">
             <input name="shipmentId" type="hidden" value={shipment.id} />
             <label>
-              <span>Подтверждённая ETA</span>
+              <span>Начало окна ETA (дата Таллинна)</span>
               <input
-                defaultValue={
-                  shipment.estimatedDeliveryAt
-                    ? shipment.estimatedDeliveryAt.toISOString().slice(0, 16)
-                    : ""
-                }
-                name="estimatedDeliveryAt"
-                type="datetime-local"
+                defaultValue={tallinnDateInput(shipment.etaFrom)}
+                name="etaFrom"
+                type="date"
               />
             </label>
             <label>
+              <span>Конец окна ETA (дата Таллинна)</span>
+              <input
+                defaultValue={tallinnDateInput(shipment.etaTo)}
+                name="etaTo"
+                type="date"
+              />
+            </label>
+            <label>
+              <span>Уверенность</span>
+              <select
+                defaultValue={shipment.etaConfidence ?? "MEDIUM"}
+                name="etaConfidence"
+              >
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+              </select>
+            </label>
+            <label>
               <span>Основание ETA (обязательно при установке)</span>
-              <input defaultValue={shipment.etaNote ?? ""} name="etaNote" />
+              <input
+                defaultValue={shipment.etaEvidenceNote ?? ""}
+                name="etaEvidenceNote"
+              />
             </label>
             <button type="submit">Сохранить или очистить ETA</button>
           </form>

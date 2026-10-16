@@ -37,6 +37,8 @@ describe("Ship24 parsing", () => {
       carrierCode: "carrier",
       carrierName: "Carrier",
       estimatedDeliveryAt: new Date("2026-10-20"),
+      estimatedDeliveryFrom: new Date("2026-10-20"),
+      estimatedDeliveryTo: new Date("2026-10-20"),
       providerTrackingId: "tracker-id",
       rawStatus: "in_transit",
       syncStatus: "SUCCESS",

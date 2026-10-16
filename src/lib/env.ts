@@ -23,6 +23,7 @@ export type ServerConfig = {
   ship24WebhookSecret: string | null;
   siteUrl: URL;
   trackingStaleDays: number;
+  trackingAccessCodeSecret: string | null;
 };
 
 function optionalValue(value: string | undefined): string | null {
@@ -91,6 +92,9 @@ export function getServerConfig(): ServerConfig {
     trackingStaleDays: Math.max(
       1,
       Number.parseInt(process.env.TRACKING_STALE_DAYS ?? "7", 10) || 7,
+    ),
+    trackingAccessCodeSecret: optionalValue(
+      process.env.TRACKING_ACCESS_CODE_SECRET,
     ),
   };
 

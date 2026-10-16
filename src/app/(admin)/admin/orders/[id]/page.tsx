@@ -1,10 +1,17 @@
-import { OrderStatus, PaymentKind } from "@prisma/client";
+import {
+  OrderStatus,
+  OrderTrackingMilestoneKind,
+  PaymentKind,
+} from "@prisma/client";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
+import { TrackingCustomerControls } from "@/components/admin/tracking-customer-controls";
 import { getAdminOrder } from "@/lib/admin/query";
 import { getServerConfig } from "@/lib/env";
 import { shipmentStatusLabels } from "@/lib/tracking/admin";
+import { customerTrackingMessage } from "@/lib/tracking/customer-message";
+import { getPublicTrackingOrder } from "@/lib/tracking/public";
 import { trafficSourceLabels } from "@/lib/admin/traffic-labels";
 import {
   acquisitionChannelLabels,
@@ -20,10 +27,21 @@ import {
 
 import {
   recordPayment,
+  recordOrderTrackingMilestone,
   retryOrderNotification,
   rotateOrderTrackingLink,
   updateOrderStatus,
 } from "../../actions";
+
+const trackingMilestoneLabels: Record<OrderTrackingMilestoneKind, string> = {
+  INTERNATIONAL_DISPATCH_CONFIRMED: "Международная отправка подтверждена",
+  ORDER_CONFIRMED: "Заказ подтверждён",
+  PACKING_CONFIRMED: "Упаковка подтверждена",
+  PAYMENT_RECEIVED: "Оплата / предоплата получена (только CRM)",
+  PREPARATION_STARTED: "Подготовка начата",
+  QUALITY_CHECK_APPROVED: "Проверка качества одобрена",
+  QUALITY_CHECK_RECEIVED: "Получены материалы проверки качества",
+};
 
 export default async function AdminOrderPage({
   params,
@@ -45,6 +63,22 @@ export default async function AdminOrderPage({
         getServerConfig().siteUrl,
       ).toString()
     : null;
+  const customerTracking = order.publicTrackingToken
+    ? await getPublicTrackingOrder(
+        order.publicTrackingToken,
+        order.requestedLocale,
+      )
+    : null;
+  const customerMessage =
+    trackingUrl && order.trackingAccessCode && customerTracking
+      ? customerTrackingMessage({
+          accessCode: order.trackingAccessCode,
+          locale: order.requestedLocale,
+          reference: order.displayNumber,
+          status: customerTracking.statusLabel,
+          url: trackingUrl,
+        })
+      : null;
   return (
     <>
       <span className="eyebrow">{order.displayNumber}</span>
@@ -287,6 +321,14 @@ export default async function AdminOrderPage({
           <h2>Логистика и отслеживание</h2>
           <dl>
             <div>
+              <dt>Номер заказа</dt>
+              <dd>{order.displayNumber}</dd>
+            </div>
+            <div>
+              <dt>Код доступа</dt>
+              <dd>{order.trackingAccessCode ?? "Не создан"}</dd>
+            </div>
+            <div>
               <dt>Публичная ссылка</dt>
               <dd>
                 {trackingUrl ? (
@@ -299,20 +341,52 @@ export default async function AdminOrderPage({
               </dd>
             </div>
             <div>
+              <dt>Безопасный статус клиента</dt>
+              <dd>{customerTracking?.statusLabel ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Последнее подтверждённое обновление</dt>
+              <dd>
+                {customerTracking?.lastUpdatedAt
+                  ? russianDateTime.format(
+                      new Date(customerTracking.lastUpdatedAt),
+                    )
+                  : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt>Окно ETA</dt>
+              <dd>
+                {customerTracking?.estimatedDeliveryFrom &&
+                customerTracking.estimatedDeliveryTo
+                  ? `${russianDate.format(new Date(customerTracking.estimatedDeliveryFrom))} — ${russianDate.format(new Date(customerTracking.estimatedDeliveryTo))}`
+                  : "—"}
+              </dd>
+            </div>
+            <div>
               <dt>Маршрут</dt>
               <dd>
                 {order.deliveryMode ?? "Определяется из способа получения"}
               </dd>
             </div>
           </dl>
+          <TrackingCustomerControls
+            accessCode={order.trackingAccessCode}
+            message={customerMessage}
+            trackingUrl={trackingUrl}
+          />
           <form action={rotateOrderTrackingLink} className="admin-stack-form">
             <input name="orderId" type="hidden" value={order.id} />
             <button type="submit">
               {trackingUrl
-                ? "Перевыпустить защищённую ссылку"
-                : "Создать защищённую ссылку"}
+                ? "Перевыпустить ссылку и код доступа"
+                : "Создать ссылку и код доступа"}
             </button>
           </form>
+          <p className="admin-readiness-note">
+            Перевыпуск немедленно отзывает прежнюю ссылку и код. Используйте
+            только перед передачей новых реквизитов клиенту.
+          </p>
           <ul className="timeline">
             {order.shipmentLinks.map((link) => (
               <li key={link.id}>
@@ -322,6 +396,9 @@ export default async function AdminOrderPage({
                 <span>
                   {shipmentStatusLabels[link.shipment.normalizedStatus]} ·{" "}
                   {link.shipment.providerSyncStatus}
+                  {link.shipment.lastSuccessfulSyncAt
+                    ? ` · sync ${russianDateTime.format(link.shipment.lastSuccessfulSyncAt)}`
+                    : ""}
                   {link.shipment.staleFlag ? " · данные устарели" : ""}
                 </span>
               </li>
@@ -333,6 +410,61 @@ export default async function AdminOrderPage({
               «Логистика» и прикрепите этот заказ.
             </p>
           ) : null}
+          <h3>Подтверждённая история заказа</h3>
+          <form
+            action={recordOrderTrackingMilestone}
+            className="admin-stack-form admin-form-grid"
+          >
+            <input name="orderId" type="hidden" value={order.id} />
+            <label>
+              <span>Событие</span>
+              <select name="kind">
+                {Object.values(OrderTrackingMilestoneKind).map((kind) => (
+                  <option key={kind} value={kind}>
+                    {trackingMilestoneLabels[kind]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Источник доказательства</span>
+              <select defaultValue="OWNER_CONFIRMED" name="evidenceSource">
+                <option value="OWNER_CONFIRMED">OWNER_CONFIRMED</option>
+                <option value="WAREHOUSE_CONFIRMED">WAREHOUSE_CONFIRMED</option>
+                <option value="MANUAL_OVERRIDE">MANUAL_OVERRIDE</option>
+              </select>
+            </label>
+            <label>
+              <span>Реальная дата и время (Таллинн)</span>
+              <input name="occurredAt" required type="datetime-local" />
+            </label>
+            <label>
+              <span>Основание / доказательство</span>
+              <input name="evidenceNote" required />
+            </label>
+            <button type="submit">Добавить подтверждённое событие</button>
+          </form>
+          {order.trackingMilestones.length ? (
+            <ul className="timeline">
+              {order.trackingMilestones.map((milestone) => (
+                <li key={milestone.id}>
+                  <strong>{trackingMilestoneLabels[milestone.kind]}</strong>
+                  <span>
+                    {russianDateTime.format(milestone.occurredAt)} ·{" "}
+                    {milestone.evidenceSource} ·{" "}
+                    {milestone.createdByAdmin.email}
+                  </span>
+                  <p>{milestone.evidenceNote}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="admin-readiness-note">
+              Подтверждённая историческая дата ещё не внесена. Клиенту
+              показывается нейтральное добавление в систему, а не ложное
+              подтверждение заказа.
+            </p>
+          )}
           {order.trackingNotifications.length ? (
             <>
               <h3>Уведомления клиенту</h3>

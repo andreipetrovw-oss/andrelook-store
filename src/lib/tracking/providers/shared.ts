@@ -58,6 +58,8 @@ export function unavailableSnapshot(
     carrierCode: null,
     carrierName: null,
     estimatedDeliveryAt: null,
+    estimatedDeliveryFrom: null,
+    estimatedDeliveryTo: null,
     events: [],
     provider,
     providerTrackingId: null,

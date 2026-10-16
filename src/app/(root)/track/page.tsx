@@ -2,33 +2,56 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { TrackingLookupForm } from "@/components/tracking-lookup-form";
+import { trackingCopy, trackingLocale } from "@/lib/tracking/copy";
 
-export const metadata: Metadata = {
-  robots: { follow: false, index: false, nocache: true },
-  title: "Track your Andrelook order",
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}): Promise<Metadata> {
+  const locale = trackingLocale((await searchParams).lang);
+  return {
+    robots: { follow: false, index: false, nocache: true },
+    title: `${trackingCopy[locale].lookupTitle} · Andrelook`,
+  };
+}
 
-export default function TrackingLookupPage() {
+export default async function TrackingLookupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}) {
+  const { lang } = await searchParams;
+  const locale = trackingLocale(lang);
+  const copy = trackingCopy[locale];
   return (
     <main className="tracking-shell">
-      <Link className="tracking-wordmark" href="/et">
+      <Link className="tracking-wordmark" href={`/${locale.toLowerCase()}`}>
         ANDRELOOK
       </Link>
       <section className="tracking-card">
-        <span className="eyebrow">Andrelook order</span>
-        <h1>Track your order</h1>
-        <p>
-          Enter the order number and customer email used for the order. Tracking
-          details are protected and cannot be searched by order number alone.
-        </p>
-        <TrackingLookupForm />
+        <nav aria-label="Language" className="tracking-language">
+          {(["ET", "RU", "EN"] as const).map((value) => (
+            <Link
+              aria-current={value === locale ? "page" : undefined}
+              href={`/track?lang=${value.toLowerCase()}`}
+              key={value}
+            >
+              {value}
+            </Link>
+          ))}
+        </nav>
+        <span className="eyebrow">Andrelook</span>
+        <h1>{copy.lookupTitle}</h1>
+        <p>{copy.lookupBody}</p>
+        <TrackingLookupForm locale={locale} />
         <a
           className="tracking-support"
           href="https://t.me/andrelookstore"
           rel="noreferrer"
           target="_blank"
         >
-          Need help? Contact Andrelook ↗
+          {copy.support}
         </a>
       </section>
     </main>

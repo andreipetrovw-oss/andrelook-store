@@ -4,6 +4,7 @@ import { OrderStatus, Prisma } from "@prisma/client";
 
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
+import { decryptTrackingAccessCode } from "@/lib/tracking/security";
 import { calculateFinancials } from "@/lib/orders/financials";
 import {
   buildAdvertisingRows,
@@ -142,6 +143,7 @@ export async function getAdminOrder(id: string) {
             select: {
               id: true,
               kind: true,
+              lastSuccessfulSyncAt: true,
               normalizedStatus: true,
               provider: true,
               providerSyncStatus: true,
@@ -152,17 +154,29 @@ export async function getAdminOrder(id: string) {
         orderBy: { sequence: "asc" },
       },
       statusHistory: { orderBy: { createdAt: "desc" } },
+      trackingMilestones: {
+        include: { createdByAdmin: { select: { email: true } } },
+        orderBy: { occurredAt: "desc" },
+      },
       trackingNotifications: { orderBy: { createdAt: "desc" } },
     },
     where: { id },
   });
-  return order
-    ? {
-        ...order,
-        ...calculateFinancials(order.confirmedTotalMinor, order.payments),
-        isTest: isInternalTestOrder(order.displayNumber),
-      }
-    : null;
+  if (!order) return null;
+  const {
+    trackingAccessCodeEncrypted,
+    trackingAccessCodeHash: _trackingAccessCodeHash,
+    ...safeOrder
+  } = order;
+  void _trackingAccessCodeHash;
+  return {
+    ...safeOrder,
+    trackingAccessCode: trackingAccessCodeEncrypted
+      ? decryptTrackingAccessCode(trackingAccessCodeEncrypted)
+      : null,
+    ...calculateFinancials(order.confirmedTotalMinor, order.payments),
+    isTest: isInternalTestOrder(order.displayNumber),
+  };
 }
 
 export async function getAdvertisingReport(input: { from: Date; to: Date }) {

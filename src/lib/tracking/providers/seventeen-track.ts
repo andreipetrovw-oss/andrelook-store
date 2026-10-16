@@ -150,6 +150,8 @@ export function parseSeventeenTrackSnapshot(
         : String(providerInfo.key),
     carrierName: asString(providerInfo?.name),
     estimatedDeliveryAt: asDate(estimate?.to) ?? asDate(estimate?.from) ?? null,
+    estimatedDeliveryFrom: asDate(estimate?.from),
+    estimatedDeliveryTo: asDate(estimate?.to),
     events: sortEvents(events),
     provider: "SEVENTEEN_TRACK",
     providerTrackingId: null,

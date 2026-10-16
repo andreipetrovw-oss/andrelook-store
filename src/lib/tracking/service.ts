@@ -13,6 +13,7 @@ import { getPrisma } from "@/lib/db";
 
 import {
   isMeaningfulMilestone,
+  isProviderRegistrationEvent,
   normalizeProviderEvent,
   shouldApplyCandidate,
 } from "./normalization";
@@ -83,6 +84,33 @@ export async function ingestProviderSnapshot(
     const newlyVisible: ShipmentStatus[] = [];
     for (const event of snapshot.events) {
       const normalizedStatus = normalizeProviderEvent(event, shipment.kind);
+      const providerEventId = `${snapshot.provider}:${event.id}`;
+      if (!normalizedStatus && isProviderRegistrationEvent(event)) {
+        await tx.trackingEvent.upsert({
+          create: {
+            customerVisible: true,
+            evidenceSource: "PROVIDER_EVENT",
+            normalizedStatus: currentStatus,
+            provider: snapshot.provider,
+            providerEventId,
+            publicTimestamp: event.occurredAt,
+            rawDescription: event.description,
+            rawLocation: event.location,
+            rawStatus: event.status ?? event.stage,
+            rawTimestamp: event.occurredAt,
+            shipmentId,
+          },
+          update: {},
+          where: {
+            shipmentId_evidenceSource_providerEventId: {
+              evidenceSource: "PROVIDER_EVENT",
+              providerEventId,
+              shipmentId,
+            },
+          },
+        });
+        continue;
+      }
       if (!normalizedStatus) continue;
       const resolution = shouldApplyCandidate({
         candidate: normalizedStatus,
@@ -92,7 +120,6 @@ export async function ingestProviderSnapshot(
       });
       const changed = resolution.apply && normalizedStatus !== currentStatus;
       requiresOwnerReview ||= resolution.contradiction;
-      const providerEventId = `${snapshot.provider}:${event.id}`;
       await tx.trackingEvent.upsert({
         create: {
           customerVisible: changed,
@@ -149,12 +176,28 @@ export async function ingestProviderSnapshot(
         fallbackDetectedCarrierName: !isPrimary
           ? snapshot.carrierName
           : undefined,
-        ...(snapshot.estimatedDeliveryAt
+        ...(snapshot.estimatedDeliveryAt ||
+        snapshot.estimatedDeliveryFrom ||
+        snapshot.estimatedDeliveryTo
           ? {
-              estimatedDeliveryAt: snapshot.estimatedDeliveryAt,
+              estimatedDeliveryAt:
+                snapshot.estimatedDeliveryTo ??
+                snapshot.estimatedDeliveryAt ??
+                snapshot.estimatedDeliveryFrom,
+              etaConfidence: "MEDIUM",
               etaConfirmedAt: new Date(),
+              etaEvidenceNote: null,
+              etaFrom:
+                snapshot.estimatedDeliveryFrom ??
+                snapshot.estimatedDeliveryAt ??
+                snapshot.estimatedDeliveryTo,
               etaNote: null,
               etaSource: "PROVIDER_EVENT",
+              etaTo:
+                snapshot.estimatedDeliveryTo ??
+                snapshot.estimatedDeliveryAt ??
+                snapshot.estimatedDeliveryFrom,
+              etaWindowSource: "PROVIDER",
             }
           : {}),
         lastConfirmedEventAt: currentAt,

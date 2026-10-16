@@ -29,6 +29,10 @@ function searchable(event: ProviderEvent) {
     .replaceAll(/[^a-z0-9]+/g, "");
 }
 
+export function isProviderRegistrationEvent(event: ProviderEvent) {
+  return searchable(event).includes("inforeceived");
+}
+
 export function normalizeProviderEvent(
   event: ProviderEvent,
   kind: ShipmentKind,
@@ -122,6 +126,5 @@ export function isMeaningfulMilestone(status: ShipmentStatus) {
     "READY_FOR_HANDOVER",
     "LOCAL_CARRIER",
     "DELIVERED",
-    "DELAYED_OR_EXCEPTION",
   ].includes(status);
 }

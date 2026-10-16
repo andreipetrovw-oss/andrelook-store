@@ -197,6 +197,29 @@ enum TrackingEvidenceSource {
   MANUAL_OVERRIDE
 }
 
+enum TrackingEtaSource {
+  PROVIDER
+  OFFICIAL_CARRIER
+  OWNER_CONFIRMED
+  SYSTEM_ESTIMATE
+}
+
+enum TrackingEtaConfidence {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum OrderTrackingMilestoneKind {
+  ORDER_CONFIRMED
+  PAYMENT_RECEIVED
+  PREPARATION_STARTED
+  QUALITY_CHECK_RECEIVED
+  QUALITY_CHECK_APPROVED
+  PACKING_CONFIRMED
+  INTERNATIONAL_DISPATCH_CONFIRMED
+}
+
 enum ShipmentRelationship {
   MASTER_INBOUND
   LOCAL_OUTBOUND
@@ -500,53 +523,57 @@ model Customer {
 }
 
 model Order {
-  id                    String                          @id @default(cuid())
-  displayNumber         String                          @unique
-  requestKey            String                          @unique
-  customerId            String
-  customer              Customer                        @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  status                OrderStatus                     @default(NEW)
-  currency              String?                         @db.Char(3)
-  confirmedTotalMinor   Int?
-  fulfilmentMethod      FulfilmentMethod?
-  deliveryMode          DeliveryMode?
-  paymentPreference     PaymentPreference?
-  countryCode           String?                         @db.Char(2)
-  city                  String?
-  postalCode            String?
-  addressLine1          String?
-  addressLine2          String?
-  acquisitionChannel    AcquisitionChannel              @default(DIRECT)
-  utmSource             String?
-  utmMedium             String?
-  utmCampaign           String?
-  utmContent            String?
-  utmTerm               String?
-  initialReferrer       String?
-  landingPath           String?
-  requestedLocale       Locale
-  consentVersion        String
-  consentAt             DateTime
-  orderDate             DateTime                        @default(now())
-  confirmedAt           DateTime?
-  supplierOrderedAt     DateTime?
-  etaText               String?
-  etaDate               DateTime?
-  trackingReference     String?
-  publicTrackingToken   String?                         @unique
-  nextActionAt          DateTime?
-  internalNotes         String?
-  cancelledReason       String?
-  items                 OrderItem[]
-  payments              Payment[]
-  statusHistory         OrderStatusHistory[]
-  attribution           OrderAttribution?
-  businessEvents        OrderBusinessEvent[]
-  notification          OrderNotification?
-  shipmentLinks         OrderShipment[]
-  trackingNotifications TrackingMilestoneNotification[]
-  createdAt             DateTime                        @default(now())
-  updatedAt             DateTime                        @updatedAt
+  id                           String                          @id @default(cuid())
+  displayNumber                String                          @unique
+  requestKey                   String                          @unique
+  customerId                   String
+  customer                     Customer                        @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  status                       OrderStatus                     @default(NEW)
+  currency                     String?                         @db.Char(3)
+  confirmedTotalMinor          Int?
+  fulfilmentMethod             FulfilmentMethod?
+  deliveryMode                 DeliveryMode?
+  paymentPreference            PaymentPreference?
+  countryCode                  String?                         @db.Char(2)
+  city                         String?
+  postalCode                   String?
+  addressLine1                 String?
+  addressLine2                 String?
+  acquisitionChannel           AcquisitionChannel              @default(DIRECT)
+  utmSource                    String?
+  utmMedium                    String?
+  utmCampaign                  String?
+  utmContent                   String?
+  utmTerm                      String?
+  initialReferrer              String?
+  landingPath                  String?
+  requestedLocale              Locale
+  consentVersion               String
+  consentAt                    DateTime
+  orderDate                    DateTime                        @default(now())
+  confirmedAt                  DateTime?
+  supplierOrderedAt            DateTime?
+  etaText                      String?
+  etaDate                      DateTime?
+  trackingReference            String?
+  publicTrackingToken          String?                         @unique
+  trackingAccessCodeHash       String?                         @unique
+  trackingAccessCodeEncrypted  String?
+  trackingCredentialsRotatedAt DateTime?
+  nextActionAt                 DateTime?
+  internalNotes                String?
+  cancelledReason              String?
+  items                        OrderItem[]
+  payments                     Payment[]
+  statusHistory                OrderStatusHistory[]
+  attribution                  OrderAttribution?
+  businessEvents               OrderBusinessEvent[]
+  notification                 OrderNotification?
+  shipmentLinks                OrderShipment[]
+  trackingNotifications        TrackingMilestoneNotification[]
+  trackingMilestones           OrderTrackingMilestone[]
+  createdAt                    DateTime                        @default(now())
+  updatedAt                    DateTime                        @updatedAt
 
   @@index([status, nextActionAt])
   @@index([acquisitionChannel, orderDate])
@@ -573,8 +600,13 @@ model Shipment {
   fallbackSyncStatus           ShipmentSyncStatus?
   fallbackLastError            String?
   estimatedDeliveryAt          DateTime?
+  etaFrom                      DateTime?
+  etaTo                        DateTime?
   etaSource                    TrackingEvidenceSource?
   etaNote                      String?
+  etaWindowSource              TrackingEtaSource?
+  etaConfidence                TrackingEtaConfidence?
+  etaEvidenceNote              String?
   etaConfirmedAt               DateTime?
   lastProviderUpdateAt         DateTime?
   fallbackLastProviderUpdateAt DateTime?
@@ -600,6 +632,22 @@ model Shipment {
 
   @@index([normalizedStatus, staleFlag])
   @@index([providerSyncStatus, lastSyncAt])
+}
+
+model OrderTrackingMilestone {
+  id               String                     @id @default(cuid())
+  orderId          String
+  order            Order                      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kind             OrderTrackingMilestoneKind
+  occurredAt       DateTime
+  evidenceSource   TrackingEvidenceSource
+  evidenceNote     String
+  customerVisible  Boolean                    @default(true)
+  createdByAdminId String
+  createdByAdmin   AdminUser                  @relation("OrderTrackingMilestoneCreator", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  createdAt        DateTime                   @default(now())
+
+  @@index([orderId, occurredAt])
 }
 
 model OrderShipment {
@@ -951,19 +999,20 @@ model OrderStatusHistory {
 }
 
 model AdminUser {
-  id                String                   @id @default(cuid())
-  provider          String
-  providerSubject   String
-  email             String                   @unique
-  isActive          Boolean                  @default(true)
-  payments          Payment[]                @relation("PaymentRecorder")
-  statusChanges     OrderStatusHistory[]     @relation("StatusChanger")
-  spendEntries      AdSpend[]                @relation("SpendRecorder")
-  campaignChanges   CampaignChangeLog[]      @relation("CampaignChangeRecorder")
-  trackingEvents    TrackingEvent[]          @relation("TrackingEventCreator")
-  shipmentOverrides ShipmentStatusOverride[] @relation("ShipmentOverrideCreator")
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
+  id                      String                   @id @default(cuid())
+  provider                String
+  providerSubject         String
+  email                   String                   @unique
+  isActive                Boolean                  @default(true)
+  payments                Payment[]                @relation("PaymentRecorder")
+  statusChanges           OrderStatusHistory[]     @relation("StatusChanger")
+  spendEntries            AdSpend[]                @relation("SpendRecorder")
+  campaignChanges         CampaignChangeLog[]      @relation("CampaignChangeRecorder")
+  trackingEvents          TrackingEvent[]          @relation("TrackingEventCreator")
+  shipmentOverrides       ShipmentStatusOverride[] @relation("ShipmentOverrideCreator")
+  orderTrackingMilestones OrderTrackingMilestone[] @relation("OrderTrackingMilestoneCreator")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
 
   @@unique([provider, providerSubject])
 }

@@ -6,6 +6,7 @@ import {
   ContactMethod,
   DeliveryMode,
   Locale,
+  OrderTrackingMilestoneKind,
   OrderStatus,
   PaymentKind,
   PublicationStatus,
@@ -25,7 +26,7 @@ import { sendNewOrderNotification } from "@/lib/notifications/order-notification
 import { createManualOrder as createManualOrderRecord } from "@/lib/orders/manual";
 import { notifyLinkedOrders } from "@/lib/tracking/notifications";
 import {
-  createTrackingToken,
+  createTrackingCredentials,
   safeProviderError,
 } from "@/lib/tracking/security";
 import {
@@ -33,6 +34,10 @@ import {
   recordOperationalMilestone,
   registerShipment,
 } from "@/lib/tracking/service";
+import {
+  parseTallinnDate,
+  parseTallinnLocalDateTime,
+} from "@/lib/tracking/time";
 
 const statusSchema = z.object({
   note: z.string().trim().max(500).optional(),
@@ -165,6 +170,18 @@ const milestoneSchema = z.object({
   reason: z.string().trim().min(3).max(500),
   shipmentId: z.string().min(1),
   status: z.enum(ShipmentStatus),
+});
+
+const orderTrackingMilestoneSchema = z.object({
+  evidenceNote: z.string().trim().min(3).max(500),
+  evidenceSource: z.enum([
+    "OWNER_CONFIRMED",
+    "WAREHOUSE_CONFIRMED",
+    "MANUAL_OVERRIDE",
+  ]),
+  kind: z.enum(OrderTrackingMilestoneKind),
+  occurredAt: z.string().trim().min(1),
+  orderId: z.string().min(1),
 });
 
 export async function createManualOrder(formData: FormData) {
@@ -356,11 +373,48 @@ export async function reconcileShipmentAction(formData: FormData) {
 export async function rotateOrderTrackingLink(formData: FormData) {
   await requireOwner();
   const orderId = z.string().min(1).parse(formData.get("orderId"));
+  const credentials = createTrackingCredentials();
   await getPrisma().order.update({
-    data: { publicTrackingToken: createTrackingToken() },
+    data: {
+      publicTrackingToken: credentials.publicTrackingToken,
+      trackingAccessCodeEncrypted: credentials.trackingAccessCodeEncrypted,
+      trackingAccessCodeHash: credentials.trackingAccessCodeHash,
+      trackingCredentialsRotatedAt: credentials.trackingCredentialsRotatedAt,
+    },
     where: { id: orderId },
   });
   revalidatePath(`/admin/orders/${orderId}`);
+}
+
+export async function recordOrderTrackingMilestone(formData: FormData) {
+  const parsed = orderTrackingMilestoneSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) throw new Error("Invalid order milestone.");
+  const occurredAt = parseTallinnLocalDateTime(parsed.data.occurredAt);
+  if (!occurredAt) throw new Error("Invalid Tallinn milestone timestamp.");
+  const changedByAdminId = await adminId();
+  const customerVisible = parsed.data.kind !== "PAYMENT_RECEIVED";
+  await getPrisma().$transaction(async (tx) => {
+    await tx.orderTrackingMilestone.create({
+      data: {
+        createdByAdminId: changedByAdminId,
+        customerVisible,
+        evidenceNote: parsed.data.evidenceNote,
+        evidenceSource: parsed.data.evidenceSource,
+        kind: parsed.data.kind,
+        occurredAt,
+        orderId: parsed.data.orderId,
+      },
+    });
+    if (parsed.data.kind === "ORDER_CONFIRMED") {
+      await tx.order.update({
+        data: { confirmedAt: occurredAt },
+        where: { id: parsed.data.orderId },
+      });
+    }
+  });
+  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
 }
 
 export async function updateShipmentPublicTracking(formData: FormData) {
@@ -403,35 +457,55 @@ export async function updateShipmentEta(formData: FormData) {
   await requireOwner();
   const parsed = z
     .object({
-      estimatedDeliveryAt: z.string().trim(),
-      etaNote: z.string().trim().max(500),
+      etaConfidence: z.enum(["LOW", "MEDIUM", "HIGH"]),
+      etaEvidenceNote: z.string().trim().max(500),
+      etaFrom: z.string().trim(),
+      etaTo: z.string().trim(),
       shipmentId: z.string().min(1),
     })
     .safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid ETA evidence.");
-  const estimatedDeliveryAt = parsed.data.estimatedDeliveryAt
-    ? new Date(parsed.data.estimatedDeliveryAt)
+  const etaFrom = parsed.data.etaFrom
+    ? parseTallinnDate(parsed.data.etaFrom)
     : null;
-  if (estimatedDeliveryAt && Number.isNaN(estimatedDeliveryAt.valueOf())) {
+  const etaTo = parsed.data.etaTo ? parseTallinnDate(parsed.data.etaTo) : null;
+  if ((parsed.data.etaFrom && !etaFrom) || (parsed.data.etaTo && !etaTo)) {
     throw new Error("Invalid ETA.");
   }
-  if (estimatedDeliveryAt && !parsed.data.etaNote) {
+  if ((etaFrom === null) !== (etaTo === null)) {
+    throw new Error("ETA requires both start and end dates.");
+  }
+  if (etaFrom && etaTo && etaFrom > etaTo) {
+    throw new Error("ETA start must not be after ETA end.");
+  }
+  if (etaFrom && !parsed.data.etaEvidenceNote) {
     throw new Error("Owner-confirmed ETA requires an evidence note.");
   }
   await getPrisma().shipment.update({
-    data: estimatedDeliveryAt
-      ? {
-          estimatedDeliveryAt,
-          etaConfirmedAt: new Date(),
-          etaNote: parsed.data.etaNote,
-          etaSource: "OWNER_CONFIRMED",
-        }
-      : {
-          estimatedDeliveryAt: null,
-          etaConfirmedAt: null,
-          etaNote: null,
-          etaSource: null,
-        },
+    data:
+      etaFrom && etaTo
+        ? {
+            estimatedDeliveryAt: etaTo,
+            etaConfidence: parsed.data.etaConfidence,
+            etaConfirmedAt: new Date(),
+            etaEvidenceNote: parsed.data.etaEvidenceNote,
+            etaFrom,
+            etaNote: parsed.data.etaEvidenceNote,
+            etaSource: "OWNER_CONFIRMED",
+            etaTo,
+            etaWindowSource: "OWNER_CONFIRMED",
+          }
+        : {
+            estimatedDeliveryAt: null,
+            etaConfidence: null,
+            etaConfirmedAt: null,
+            etaEvidenceNote: null,
+            etaFrom: null,
+            etaNote: null,
+            etaSource: null,
+            etaTo: null,
+            etaWindowSource: null,
+          },
     where: { id: parsed.data.shipmentId },
   });
   revalidatePath(`/admin/logistics/${parsed.data.shipmentId}`);

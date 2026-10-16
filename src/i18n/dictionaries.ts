@@ -90,6 +90,7 @@ export type Dictionary = {
   submitting: string;
   tagline: string;
   terms: string;
+  trackOrder: string;
   privacy: string;
   returnsExchanges: string;
   preorder: string;
@@ -202,6 +203,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     submitting: "Отправляем…",
     tagline: "МИРОВЫЕ БРЕНДЫ · ЛИЧНЫЙ ПОДХОД",
     terms: "Условия",
+    trackOrder: "Отследить заказ",
     privacy: "Конфиденциальность",
     returnsExchanges: "Возврат и обмен",
     preorder: "Предзаказ",
@@ -314,6 +316,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     submitting: "Saadan…",
     tagline: "MAAILMA BRÄNDID · PERSONAALNE TEENINDUS",
     terms: "Tingimused",
+    trackOrder: "Jälgi tellimust",
     privacy: "Privaatsus",
     returnsExchanges: "Tagastus ja vahetus",
     preorder: "Eeltellimus",
@@ -426,6 +429,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     submitting: "Sending…",
     tagline: "GLOBAL BRANDS · PERSONAL SERVICE",
     terms: "Terms",
+    trackOrder: "Track order",
     privacy: "Privacy",
     returnsExchanges: "Returns & exchanges",
     preorder: "Pre-order",

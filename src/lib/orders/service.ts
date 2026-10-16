@@ -13,7 +13,7 @@ import {
 import type { AttributionTouchData } from "@/lib/attribution/types";
 import { getPrisma } from "@/lib/db";
 import { getServerConfig } from "@/lib/env";
-import { createTrackingToken } from "@/lib/tracking/security";
+import { createTrackingCredentials } from "@/lib/tracking/security";
 
 import { SIZE_HELP_VALUE } from "./request-constants";
 import type { RequestOrderInput } from "./request-schema";
@@ -176,6 +176,7 @@ export async function createOrderRequest(
   );
   const lastTouch = attribution.lastTouch ?? attribution.firstTouch;
   const economics = product.economicsVersions?.[0] ?? null;
+  const trackingCredentials = createTrackingCredentials();
 
   try {
     const order = await prisma.$transaction(async (tx) => {
@@ -223,7 +224,12 @@ export async function createOrderRequest(
           internalNotes: input.comment ?? null,
           landingPath: attribution.firstTouch.landingPage,
           paymentPreference: input.paymentPreference,
-          publicTrackingToken: createTrackingToken(),
+          publicTrackingToken: trackingCredentials.publicTrackingToken,
+          trackingAccessCodeEncrypted:
+            trackingCredentials.trackingAccessCodeEncrypted,
+          trackingAccessCodeHash: trackingCredentials.trackingAccessCodeHash,
+          trackingCredentialsRotatedAt:
+            trackingCredentials.trackingCredentialsRotatedAt,
           postalCode:
             input.fulfilmentMethod === "DELIVERY"
               ? (input.postalCode ?? null)

@@ -37,6 +37,7 @@ export function SiteFooter({
             {dictionary.deliveryPayment}
           </Link>
           <Link href={`/${locale}/pre-order`}>{dictionary.preorder}</Link>
+          <Link href={`/track?lang=${locale}`}>{dictionary.trackOrder}</Link>
           <Link href={`/${locale}/returns-exchanges`}>
             {dictionary.returnsExchanges}
           </Link>

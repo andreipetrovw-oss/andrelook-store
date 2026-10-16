@@ -164,6 +164,37 @@ describe("17TRACK v2.4 parsing", () => {
     expect(result.syncStatus).toBe("SUCCESS");
   });
 
+  it("preserves the provider ETA window instead of inventing an exact date", () => {
+    const result = parseSeventeenTrackSnapshot({
+      code: 0,
+      data: {
+        accepted: [
+          {
+            carrier: 7041,
+            track_info: {
+              time_metrics: {
+                estimated_delivery_date: {
+                  from: "2026-10-18",
+                  to: "2026-10-21",
+                },
+              },
+              tracking: {
+                providers: [
+                  {
+                    latest_sync_status: "Success",
+                    provider: { key: 7041, name: "DHL Paket" },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    });
+    expect(result.estimatedDeliveryFrom).toEqual(new Date("2026-10-18"));
+    expect(result.estimatedDeliveryTo).toEqual(new Date("2026-10-21"));
+  });
+
   it("retains raw location internally while producing provider events", () => {
     const payload = {
       event: "TRACKING_UPDATED",

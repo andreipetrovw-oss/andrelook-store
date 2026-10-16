@@ -86,8 +86,11 @@ export const sourceReviewStatusLabels: Record<SourceReviewStatus, string> = {
   REJECTED: "Отклонено",
 };
 
-export const russianDate = new Intl.DateTimeFormat("ru-RU");
+export const russianDate = new Intl.DateTimeFormat("ru-RU", {
+  timeZone: "Europe/Tallinn",
+});
 export const russianDateTime = new Intl.DateTimeFormat("ru-RU", {
   dateStyle: "short",
   timeStyle: "short",
+  timeZone: "Europe/Tallinn",
 });

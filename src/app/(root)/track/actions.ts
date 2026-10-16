@@ -15,7 +15,12 @@ export type TrackingLookupState = {
 };
 
 const lookupSchema = z.object({
-  email: z.email().max(320),
+  accessCode: z
+    .string()
+    .trim()
+    .max(20)
+    .regex(/^[2-9A-HJ-NP-Z -]{8,12}$/i),
+  locale: z.enum(["et", "ru", "en"]),
   reference: z
     .string()
     .trim()
@@ -28,29 +33,32 @@ export async function lookupTracking(
   formData: FormData,
 ): Promise<TrackingLookupState> {
   const requestHeaders = await headers();
+  const raw = Object.fromEntries(formData);
+  const reference = typeof raw.reference === "string" ? raw.reference : "";
   const identifier =
     requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     requestHeaders.get("x-real-ip") ??
     "unknown";
-  if (!(await consumeLookupAttempt(identifier))) {
+  const allowed = await consumeLookupAttempt(identifier, reference);
+  const parsed = lookupSchema.safeParse(raw);
+  const locale = raw.locale === "ru" || raw.locale === "en" ? raw.locale : "et";
+  const messages = {
+    en: "We could not verify those details. Check them or wait before trying again.",
+    et: "Andmeid ei õnnestunud kinnitada. Kontrolli neid või proovi veidi hiljem uuesti.",
+    ru: "Не удалось проверить данные. Проверьте их или повторите попытку позже.",
+  };
+  if (!allowed || !parsed.success) {
     return {
-      message: "Too many attempts. Please wait before trying again.",
-      status: "error",
-    };
-  }
-  const parsed = lookupSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) {
-    return {
-      message: "Check the order number and email address.",
+      message: messages[locale],
       status: "error",
     };
   }
   const token = await authenticateTrackingLookup(parsed.data);
   if (!token) {
     return {
-      message: "We could not match those details. Check them and try again.",
+      message: messages[locale],
       status: "error",
     };
   }
-  redirect(`/track/${token}`);
+  redirect(`/track/${token}?lang=${parsed.data.locale}`);
 }

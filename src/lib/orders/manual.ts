@@ -12,7 +12,7 @@ import type {
 } from "@prisma/client";
 
 import { getPrisma } from "@/lib/db";
-import { createTrackingToken } from "@/lib/tracking/security";
+import { createTrackingCredentials } from "@/lib/tracking/security";
 
 import { createDisplayNumber } from "./service";
 
@@ -86,6 +86,7 @@ export async function createManualOrder(input: ManualOrderInput) {
     (sum, item) => sum + item.unitPriceMinor * item.quantity,
     0,
   );
+  const trackingCredentials = createTrackingCredentials();
   return prisma.$transaction(async (tx) => {
     const customer = await tx.customer.create({
       data: {
@@ -116,7 +117,12 @@ export async function createManualOrder(input: ManualOrderInput) {
             ? "PERSONAL_HANDOVER"
             : "DELIVERY",
         internalNotes: input.notes,
-        publicTrackingToken: createTrackingToken(),
+        publicTrackingToken: trackingCredentials.publicTrackingToken,
+        trackingAccessCodeEncrypted:
+          trackingCredentials.trackingAccessCodeEncrypted,
+        trackingAccessCodeHash: trackingCredentials.trackingAccessCodeHash,
+        trackingCredentialsRotatedAt:
+          trackingCredentials.trackingCredentialsRotatedAt,
         requestKey: `manual:${randomUUID()}`,
         requestedLocale: input.locale,
         status: input.status,
