@@ -24,6 +24,7 @@ on:
       - codex/meta-prelaunch-closeout
       - codex/final-analytics-closeout
       - codex/order-tracking-logistics-v1
+      - codex/customer-tracking-experience-v2
 
 permissions:
   contents: read
