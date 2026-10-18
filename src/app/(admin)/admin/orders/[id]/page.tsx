@@ -527,13 +527,12 @@ export default async function AdminOrderPage({
             {order.shipmentLinks.map((link) => (
               <li key={link.id}>
                 <Link href={`/admin/logistics/${link.shipment.id}`}>
-                  <strong>{link.shipment.kind}</strong>
+                  <strong>Открыть управление логистикой</strong>
                 </Link>
                 <span>
-                  {shipmentStatusLabels[link.shipment.normalizedStatus]} ·{" "}
-                  {link.shipment.providerSyncStatus}
-                  {link.shipment.lastSuccessfulSyncAt
-                    ? ` · sync ${russianDateTime.format(link.shipment.lastSuccessfulSyncAt)}`
+                  {shipmentStatusLabels[link.shipment.normalizedStatus]}
+                  {link.shipment.lastConfirmedEventAt
+                    ? ` · ${russianDateTime.format(link.shipment.lastConfirmedEventAt)}`
                     : ""}
                   {link.shipment.staleFlag ? " · данные устарели" : ""}
                 </span>

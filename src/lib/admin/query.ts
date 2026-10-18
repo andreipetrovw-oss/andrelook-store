@@ -175,11 +175,8 @@ export async function getAdminOrder(id: string) {
           shipment: {
             select: {
               id: true,
-              kind: true,
-              lastSuccessfulSyncAt: true,
+              lastConfirmedEventAt: true,
               normalizedStatus: true,
-              provider: true,
-              providerSyncStatus: true,
               staleFlag: true,
             },
           },
