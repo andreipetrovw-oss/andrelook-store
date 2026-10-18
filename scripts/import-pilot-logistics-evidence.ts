@@ -1,7 +1,10 @@
 import { getPrisma } from "../src/lib/db";
 import { getServerConfig } from "../src/lib/env";
 import { importOwnerLogisticsEvidence } from "../src/lib/tracking/owner-evidence";
-import { verifiedPilotEvidence } from "../src/lib/tracking/pilot-evidence";
+import {
+  isVerifiedPilotOrderSet,
+  verifiedPilotEvidence,
+} from "../src/lib/tracking/pilot-evidence";
 
 async function main() {
   const shipmentId = process.env.PILOT_SHIPMENT_ID?.trim();
@@ -25,7 +28,6 @@ async function main() {
         : {
             kind: "INTERNATIONAL_INBOUND",
             provider: "SEVENTEEN_TRACK",
-            rawStatus: "InfoReceived",
           },
     }),
     prisma.adminUser.findUniqueOrThrow({
@@ -33,19 +35,11 @@ async function main() {
       where: { email: ownerEmail },
     }),
   ]);
-  const expectedOrders = [
-    "AL-20261015-32CC44",
-    "AL-20261015-3D0AA1",
-    "AL-20261015-4F3DAD",
-  ];
   const matchingShipments = shipments.filter((candidate) => {
-    const linkedOrders = candidate.orderLinks
-      .map(({ order }) => order.displayNumber)
-      .toSorted();
-    return (
-      linkedOrders.length === expectedOrders.length &&
-      linkedOrders.every((value, index) => value === expectedOrders[index])
+    const linkedOrders = candidate.orderLinks.map(
+      ({ order }) => order.displayNumber,
     );
+    return isVerifiedPilotOrderSet(linkedOrders);
   });
   if (matchingShipments.length !== 1) {
     throw new Error("Exactly one shipment must match the real pilot orders.");

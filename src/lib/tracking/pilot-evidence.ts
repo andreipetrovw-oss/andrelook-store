@@ -3,6 +3,22 @@ import "server-only";
 import { parseEvidenceLocalDateTime, parseTallinnDate } from "./time";
 import type { OwnerEvidenceInput } from "./owner-evidence";
 
+export const verifiedPilotOrderNumbers = [
+  "AL-20261015-32CC44",
+  "AL-20261015-3D0AA1",
+  "AL-20261015-4F3DAD",
+] as const;
+
+export function isVerifiedPilotOrderSet(orderNumbers: string[]) {
+  const sorted = orderNumbers.toSorted();
+  return (
+    sorted.length === verifiedPilotOrderNumbers.length &&
+    sorted.every(
+      (orderNumber, index) => orderNumber === verifiedPilotOrderNumbers[index],
+    )
+  );
+}
+
 function upstreamTimestamp(value: string) {
   const parsed = parseEvidenceLocalDateTime(value, "Asia/Shanghai");
   if (!parsed) throw new Error("Invalid verified upstream timestamp.");

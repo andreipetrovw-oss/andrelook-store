@@ -2,9 +2,32 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { verifiedPilotEvidence } from "./pilot-evidence";
+import {
+  isVerifiedPilotOrderSet,
+  verifiedPilotEvidence,
+} from "./pilot-evidence";
 
 describe("verified pilot evidence definition", () => {
+  it("matches only the exact three verified real orders", () => {
+    expect(
+      isVerifiedPilotOrderSet([
+        "AL-20261015-4F3DAD",
+        "AL-20261015-32CC44",
+        "AL-20261015-3D0AA1",
+      ]),
+    ).toBe(true);
+    expect(
+      isVerifiedPilotOrderSet(["AL-20261015-32CC44", "AL-20261015-3D0AA1"]),
+    ).toBe(false);
+    expect(
+      isVerifiedPilotOrderSet([
+        "AL-20261015-32CC44",
+        "AL-20261015-3D0AA1",
+        "AL-TEST",
+      ]),
+    ).toBe(false);
+  });
+
   it("preserves source timestamps, physical sequence, visibility, and ETA", () => {
     const pilot = verifiedPilotEvidence("shipment-pilot");
 
