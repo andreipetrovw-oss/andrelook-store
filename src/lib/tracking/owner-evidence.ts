@@ -355,7 +355,23 @@ export async function importOwnerLogisticsEvidence(input: {
       });
       created += 1;
     }
-    const state = await refreshShipmentEvidenceState(tx, input.shipmentId);
+    const state = created
+      ? await refreshShipmentEvidenceState(tx, input.shipmentId)
+      : await tx.shipment
+          .findUniqueOrThrow({
+            select: {
+              lastConfirmedEventAt: true,
+              normalizedStatus: true,
+              requiresOwnerReview: true,
+            },
+            where: { id: input.shipmentId },
+          })
+          .then((shipment) => ({
+            conflict: false,
+            lastConfirmedEventAt: shipment.lastConfirmedEventAt,
+            requiresOwnerReview: shipment.requiresOwnerReview,
+            status: shipment.normalizedStatus,
+          }));
     let etaUpdated = false;
     if (input.eta) {
       const currentEta = await tx.shipment.findUniqueOrThrow({

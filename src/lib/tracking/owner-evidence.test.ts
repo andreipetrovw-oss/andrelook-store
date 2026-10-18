@@ -225,7 +225,7 @@ describe("owner-verified logistics evidence", () => {
     expect(first).toMatchObject({ created: 9, etaUpdated: true });
     expect(second).toMatchObject({ created: 0, etaUpdated: false });
     expect(evidenceRecords).toHaveLength(9);
-    expect(shipmentUpdate.mock.calls.length).toBe(updatesAfterFirstImport + 1);
+    expect(shipmentUpdate.mock.calls.length).toBe(updatesAfterFirstImport);
     expect(shipmentState).toMatchObject({
       etaConfidence: "MEDIUM",
       etaFrom: pilot.eta.date,
