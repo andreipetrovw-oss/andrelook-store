@@ -20,6 +20,7 @@ import {
   inferDeliveryMode,
   publicStatusLabel,
 } from "./public";
+import { verifiedPilotEvidence } from "./pilot-evidence";
 
 function trackedOrder(overrides: Record<string, unknown> = {}) {
   return {
@@ -71,7 +72,7 @@ describe("public tracking presentation", () => {
       }),
     ).toBe("ESTONIA_DELIVERY");
     expect(publicStatusLabel("ET", "LOGISTICS_REGISTERED")).toBe(
-      "Logistikaandmed on edastatud",
+      "Logistikaandmed edastatud",
     );
     expect(publicStatusLabel("RU", "LOGISTICS_REGISTERED")).toBe(
       "Логистическая информация передана",
@@ -178,7 +179,7 @@ describe("public tracking presentation", () => {
       ),
     ).toEqual([
       {
-        label: "Logistikaandmed on edastatud",
+        label: "Logistikaandmed edastatud",
         occurredAt: "2026-10-04T09:00:00.000Z",
         status: "LOGISTICS_REGISTERED",
       },
@@ -260,6 +261,171 @@ describe("public tracking presentation", () => {
     const query = findUnique.mock.calls[0]?.[0];
     expect(JSON.stringify(query)).not.toContain("internalTrackingNumber");
     expect(JSON.stringify(query)).not.toContain("payload");
+  });
+
+  it.each([
+    [
+      "ET",
+      [
+        "Logistikaandmed edastatud",
+        "Saadetis vastu võetud rahvusvahelisse logistikasse",
+        "Saadetis üle antud lennutranspordile",
+        "Rahvusvaheline transport alanud",
+        "Saadetis saabus Euroopasse",
+        "Euroopa logistiline töötlemine lõpetatud - ootel tollivormistus",
+      ],
+    ],
+    [
+      "RU",
+      [
+        "Логистическая информация передана",
+        "Отправление принято международной логистикой",
+        "Отправление передано авиаперевозчику",
+        "Международная перевозка началась",
+        "Отправление прибыло в Европу",
+        "Обработка в европейском логистическом центре завершена - ожидается таможенное оформление",
+      ],
+    ],
+    [
+      "EN",
+      [
+        "Logistics information received",
+        "Shipment accepted into international logistics",
+        "Shipment handed over for air transport",
+        "International transit started",
+        "Shipment arrived in Europe",
+        "European logistics processing completed - awaiting customs clearance",
+      ],
+    ],
+  ] as const)(
+    "publishes the exact safe pilot timeline in %s without leaking private evidence",
+    async (locale, labels) => {
+      const pilot = verifiedPilotEvidence("shipment-pilot");
+      const logisticsEvidence = pilot.evidence.map((record, index) => ({
+        customerVisible: record.customerVisible,
+        eventTimestamp: record.eventTimestamp,
+        eventType: record.eventType,
+        id: `evidence-${index}`,
+        supersedesId: null,
+        verificationStatus: record.verificationStatus,
+      }));
+      findUnique.mockResolvedValue(
+        trackedOrder({
+          requestedLocale: locale,
+          shipmentLinks: [
+            {
+              sequence: 0,
+              shipment: {
+                estimatedDeliveryAt: pilot.eta.date,
+                etaFrom: pilot.eta.date,
+                etaTo: pilot.eta.date,
+                events: [
+                  {
+                    evidenceSource: "PROVIDER_EVENT",
+                    normalizedStatus: "ORDER_CONFIRMED",
+                    provider: "SEVENTEEN_TRACK",
+                    publicTimestamp: new Date("2026-10-04T09:00:00Z"),
+                    rawStatus: "InfoReceived",
+                  },
+                ],
+                exposePublicTracking: false,
+                logisticsEvidence,
+                normalizedStatus: "EUROPEAN_LOGISTICS",
+                provider: "SEVENTEEN_TRACK",
+                providerRecords: [
+                  {
+                    latestEventAt: new Date("2026-10-04T09:00:00Z"),
+                    provider: "SEVENTEEN_TRACK",
+                    syncStatus: "SUCCESS",
+                  },
+                ],
+                providerSyncStatus: "SUCCESS",
+                publicCarrierName: null,
+                publicTrackingNumber: null,
+                rawStatus: "InfoReceived",
+              },
+            },
+          ],
+        }),
+      );
+
+      const result = await getPublicTrackingOrder("p".repeat(43), locale);
+
+      expect(result?.status).toBe("IN_TRANSIT");
+      expect(result?.timeline.map((event) => event.label)).toEqual(labels);
+      expect(result?.lastUpdatedAt).toBe("2026-10-15T07:03:00.000Z");
+      expect(result?.estimatedDeliveryFrom).toBe("2026-10-19T09:00:00.000Z");
+      expect(result?.estimatedDeliveryTo).toBe("2026-10-19T09:00:00.000Z");
+      expect(
+        result?.timeline.filter(
+          ({ status }) => status === "LOGISTICS_REGISTERED",
+        ),
+      ).toHaveLength(1);
+      expect(JSON.stringify(result)).not.toMatch(
+        /Superbuy|China|Shenzhen|Germany|Netherlands|DHL|17TRACK|InfoReceived|SEVENTEEN_TRACK|owner verified/i,
+      );
+      const query = findUnique.mock.calls.at(-1)?.[0];
+      expect(JSON.stringify(query)).not.toMatch(
+        /sourceLabel|evidenceNote|internalLocation|internalReference|sourceTimestampText/,
+      );
+    },
+  );
+
+  it("gives all three linked real orders one shared shipment timeline", async () => {
+    const pilot = verifiedPilotEvidence("shipment-pilot");
+    const logisticsEvidence = pilot.evidence.map((record, index) => ({
+      customerVisible: record.customerVisible,
+      eventTimestamp: record.eventTimestamp,
+      eventType: record.eventType,
+      id: `shared-evidence-${index}`,
+      supersedesId: null,
+      verificationStatus: record.verificationStatus,
+    }));
+    const shipment = {
+      estimatedDeliveryAt: pilot.eta.date,
+      etaFrom: pilot.eta.date,
+      etaTo: pilot.eta.date,
+      events: [],
+      exposePublicTracking: false,
+      logisticsEvidence,
+      normalizedStatus: "EUROPEAN_LOGISTICS",
+      provider: "SEVENTEEN_TRACK",
+      providerRecords: [],
+      providerSyncStatus: "SUCCESS",
+      publicCarrierName: null,
+      publicTrackingNumber: null,
+      rawStatus: "InfoReceived",
+    };
+    const orderNumbers = [
+      "AL-20261015-3D0AA1",
+      "AL-20261015-4F3DAD",
+      "AL-20261015-32CC44",
+    ];
+    for (const displayNumber of orderNumbers) {
+      findUnique.mockResolvedValueOnce(
+        trackedOrder({
+          displayNumber,
+          requestedLocale: "EN",
+          shipmentLinks: [{ sequence: 0, shipment }],
+        }),
+      );
+    }
+
+    const results = await Promise.all(
+      orderNumbers.map((_, index) =>
+        getPublicTrackingOrder(String(index + 1).repeat(43), "EN"),
+      ),
+    );
+
+    expect(results.map((result) => result?.reference)).toEqual(orderNumbers);
+    expect(results.map((result) => result?.timeline)).toEqual([
+      results[0]?.timeline,
+      results[0]?.timeline,
+      results[0]?.timeline,
+    ]);
+    expect(results.every((result) => result?.status === "IN_TRANSIT")).toBe(
+      true,
+    );
   });
 
   it("follows a customer's own local leg and exposes only owner-approved carrier data", async () => {

@@ -1,20 +1,31 @@
-import { ShipmentRelationship, ShipmentStatus } from "@prisma/client";
+import {
+  LogisticsEvidenceEventType,
+  ShipmentRelationship,
+  ShipmentStatus,
+} from "@prisma/client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
+  addShipmentLogisticsEvidence,
+  editShipmentLogisticsEvidence,
   linkOrderToShipment,
   reconcileShipmentAction,
   recordShipmentMilestone,
   updateShipmentEta,
   updateShipmentPublicTracking,
+  voidShipmentLogisticsEvidence,
 } from "@/app/(admin)/admin/actions";
 import {
   getAdminShipment,
   getOrdersForShipmentLinking,
   shipmentStatusLabels,
 } from "@/lib/tracking/admin";
-import { tallinnDateInput } from "@/lib/tracking/time";
+import {
+  activeOwnerEvidence,
+  summarizeOwnerEvidence,
+} from "@/lib/tracking/owner-evidence";
+import { tallinnDateInput, tallinnLocalInput } from "@/lib/tracking/time";
 
 const dateTime = new Intl.DateTimeFormat("ru-RU", {
   dateStyle: "medium",
@@ -25,6 +36,20 @@ const dateTime = new Intl.DateTimeFormat("ru-RU", {
 function stamp(value: Date | null) {
   return value ? dateTime.format(value) : "—";
 }
+
+const evidenceEventLabels: Record<LogisticsEvidenceEventType, string> = {
+  AIR_TRANSPORT_HANDOFF: "Передано авиаперевозчику",
+  ARRIVED_IN_EUROPE: "Прибыло в Европу",
+  ESTIMATED_ARRIVAL: "Расчётная дата прибытия",
+  EUROPE_PROCESSING_AWAITING_CUSTOMS:
+    "Европейская обработка завершена — ожидает таможню",
+  FLIGHT_BOOKED: "Рейс забронирован",
+  INTERNATIONAL_LOGISTICS_ACCEPTED: "Принято международной логистикой",
+  INTERNATIONAL_TRANSIT_STARTED: "Международная перевозка началась",
+  LOGISTICS_INFORMATION_RECEIVED: "Логистическая информация получена",
+  LOGISTICS_INSTRUCTION_PROVIDED: "Логистические данные переданы",
+  MOVING_TO_CARRIER_WAREHOUSE: "Направляется на склад перевозчика",
+};
 
 export default async function AdminShipmentPage({
   params,
@@ -37,6 +62,15 @@ export default async function AdminShipmentPage({
     getOrdersForShipmentLinking(),
   ]);
   if (!shipment) notFound();
+  const activeEvidence = activeOwnerEvidence(shipment.logisticsEvidence);
+  const evidenceSummary = summarizeOwnerEvidence(activeEvidence);
+  const evidenceSources = [
+    ...new Set(
+      activeEvidence
+        .filter((evidence) => evidence.verificationStatus === "VERIFIED")
+        .map((evidence) => evidence.sourceLabel),
+    ),
+  ];
   return (
     <>
       <span className="eyebrow">Внутренняя логистика</span>
@@ -223,6 +257,317 @@ export default async function AdminShipmentPage({
             </label>
             <button type="submit">Прикрепить</button>
           </form>
+        </section>
+
+        <section className="admin-panel admin-panel-wide">
+          <h2>VERIFIED LOGISTICS EVIDENCE</h2>
+          <p className="admin-readiness-note">
+            Внутренние проверенные данные. Названия источников, заметки,
+            география и идентификаторы никогда не входят в клиентский DTO.
+            Изменение и аннулирование создают новую ревизию и не стирают аудит.
+          </p>
+          <dl>
+            <div>
+              <dt>BEST VERIFIED CUSTOMER STATE</dt>
+              <dd>{shipmentStatusLabels[shipment.normalizedStatus]}</dd>
+            </div>
+            <div>
+              <dt>LAST VERIFIED PHYSICAL MOVEMENT</dt>
+              <dd>{stamp(evidenceSummary.lastPhysicalMovementAt)}</dd>
+            </div>
+            <div>
+              <dt>ESTIMATED ARRIVAL</dt>
+              <dd>
+                {shipment.etaFrom && shipment.etaTo
+                  ? `${dateTime.format(shipment.etaFrom)} — ${dateTime.format(shipment.etaTo)}`
+                  : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt>DATA SOURCES</dt>
+              <dd>{evidenceSources.join(" · ") || "—"}</dd>
+            </div>
+          </dl>
+          <details>
+            <summary>Добавить проверенное свидетельство</summary>
+            <form
+              action={addShipmentLogisticsEvidence}
+              className="admin-stack-form admin-form-grid"
+            >
+              <input name="shipmentId" type="hidden" value={shipment.id} />
+              <input
+                name="sourceType"
+                type="hidden"
+                value="OWNER_VERIFIED_LOGISTICS"
+              />
+              <label>
+                <span>Внутренний источник</span>
+                <input name="sourceLabel" required />
+              </label>
+              <label>
+                <span>Событие</span>
+                <select name="eventType" required>
+                  {Object.values(LogisticsEvidenceEventType).map((value) => (
+                    <option key={value} value={value}>
+                      {evidenceEventLabels[value]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Время из источника</span>
+                <input name="eventTimestamp" required type="datetime-local" />
+              </label>
+              <label>
+                <span>Часовой пояс источника</span>
+                <select defaultValue="Europe/Tallinn" name="sourceTimeZone">
+                  <option value="Europe/Tallinn">Europe/Tallinn</option>
+                  <option value="Asia/Shanghai">Asia/Shanghai (UTC+8)</option>
+                  <option value="UTC">UTC</option>
+                </select>
+              </label>
+              <label>
+                <span>Внутренняя локация (необязательно)</span>
+                <input name="internalLocation" />
+              </label>
+              <label>
+                <span>Внутренняя ссылка / номер (необязательно)</span>
+                <input name="internalReference" />
+              </label>
+              <label>
+                <span>Основание / заметка</span>
+                <textarea name="evidenceNote" required rows={3} />
+              </label>
+              <label>
+                <span>Проверка</span>
+                <select defaultValue="VERIFIED" name="verificationStatus">
+                  <option value="VERIFIED">VERIFIED</option>
+                  <option value="PENDING_REVIEW">PENDING_REVIEW</option>
+                </select>
+              </label>
+              <label className="admin-confirm-checkbox">
+                <input
+                  defaultChecked
+                  name="customerVisible"
+                  type="checkbox"
+                  value="true"
+                />
+                <span>Показывать нормализованную веху клиенту</span>
+              </label>
+              <button type="submit">Add evidence</button>
+            </form>
+          </details>
+          <div className="admin-table-wrap" tabIndex={0}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Источник / время</th>
+                  <th>Событие</th>
+                  <th>Проверка</th>
+                  <th>Заметка</th>
+                  <th>Ревизия</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {shipment.logisticsEvidence.map((evidence) => {
+                  const isCurrent = !evidence.supersededBy;
+                  return (
+                    <tr key={evidence.id}>
+                      <td>
+                        <strong>{evidence.sourceLabel}</strong>
+                        <small>
+                          {evidence.sourceTimestampText ??
+                            stamp(evidence.eventTimestamp)}{" "}
+                          · {evidence.sourceTimeZone ?? "—"}
+                        </small>
+                      </td>
+                      <td>{evidenceEventLabels[evidence.eventType]}</td>
+                      <td>{evidence.verificationStatus}</td>
+                      <td>{evidence.evidenceNote}</td>
+                      <td>
+                        v{evidence.revision} ·{" "}
+                        {isCurrent ? "CURRENT" : "SUPERSEDED"}
+                        <small>{evidence.createdByAdmin.email}</small>
+                      </td>
+                      <td>
+                        {isCurrent &&
+                        evidence.verificationStatus !== "VOIDED" ? (
+                          <details>
+                            <summary>Edit / Void</summary>
+                            <form
+                              action={editShipmentLogisticsEvidence}
+                              className="admin-stack-form"
+                            >
+                              <input
+                                name="evidenceId"
+                                type="hidden"
+                                value={evidence.id}
+                              />
+                              <input
+                                name="shipmentId"
+                                type="hidden"
+                                value={shipment.id}
+                              />
+                              <input
+                                name="sourceType"
+                                type="hidden"
+                                value={evidence.sourceType}
+                              />
+                              <label>
+                                <span>Источник</span>
+                                <input
+                                  defaultValue={evidence.sourceLabel}
+                                  name="sourceLabel"
+                                  required
+                                />
+                              </label>
+                              <label>
+                                <span>Событие</span>
+                                <select
+                                  defaultValue={evidence.eventType}
+                                  name="eventType"
+                                >
+                                  {Object.values(
+                                    LogisticsEvidenceEventType,
+                                  ).map((value) => (
+                                    <option key={value} value={value}>
+                                      {evidenceEventLabels[value]}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              <label>
+                                <span>Время из источника</span>
+                                <input
+                                  defaultValue={
+                                    evidence.sourceTimestampText
+                                      ?.replace(" ", "T")
+                                      .slice(0, 16) ??
+                                    tallinnLocalInput(evidence.eventTimestamp)
+                                  }
+                                  name="eventTimestamp"
+                                  required
+                                  type="datetime-local"
+                                />
+                              </label>
+                              <label>
+                                <span>Часовой пояс</span>
+                                <select
+                                  defaultValue={
+                                    evidence.sourceTimeZone ?? "Europe/Tallinn"
+                                  }
+                                  name="sourceTimeZone"
+                                >
+                                  <option value="Europe/Tallinn">
+                                    Europe/Tallinn
+                                  </option>
+                                  <option value="Asia/Shanghai">
+                                    Asia/Shanghai (UTC+8)
+                                  </option>
+                                  <option value="UTC">UTC</option>
+                                </select>
+                              </label>
+                              <label>
+                                <span>Локация</span>
+                                <input
+                                  defaultValue={evidence.internalLocation ?? ""}
+                                  name="internalLocation"
+                                />
+                              </label>
+                              <label>
+                                <span>Внутренняя ссылка</span>
+                                <input
+                                  defaultValue={
+                                    evidence.internalReference ?? ""
+                                  }
+                                  name="internalReference"
+                                />
+                              </label>
+                              <label>
+                                <span>Заметка</span>
+                                <textarea
+                                  defaultValue={evidence.evidenceNote}
+                                  name="evidenceNote"
+                                  required
+                                  rows={3}
+                                />
+                              </label>
+                              <label>
+                                <span>Проверка</span>
+                                <select
+                                  defaultValue={evidence.verificationStatus}
+                                  name="verificationStatus"
+                                >
+                                  <option value="VERIFIED">VERIFIED</option>
+                                  <option value="PENDING_REVIEW">
+                                    PENDING_REVIEW
+                                  </option>
+                                </select>
+                              </label>
+                              <label className="admin-confirm-checkbox">
+                                <input
+                                  defaultChecked={evidence.customerVisible}
+                                  name="customerVisible"
+                                  type="checkbox"
+                                  value="true"
+                                />
+                                <span>Показывать нормализованную веху</span>
+                              </label>
+                              <button type="submit">Edit evidence</button>
+                            </form>
+                            <form
+                              action={voidShipmentLogisticsEvidence}
+                              className="admin-stack-form"
+                            >
+                              <input
+                                name="evidenceId"
+                                type="hidden"
+                                value={evidence.id}
+                              />
+                              <label>
+                                <span>Причина аннулирования</span>
+                                <input name="reason" required />
+                              </label>
+                              <button type="submit">Void evidence</button>
+                            </form>
+                          </details>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="admin-panel admin-panel-wide">
+          <h2>Private tracking identifiers</h2>
+          <p className="admin-readiness-note">
+            Архитектура поддерживает отдельные upstream, основной и local
+            last-mile идентификаторы. Они доступны только владельцу.
+          </p>
+          {shipment.trackingIdentifiers.length ? (
+            <ul className="timeline">
+              {shipment.trackingIdentifiers.map((identifier) => (
+                <li key={identifier.id}>
+                  <strong>{identifier.role}</strong>
+                  <span>
+                    {identifier.sourceLabel} · {identifier.value} ·{" "}
+                    {identifier.isActive ? "ACTIVE" : "RETIRED"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="admin-readiness-note">
+              Дополнительные идентификаторы пока не добавлены; текущий основной
+              номер сохранён без изменений.
+            </p>
+          )}
         </section>
 
         <section className="admin-panel admin-panel-wide">

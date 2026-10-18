@@ -6,6 +6,9 @@ import {
   ContactMethod,
   DeliveryMode,
   FulfilmentMethod,
+  LogisticsEvidenceEventType,
+  LogisticsEvidenceSourceType,
+  LogisticsEvidenceVerificationStatus,
   Locale,
   OrderTrackingMilestoneKind,
   OrderStatus,
@@ -39,6 +42,11 @@ import {
 import { createManualOrder as createManualOrderRecord } from "@/lib/orders/manual";
 import { notifyLinkedOrders } from "@/lib/tracking/notifications";
 import {
+  createOwnerLogisticsEvidence,
+  reviseOwnerLogisticsEvidence,
+  voidOwnerLogisticsEvidence,
+} from "@/lib/tracking/owner-evidence";
+import {
   createTrackingCredentials,
   safeProviderError,
 } from "@/lib/tracking/security";
@@ -48,6 +56,7 @@ import {
   registerShipment,
 } from "@/lib/tracking/service";
 import {
+  parseEvidenceLocalDateTime,
   parseTallinnDate,
   parseTallinnLocalDateTime,
 } from "@/lib/tracking/time";
@@ -218,6 +227,48 @@ const milestoneSchema = z.object({
   shipmentId: z.string().min(1),
   status: z.enum(ShipmentStatus),
 });
+
+const logisticsEvidenceSchema = z.object({
+  eventTimestamp: z.string().trim().min(1),
+  eventType: z.enum(LogisticsEvidenceEventType),
+  evidenceNote: z.string().trim().min(3).max(1000),
+  internalLocation: z.string().trim().max(300),
+  internalReference: z.string().trim().max(300),
+  shipmentId: z.string().min(1),
+  sourceLabel: z.string().trim().min(2).max(120),
+  sourceTimeZone: z.enum(["Asia/Shanghai", "Europe/Tallinn", "UTC"]),
+  sourceType: z.enum(LogisticsEvidenceSourceType),
+  verificationStatus: z.enum([
+    LogisticsEvidenceVerificationStatus.PENDING_REVIEW,
+    LogisticsEvidenceVerificationStatus.VERIFIED,
+  ]),
+});
+
+function parsedLogisticsEvidence(formData: FormData) {
+  const parsed = logisticsEvidenceSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  if (!parsed.success) throw new Error("Invalid logistics evidence.");
+  const eventTimestamp = parseEvidenceLocalDateTime(
+    parsed.data.eventTimestamp,
+    parsed.data.sourceTimeZone,
+  );
+  if (!eventTimestamp) throw new Error("Invalid evidence timestamp.");
+  return {
+    customerVisible: formData.get("customerVisible") === "true",
+    eventTimestamp,
+    eventType: parsed.data.eventType,
+    evidenceNote: parsed.data.evidenceNote,
+    internalLocation: parsed.data.internalLocation || null,
+    internalReference: parsed.data.internalReference || null,
+    shipmentId: parsed.data.shipmentId,
+    sourceLabel: parsed.data.sourceLabel,
+    sourceTimestampText: parsed.data.eventTimestamp.replace("T", " "),
+    sourceTimeZone: parsed.data.sourceTimeZone,
+    sourceType: parsed.data.sourceType,
+    verificationStatus: parsed.data.verificationStatus,
+  };
+}
 
 const orderTrackingMilestoneSchema = z.object({
   evidenceNote: z.string().trim().min(3).max(500),
@@ -398,6 +449,42 @@ export async function recordShipmentMilestone(formData: FormData) {
     await notifyLinkedOrders(parsed.data.shipmentId, [parsed.data.status]);
   }
   revalidatePath(`/admin/logistics/${parsed.data.shipmentId}`);
+}
+
+export async function addShipmentLogisticsEvidence(formData: FormData) {
+  const changedByAdminId = await adminId();
+  const input = parsedLogisticsEvidence(formData);
+  await createOwnerLogisticsEvidence(changedByAdminId, input);
+  revalidatePath(`/admin/logistics/${input.shipmentId}`);
+}
+
+export async function editShipmentLogisticsEvidence(formData: FormData) {
+  const changedByAdminId = await adminId();
+  const input = parsedLogisticsEvidence(formData);
+  const evidenceId = z.string().min(1).parse(formData.get("evidenceId"));
+  const revision = await reviseOwnerLogisticsEvidence(
+    changedByAdminId,
+    evidenceId,
+    input,
+  );
+  revalidatePath(`/admin/logistics/${revision.shipmentId}`);
+}
+
+export async function voidShipmentLogisticsEvidence(formData: FormData) {
+  const changedByAdminId = await adminId();
+  const parsed = z
+    .object({
+      evidenceId: z.string().min(1),
+      reason: z.string().trim().min(3).max(500),
+    })
+    .safeParse(Object.fromEntries(formData));
+  if (!parsed.success) throw new Error("Invalid evidence void request.");
+  const revision = await voidOwnerLogisticsEvidence(
+    changedByAdminId,
+    parsed.data.evidenceId,
+    parsed.data.reason,
+  );
+  revalidatePath(`/admin/logistics/${revision.shipmentId}`);
 }
 
 export async function reconcileShipmentAction(formData: FormData) {

@@ -53,7 +53,7 @@ export type ShipmentForNormalization = {
 
 export type PublicTrackingLocale = "ET" | "RU" | "EN";
 
-export type PublicTrackingStatus =
+export type PublicTrackingCurrentStatus =
   | "TRACKING_ADDED"
   | "ORDER_CONFIRMED"
   | "PREPARING"
@@ -64,10 +64,20 @@ export type PublicTrackingStatus =
   | "LOCAL_DELIVERY"
   | "DELIVERED";
 
+export type PublicTrackingMilestoneStatus =
+  | PublicTrackingCurrentStatus
+  | "INTERNATIONAL_LOGISTICS_ACCEPTED"
+  | "AIR_TRANSPORT_HANDOFF"
+  | "INTERNATIONAL_TRANSIT_STARTED"
+  | "ARRIVED_IN_EUROPE"
+  | "EUROPE_PROCESSING_AWAITING_CUSTOMS";
+
+export type PublicTrackingStatus = PublicTrackingCurrentStatus;
+
 export type PublicTrackingEvent = {
   label: string;
   occurredAt: string | null;
-  status: PublicTrackingStatus;
+  status: PublicTrackingMilestoneStatus;
 };
 
 export type PublicTrackingOrder = {

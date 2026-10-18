@@ -40,7 +40,8 @@ export default async function TrackingPage({
     timeZone: "Europe/Tallinn",
   });
   const etaDate = new Intl.DateTimeFormat(localeCode, {
-    dateStyle: "medium",
+    day: "numeric",
+    month: "long",
     timeZone: "Europe/Tallinn",
   });
   const etaFrom = order.estimatedDeliveryFrom

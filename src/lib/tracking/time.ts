@@ -65,6 +65,36 @@ export function parseTallinnDate(value: string) {
   return parseTallinnLocalDateTime(`${value.trim()}T12:00`);
 }
 
+export type EvidenceTimeZone = "Asia/Shanghai" | "Europe/Tallinn" | "UTC";
+
+export function parseEvidenceLocalDateTime(
+  value: string,
+  timeZone: EvidenceTimeZone,
+) {
+  if (timeZone === "Europe/Tallinn") {
+    return parseTallinnLocalDateTime(value);
+  }
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const offsetHours = timeZone === "Asia/Shanghai" ? 8 : 0;
+  const date = new Date(
+    Date.UTC(year, month - 1, day, hour - offsetHours, minute),
+  );
+  const sourceDate = new Date(date.valueOf() + offsetHours * 60 * 60 * 1000);
+  return sourceDate.getUTCFullYear() === year &&
+    sourceDate.getUTCMonth() === month - 1 &&
+    sourceDate.getUTCDate() === day &&
+    sourceDate.getUTCHours() === hour &&
+    sourceDate.getUTCMinutes() === minute
+    ? date
+    : null;
+}
+
 export function tallinnLocalInput(value: Date | null) {
   if (!value) return "";
   const parts = partsAt(value);

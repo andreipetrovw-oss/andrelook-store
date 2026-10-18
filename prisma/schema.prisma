@@ -196,16 +196,48 @@ enum ShipmentStatus {
 
 enum TrackingEvidenceSource {
   OWNER_CONFIRMED
+  OWNER_VERIFIED_LOGISTICS
   WAREHOUSE_CONFIRMED
   PROVIDER_EVENT
   LOCAL_CARRIER_EVENT
   MANUAL_OVERRIDE
 }
 
+enum LogisticsEvidenceSourceType {
+  OWNER_VERIFIED_LOGISTICS
+  SUPPORTED_UPSTREAM_PROVIDER
+}
+
+enum LogisticsEvidenceVerificationStatus {
+  PENDING_REVIEW
+  VERIFIED
+  VOIDED
+}
+
+enum LogisticsEvidenceEventType {
+  LOGISTICS_INSTRUCTION_PROVIDED
+  LOGISTICS_INFORMATION_RECEIVED
+  MOVING_TO_CARRIER_WAREHOUSE
+  INTERNATIONAL_LOGISTICS_ACCEPTED
+  AIR_TRANSPORT_HANDOFF
+  FLIGHT_BOOKED
+  INTERNATIONAL_TRANSIT_STARTED
+  ARRIVED_IN_EUROPE
+  EUROPE_PROCESSING_AWAITING_CUSTOMS
+  ESTIMATED_ARRIVAL
+}
+
+enum ShipmentIdentifierRole {
+  UPSTREAM_INTERNATIONAL
+  PRIMARY_CARRIER
+  LOCAL_LAST_MILE
+}
+
 enum TrackingEtaSource {
   PROVIDER
   OFFICIAL_CARRIER
   OWNER_CONFIRMED
+  OWNER_VERIFIED_LOGISTICS
   SYSTEM_ESTIMATE
 }
 
@@ -633,6 +665,8 @@ model Shipment {
   orderLinks                   OrderShipment[]
   events                       TrackingEvent[]
   providerRecords              TrackingProviderRecord[]
+  logisticsEvidence            ShipmentLogisticsEvidence[]
+  trackingIdentifiers          ShipmentTrackingIdentifier[]
   overrides                    ShipmentStatusOverride[]
   notifications                TrackingMilestoneNotification[]
   createdAt                    DateTime                        @default(now())
@@ -640,6 +674,51 @@ model Shipment {
 
   @@index([normalizedStatus, staleFlag])
   @@index([providerSyncStatus, lastSyncAt])
+}
+
+model ShipmentLogisticsEvidence {
+  id                  String                              @id @default(cuid())
+  shipmentId          String
+  shipment            Shipment                            @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  sourceType          LogisticsEvidenceSourceType
+  sourceLabel         String
+  eventType           LogisticsEvidenceEventType
+  eventTimestamp      DateTime?
+  sourceTimestampText String?
+  sourceTimeZone      String?
+  internalLocation    String?
+  evidenceNote        String
+  verificationStatus  LogisticsEvidenceVerificationStatus @default(VERIFIED)
+  customerVisible     Boolean                             @default(true)
+  internalReference   String?
+  canonicalKey        String
+  revision            Int                                 @default(1)
+  supersedesId        String?                             @unique
+  supersedes          ShipmentLogisticsEvidence?          @relation("LogisticsEvidenceRevision", fields: [supersedesId], references: [id], onDelete: Restrict)
+  supersededBy        ShipmentLogisticsEvidence?          @relation("LogisticsEvidenceRevision")
+  createdByAdminId    String
+  createdByAdmin      AdminUser                           @relation("LogisticsEvidenceCreator", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  createdAt           DateTime                            @default(now())
+
+  @@unique([shipmentId, canonicalKey, revision])
+  @@index([shipmentId, eventTimestamp])
+  @@index([shipmentId, verificationStatus])
+}
+
+model ShipmentTrackingIdentifier {
+  id          String                 @id @default(cuid())
+  shipmentId  String
+  shipment    Shipment               @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  role        ShipmentIdentifierRole
+  provider    ShipmentProvider?
+  sourceLabel String
+  value       String
+  isActive    Boolean                @default(true)
+  createdAt   DateTime               @default(now())
+  retiredAt   DateTime?
+
+  @@unique([shipmentId, value])
+  @@index([shipmentId, role, isActive])
 }
 
 model OrderTrackingMilestone {
@@ -1028,22 +1107,23 @@ model OrderStatusHistory {
 }
 
 model AdminUser {
-  id                      String                   @id @default(cuid())
+  id                      String                      @id @default(cuid())
   provider                String
   providerSubject         String
-  email                   String                   @unique
-  isActive                Boolean                  @default(true)
-  payments                Payment[]                @relation("PaymentRecorder")
-  voidedPayments          Payment[]                @relation("PaymentVoider")
-  orderCorrections        OrderCorrectionHistory[] @relation("OrderCorrectionActor")
-  statusChanges           OrderStatusHistory[]     @relation("StatusChanger")
-  spendEntries            AdSpend[]                @relation("SpendRecorder")
-  campaignChanges         CampaignChangeLog[]      @relation("CampaignChangeRecorder")
-  trackingEvents          TrackingEvent[]          @relation("TrackingEventCreator")
-  shipmentOverrides       ShipmentStatusOverride[] @relation("ShipmentOverrideCreator")
-  orderTrackingMilestones OrderTrackingMilestone[] @relation("OrderTrackingMilestoneCreator")
-  createdAt               DateTime                 @default(now())
-  updatedAt               DateTime                 @updatedAt
+  email                   String                      @unique
+  isActive                Boolean                     @default(true)
+  payments                Payment[]                   @relation("PaymentRecorder")
+  voidedPayments          Payment[]                   @relation("PaymentVoider")
+  orderCorrections        OrderCorrectionHistory[]    @relation("OrderCorrectionActor")
+  statusChanges           OrderStatusHistory[]        @relation("StatusChanger")
+  spendEntries            AdSpend[]                   @relation("SpendRecorder")
+  campaignChanges         CampaignChangeLog[]         @relation("CampaignChangeRecorder")
+  trackingEvents          TrackingEvent[]             @relation("TrackingEventCreator")
+  shipmentOverrides       ShipmentStatusOverride[]    @relation("ShipmentOverrideCreator")
+  orderTrackingMilestones OrderTrackingMilestone[]    @relation("OrderTrackingMilestoneCreator")
+  logisticsEvidence       ShipmentLogisticsEvidence[] @relation("LogisticsEvidenceCreator")
+  createdAt               DateTime                    @default(now())
+  updatedAt               DateTime                    @updatedAt
 
   @@unique([provider, providerSubject])
 }

@@ -46,6 +46,13 @@ export async function getAdminShipment(id: string) {
   return getPrisma().shipment.findUnique({
     include: {
       events: { orderBy: [{ rawTimestamp: "desc" }, { createdAt: "desc" }] },
+      logisticsEvidence: {
+        include: {
+          createdByAdmin: { select: { email: true } },
+          supersededBy: { select: { id: true } },
+        },
+        orderBy: [{ eventTimestamp: "desc" }, { createdAt: "desc" }],
+      },
       orderLinks: {
         include: {
           order: {
@@ -65,6 +72,9 @@ export async function getAdminShipment(id: string) {
       providerRecords: {
         orderBy: { receivedAt: "desc" },
         take: 10,
+      },
+      trackingIdentifiers: {
+        orderBy: [{ isActive: "desc" }, { createdAt: "asc" }],
       },
     },
     where: { id },

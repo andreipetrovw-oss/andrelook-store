@@ -14,20 +14,32 @@ import {
   hashLookupBucket,
   hashTrackingAccessCode,
 } from "./security";
+import {
+  activeOwnerEvidence,
+  publicMilestoneForOwnerEvidence,
+} from "./owner-evidence";
 import type {
+  PublicTrackingCurrentStatus,
   PublicTrackingLocale,
+  PublicTrackingMilestoneStatus,
   PublicTrackingOrder,
-  PublicTrackingStatus,
 } from "./types";
 
 const statusLabels: Record<
   PublicTrackingLocale,
-  Record<PublicTrackingStatus, string>
+  Record<PublicTrackingMilestoneStatus, string>
 > = {
   EN: {
+    AIR_TRANSPORT_HANDOFF: "Shipment handed over for air transport",
+    ARRIVED_IN_EUROPE: "Shipment arrived in Europe",
     ARRIVED_IN_ESTONIA: "Arrived in Estonia",
     DELIVERED: "Delivered",
+    EUROPE_PROCESSING_AWAITING_CUSTOMS:
+      "European logistics processing completed - awaiting customs clearance",
     IN_TRANSIT: "In transit",
+    INTERNATIONAL_LOGISTICS_ACCEPTED:
+      "Shipment accepted into international logistics",
+    INTERNATIONAL_TRANSIT_STARTED: "International transit started",
     LOCAL_DELIVERY: "Local delivery",
     LOGISTICS_REGISTERED: "Logistics information received",
     ORDER_CONFIRMED: "Order confirmed",
@@ -36,20 +48,34 @@ const statusLabels: Record<
     TRACKING_ADDED: "Order added to Andrelook tracking",
   },
   ET: {
+    AIR_TRANSPORT_HANDOFF: "Saadetis üle antud lennutranspordile",
+    ARRIVED_IN_EUROPE: "Saadetis saabus Euroopasse",
     ARRIVED_IN_ESTONIA: "Saabus Eestisse",
     DELIVERED: "Kohale toimetatud",
+    EUROPE_PROCESSING_AWAITING_CUSTOMS:
+      "Euroopa logistiline töötlemine lõpetatud - ootel tollivormistus",
     IN_TRANSIT: "Teel",
+    INTERNATIONAL_LOGISTICS_ACCEPTED:
+      "Saadetis vastu võetud rahvusvahelisse logistikasse",
+    INTERNATIONAL_TRANSIT_STARTED: "Rahvusvaheline transport alanud",
     LOCAL_DELIVERY: "Kohalik tarne",
-    LOGISTICS_REGISTERED: "Logistikaandmed on edastatud",
+    LOGISTICS_REGISTERED: "Logistikaandmed edastatud",
     ORDER_CONFIRMED: "Tellimus kinnitatud",
     PREPARING: "Valmistame tellimust ette",
     READY_FOR_HANDOVER: "Valmis üleandmiseks",
     TRACKING_ADDED: "Tellimus lisati Andrelooki jälgimissüsteemi",
   },
   RU: {
+    AIR_TRANSPORT_HANDOFF: "Отправление передано авиаперевозчику",
+    ARRIVED_IN_EUROPE: "Отправление прибыло в Европу",
     ARRIVED_IN_ESTONIA: "Заказ прибыл в Эстонию",
     DELIVERED: "Доставлено",
+    EUROPE_PROCESSING_AWAITING_CUSTOMS:
+      "Обработка в европейском логистическом центре завершена - ожидается таможенное оформление",
     IN_TRANSIT: "В пути",
+    INTERNATIONAL_LOGISTICS_ACCEPTED:
+      "Отправление принято международной логистикой",
+    INTERNATIONAL_TRANSIT_STARTED: "Международная перевозка началась",
     LOCAL_DELIVERY: "Доставка по Эстонии",
     LOGISTICS_REGISTERED: "Логистическая информация передана",
     ORDER_CONFIRMED: "Заказ подтверждён",
@@ -81,7 +107,7 @@ const deliveryLabels: Record<
 };
 
 const milestoneStatus: Partial<
-  Record<OrderTrackingMilestoneKind, PublicTrackingStatus>
+  Record<OrderTrackingMilestoneKind, PublicTrackingCurrentStatus>
 > = {
   INTERNATIONAL_DISPATCH_CONFIRMED: "IN_TRANSIT",
   ORDER_CONFIRMED: "ORDER_CONFIRMED",
@@ -91,7 +117,24 @@ const milestoneStatus: Partial<
   QUALITY_CHECK_RECEIVED: "PREPARING",
 };
 
-const publicStatusRank: PublicTrackingStatus[] = [
+const publicTimelineRank: PublicTrackingMilestoneStatus[] = [
+  "TRACKING_ADDED",
+  "ORDER_CONFIRMED",
+  "PREPARING",
+  "LOGISTICS_REGISTERED",
+  "INTERNATIONAL_LOGISTICS_ACCEPTED",
+  "AIR_TRANSPORT_HANDOFF",
+  "INTERNATIONAL_TRANSIT_STARTED",
+  "ARRIVED_IN_EUROPE",
+  "EUROPE_PROCESSING_AWAITING_CUSTOMS",
+  "IN_TRANSIT",
+  "ARRIVED_IN_ESTONIA",
+  "READY_FOR_HANDOVER",
+  "LOCAL_DELIVERY",
+  "DELIVERED",
+];
+
+const publicCurrentStatusRank: PublicTrackingCurrentStatus[] = [
   "TRACKING_ADDED",
   "ORDER_CONFIRMED",
   "PREPARING",
@@ -105,7 +148,7 @@ const publicStatusRank: PublicTrackingStatus[] = [
 
 function shipmentPublicStatus(
   status: ShipmentStatus,
-): PublicTrackingStatus | null {
+): PublicTrackingCurrentStatus | null {
   if (status === "DELAYED_OR_EXCEPTION") return null;
   if (status === "ORDER_CONFIRMED") return "ORDER_CONFIRMED";
   if (status === "PREPARING_ORDER" || status === "QUALITY_CHECK_COMPLETE") {
@@ -146,7 +189,7 @@ function localizedColour(locale: PublicTrackingLocale, value: string | null) {
 
 export function publicStatusLabel(
   locale: PublicTrackingLocale,
-  status: PublicTrackingStatus,
+  status: PublicTrackingMilestoneStatus,
 ) {
   return statusLabels[locale][status];
 }
@@ -165,14 +208,31 @@ export function inferDeliveryMode(input: {
     : "INTERNATIONAL_DELIVERY";
 }
 
-function newestStatus(statuses: PublicTrackingStatus[]) {
-  return statuses.reduce<PublicTrackingStatus>(
+function newestStatus(statuses: PublicTrackingCurrentStatus[]) {
+  return statuses.reduce<PublicTrackingCurrentStatus>(
     (current, candidate) =>
-      publicStatusRank.indexOf(candidate) > publicStatusRank.indexOf(current)
+      publicCurrentStatusRank.indexOf(candidate) >
+      publicCurrentStatusRank.indexOf(current)
         ? candidate
         : current,
     "TRACKING_ADDED",
   );
+}
+
+function currentStatusForTimeline(
+  status: PublicTrackingMilestoneStatus,
+): PublicTrackingCurrentStatus | null {
+  if (status === "LOGISTICS_REGISTERED") return null;
+  if (
+    status === "INTERNATIONAL_LOGISTICS_ACCEPTED" ||
+    status === "AIR_TRANSPORT_HANDOFF" ||
+    status === "INTERNATIONAL_TRANSIT_STARTED" ||
+    status === "ARRIVED_IN_EUROPE" ||
+    status === "EUROPE_PROCESSING_AWAITING_CUSTOMS"
+  ) {
+    return "IN_TRANSIT";
+  }
+  return status;
 }
 
 export async function getPublicTrackingOrder(
@@ -214,7 +274,9 @@ export async function getPublicTrackingOrder(
               events: {
                 orderBy: [{ publicTimestamp: "asc" }, { createdAt: "asc" }],
                 select: {
+                  evidenceSource: true,
                   normalizedStatus: true,
+                  provider: true,
                   publicTimestamp: true,
                   rawStatus: true,
                 },
@@ -222,6 +284,17 @@ export async function getPublicTrackingOrder(
               },
               exposePublicTracking: true,
               normalizedStatus: true,
+              logisticsEvidence: {
+                orderBy: [{ eventTimestamp: "asc" }, { createdAt: "asc" }],
+                select: {
+                  customerVisible: true,
+                  eventTimestamp: true,
+                  eventType: true,
+                  id: true,
+                  supersedesId: true,
+                  verificationStatus: true,
+                },
+              },
               provider: true,
               providerRecords: {
                 orderBy: [{ latestEventAt: "desc" }, { receivedAt: "desc" }],
@@ -276,13 +349,20 @@ export async function getPublicTrackingOrder(
       : [
           {
             occurredAt: order.createdAt.toISOString(),
+            priority: 4,
             status: "TRACKING_ADDED" as const,
           },
         ]),
     ...order.trackingMilestones.flatMap((milestone) => {
       const status = milestoneStatus[milestone.kind];
       return status
-        ? [{ occurredAt: milestone.occurredAt.toISOString(), status }]
+        ? [
+            {
+              occurredAt: milestone.occurredAt.toISOString(),
+              priority: 2,
+              status,
+            },
+          ]
         : [];
     }),
     ...order.shipmentLinks.flatMap((link) =>
@@ -294,43 +374,83 @@ export async function getPublicTrackingOrder(
           ? [
               {
                 occurredAt: event.publicTimestamp?.toISOString() ?? null,
+                priority: event.provider ? 1 : 2,
                 status,
               },
             ]
           : [];
       }),
     ),
-    ...(providerRegistration ? [providerRegistration] : []),
+    ...order.shipmentLinks.flatMap((link) =>
+      activeOwnerEvidence(link.shipment.logisticsEvidence ?? []).flatMap(
+        (evidence) => {
+          if (
+            evidence.verificationStatus !== "VERIFIED" ||
+            !evidence.customerVisible
+          ) {
+            return [];
+          }
+          const status = publicMilestoneForOwnerEvidence(evidence.eventType);
+          return status
+            ? [
+                {
+                  occurredAt: evidence.eventTimestamp?.toISOString() ?? null,
+                  priority: 3,
+                  status,
+                },
+              ]
+            : [];
+        },
+      ),
+    ),
+    ...(providerRegistration ? [{ ...providerRegistration, priority: 1 }] : []),
   ];
   const deduplicated = new Map<
-    PublicTrackingStatus,
-    { occurredAt: string | null; status: PublicTrackingStatus }
+    PublicTrackingMilestoneStatus,
+    {
+      occurredAt: string | null;
+      priority: number;
+      status: PublicTrackingMilestoneStatus;
+    }
   >();
   for (const event of events) {
     const existing = deduplicated.get(event.status);
     if (
       !existing ||
-      (event.occurredAt &&
-        (!existing.occurredAt || event.occurredAt > existing.occurredAt))
+      event.priority < existing.priority ||
+      (event.priority === existing.priority &&
+        event.occurredAt &&
+        (!existing.occurredAt ||
+          (event.status === "LOGISTICS_REGISTERED"
+            ? event.occurredAt < existing.occurredAt
+            : event.occurredAt > existing.occurredAt)))
     ) {
       deduplicated.set(event.status, event);
     }
+  }
+  if (deduplicated.size > 1) {
+    deduplicated.delete("TRACKING_ADDED");
   }
   const timeline = [...deduplicated.values()]
     .sort((a, b) =>
       a.occurredAt && b.occurredAt
         ? a.occurredAt.localeCompare(b.occurredAt)
-        : publicStatusRank.indexOf(a.status) -
-          publicStatusRank.indexOf(b.status),
+        : publicTimelineRank.indexOf(a.status) -
+          publicTimelineRank.indexOf(b.status),
     )
-    .map((event) => ({ ...event, label: statusLabels[locale][event.status] }));
+    .map(({ occurredAt, status }) => ({
+      label: statusLabels[locale][status],
+      occurredAt,
+      status,
+    }));
   const shipmentStatus = activeShipment
     ? shipmentPublicStatus(activeShipment.normalizedStatus)
     : null;
   const currentStatus = newestStatus([
-    ...timeline
-      .filter((event) => event.status !== "LOGISTICS_REGISTERED")
-      .map((event) => event.status),
+    ...timeline.flatMap((event) => {
+      const status = currentStatusForTimeline(event.status);
+      return status ? [status] : [];
+    }),
     ...(shipmentStatus && (confirmed || shipmentStatus !== "ORDER_CONFIRMED")
       ? [shipmentStatus]
       : []),

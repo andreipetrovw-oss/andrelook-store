@@ -28,6 +28,7 @@
     "verify:phase6f-orders": "tsx scripts/verify-phase6f-orders.ts",
     "verify:phase6e-data": "tsx scripts/verify-phase6e-staging.ts",
     "backfill:tracking-access": "tsx scripts/backfill-tracking-access-codes.ts",
+    "import:pilot-logistics-evidence": "NODE_OPTIONS=--conditions=react-server tsx scripts/import-pilot-logistics-evidence.ts",
     "seed:unit-economics": "tsx scripts/seed-unit-economics.ts",
     "seed:phase6c": "tsx scripts/seed-phase6c-review.ts",
     "postinstall": "prisma generate",
