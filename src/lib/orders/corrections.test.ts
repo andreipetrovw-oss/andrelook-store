@@ -4,6 +4,7 @@ vi.mock("server-only", () => ({}));
 
 const mocks = vi.hoisted(() => ({
   correctionCreate: vi.fn(),
+  correctionFind: vi.fn(),
   eventUpdateMany: vi.fn(),
   eventUpsert: vi.fn(),
   itemFind: vi.fn(),
@@ -11,6 +12,8 @@ const mocks = vi.hoisted(() => ({
   orderFind: vi.fn(),
   orderUpdate: vi.fn(),
   paymentFind: vi.fn(),
+  paymentCreate: vi.fn(),
+  paymentUnique: vi.fn(),
   paymentUpdate: vi.fn(),
   productFind: vi.fn(),
 }));
@@ -24,12 +27,17 @@ const tx = {
     updateMany: mocks.eventUpdateMany,
     upsert: mocks.eventUpsert,
   },
-  orderCorrectionHistory: { create: mocks.correctionCreate },
+  orderCorrectionHistory: {
+    create: mocks.correctionCreate,
+    findFirst: mocks.correctionFind,
+  },
   orderItem: {
     findFirstOrThrow: mocks.itemFind,
     update: mocks.itemUpdate,
   },
   payment: {
+    create: mocks.paymentCreate,
+    findUniqueOrThrow: mocks.paymentUnique,
     findFirstOrThrow: mocks.paymentFind,
     update: mocks.paymentUpdate,
   },
@@ -43,6 +51,7 @@ vi.mock("@/lib/db", () => ({
 }));
 
 import {
+  addPaymentRecord,
   correctAgreedPrice,
   correctOrderDetails,
   correctOrderItem,
@@ -62,7 +71,12 @@ const financialOrder = {
 
 describe("owner order corrections", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+    mocks.correctionFind.mockResolvedValue(null);
+    mocks.paymentCreate.mockImplementation(async ({ data }) => ({
+      id: "payment-new",
+      ...data,
+    }));
     mocks.correctionCreate.mockResolvedValue({});
     mocks.eventUpdateMany.mockResolvedValue({ count: 0 });
     mocks.eventUpsert.mockResolvedValue({});
@@ -309,9 +323,16 @@ describe("owner order corrections", () => {
     });
     mocks.orderFind.mockResolvedValue({
       ...financialOrder,
-      payments: [{ amountMinor: 20_000, kind: "FULL", status: "ACTIVE" }],
+      payments: [],
       status: "IN_TRANSIT",
     });
+    mocks.orderFind
+      .mockResolvedValueOnce({ ...financialOrder, status: "IN_TRANSIT" })
+      .mockResolvedValue({
+        ...financialOrder,
+        status: "IN_TRANSIT",
+        payments: [{ amountMinor: 20_000, kind: "FULL", status: "ACTIVE" }],
+      });
 
     await editPaymentRecord({
       actorId: "owner",
@@ -334,5 +355,244 @@ describe("owner order corrections", () => {
         data: expect.objectContaining({ status: expect.anything() }),
       }),
     );
+  });
+});
+
+const paymentInput = {
+  actorId: "owner",
+  amountMinor: 14_900,
+  currency: "EUR",
+  kind: "BALANCE" as const,
+  orderId: "delivered-order",
+  processorFeeMinor: null,
+  reference: null,
+  requestKey: "d7d589ce-374d-4bed-a698-0b31b2b2bf6b",
+};
+const delivered = {
+  ...financialOrder,
+  status: "DELIVERED",
+  confirmedTotalMinor: 21_900,
+  items: [{ quantity: 1, unitPriceMinor: 21_900 }],
+  payments: [
+    { amountMinor: 7_000, currency: "EUR", kind: "DEPOSIT", status: "ACTIVE" },
+  ],
+};
+
+describe("delivered-order financial operations", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.correctionFind.mockResolvedValue(null);
+    mocks.paymentCreate.mockImplementation(async ({ data }) => ({
+      id: "payment-new",
+      ...data,
+    }));
+    mocks.correctionCreate.mockResolvedValue({});
+    mocks.orderFind.mockResolvedValue(delivered);
+    mocks.paymentFind.mockResolvedValue({
+      amountMinor: 7_000,
+      currency: "EUR",
+      kind: "DEPOSIT",
+      processorFeeMinor: null,
+      reference: null,
+      status: "ACTIVE",
+      order: { status: "DELIVERED" },
+    });
+  });
+
+  it.each([
+    { kind: "BALANCE" as const, amount: 14_900, before: delivered.payments },
+    { kind: "DEPOSIT" as const, amount: 5_000, before: [] },
+    { kind: "FULL" as const, amount: 21_900, before: [] },
+  ])(
+    "records $kind without writing fulfilment, tracking, history or invitations",
+    async ({ kind, amount, before }) => {
+      mocks.orderFind
+        .mockResolvedValueOnce({ ...delivered, payments: before })
+        .mockResolvedValue({
+          ...delivered,
+          payments: [
+            ...before,
+            { amountMinor: amount, currency: "EUR", kind, status: "ACTIVE" },
+          ],
+        });
+      await addPaymentRecord({ ...paymentInput, kind, amountMinor: amount });
+      expect(mocks.paymentCreate).toHaveBeenCalledTimes(1);
+      expect(mocks.orderUpdate).not.toHaveBeenCalled();
+      expect(mocks.itemUpdate).not.toHaveBeenCalled();
+      expect(mocks.correctionCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            changedField: `payment_request.${paymentInput.requestKey}`,
+            newValue: "payment-new",
+          }),
+        }),
+      );
+      if (kind !== "DEPOSIT")
+        expect(mocks.eventUpsert).toHaveBeenCalledWith(
+          expect.objectContaining({
+            create: expect.objectContaining({
+              amountMinor: 21_900,
+              eventKey: "paid:delivered-order",
+            }),
+          }),
+        );
+    },
+  );
+
+  it("retries the same request without adding payment, audit or revenue twice", async () => {
+    mocks.correctionFind.mockResolvedValue({ newValue: "payment-existing" });
+    mocks.paymentUnique.mockResolvedValue({
+      id: "payment-existing",
+      ...paymentInput,
+    });
+    await addPaymentRecord(paymentInput);
+    expect(mocks.paymentCreate).not.toHaveBeenCalled();
+    expect(mocks.correctionCreate).not.toHaveBeenCalled();
+    expect(mocks.eventUpsert).not.toHaveBeenCalled();
+  });
+
+  it("rejects reused idempotency keys with changed amounts", async () => {
+    mocks.correctionFind.mockResolvedValue({ newValue: "payment-existing" });
+    mocks.paymentUnique.mockResolvedValue({
+      ...paymentInput,
+      amountMinor: 100,
+    });
+    await expect(addPaymentRecord(paymentInput)).rejects.toThrow(
+      "already used",
+    );
+    expect(mocks.paymentCreate).not.toHaveBeenCalled();
+  });
+
+  it.each([0, -1, 0.5, 14_901])(
+    "rejects invalid amount or overpayment %s",
+    async (amountMinor) => {
+      await expect(
+        addPaymentRecord({ ...paymentInput, amountMinor }),
+      ).rejects.toThrow();
+      expect(mocks.paymentCreate).not.toHaveBeenCalled();
+    },
+  );
+
+  it("rejects currency mismatch", async () => {
+    await expect(
+      addPaymentRecord({ ...paymentInput, currency: "USD" }),
+    ).rejects.toThrow("currency");
+    expect(mocks.paymentCreate).not.toHaveBeenCalled();
+  });
+
+  it("uses agreed price for balance protection", async () => {
+    mocks.orderFind.mockResolvedValue({
+      ...delivered,
+      agreedTotalMinor: 20_000,
+    });
+    await expect(addPaymentRecord(paymentInput)).rejects.toThrow("balance");
+    await addPaymentRecord({ ...paymentInput, amountMinor: 13_000 });
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+  });
+
+  it("corrects a payment excluding its old amount from the available balance", async () => {
+    mocks.orderFind
+      .mockResolvedValueOnce({ ...delivered, payments: [] })
+      .mockResolvedValue({
+        ...delivered,
+        payments: [{ amountMinor: 21_900, kind: "FULL", status: "ACTIVE" }],
+      });
+    await editPaymentRecord({
+      ...paymentInput,
+      paymentId: "deposit",
+      amountMinor: 21_900,
+      kind: "FULL",
+    });
+    expect(mocks.paymentUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ amountMinor: 21_900 }),
+      }),
+    );
+    expect(mocks.orderFind).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          payments: expect.objectContaining({
+            where: { status: "ACTIVE", id: { not: "deposit" } },
+          }),
+        }),
+      }),
+    );
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+  });
+
+  it("voids a delivered payment, deactivates revenue and preserves delivery", async () => {
+    mocks.orderFind.mockResolvedValue({ ...delivered, payments: [] });
+    await voidPaymentRecord({
+      actorId: "owner",
+      orderId: "delivered-order",
+      paymentId: "deposit",
+      reason: "Owner correction",
+    });
+    expect(mocks.paymentUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: "VOIDED",
+          voidReason: "Owner correction",
+        }),
+      }),
+    );
+    expect(mocks.eventUpdateMany).toHaveBeenCalledWith({
+      data: { isActive: false },
+      where: { eventKey: "paid:delivered-order", isActive: true },
+    });
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+  });
+
+  it("allows agreed-price correction after delivery without rewriting delivery state", async () => {
+    mocks.orderFind
+      .mockResolvedValueOnce({ ...delivered, payments: [{ id: "deposit" }] })
+      .mockResolvedValue({ ...delivered, agreedTotalMinor: 22_000 });
+    await correctAgreedPrice({
+      actorId: "owner",
+      orderId: "delivered-order",
+      agreedTotalMinor: 22_000,
+      existingPaymentsAcknowledged: true,
+    });
+    expect(mocks.orderUpdate).toHaveBeenCalledExactlyOnceWith({
+      data: { agreedTotalMinor: 22_000 },
+      where: { id: "delivered-order" },
+    });
+  });
+
+  it("does not unlock delivered fulfilment or item editing", async () => {
+    await expect(
+      correctOrderDetails({
+        actorId: "owner",
+        orderId: "delivered-order",
+        customerNotes: null,
+        internalNotes: null,
+        deliveryMode: "ESTONIA_DELIVERY",
+        fulfilmentMethod: "DELIVERY",
+      }),
+    ).rejects.toThrow("not editable");
+    mocks.itemFind.mockResolvedValue({ order: { status: "DELIVERED" } });
+    await expect(
+      correctOrderItem({
+        actorId: "owner",
+        orderId: "delivered-order",
+        itemId: "item",
+        productId: "product",
+        productName: "Model",
+        quantity: 1,
+        color: null,
+        size: null,
+        measurementsNote: null,
+      }),
+    ).rejects.toThrow("not editable");
+    expect(mocks.orderUpdate).not.toHaveBeenCalled();
+    expect(mocks.itemUpdate).not.toHaveBeenCalled();
+  });
+
+  it("keeps cancelled orders financially locked", async () => {
+    mocks.orderFind.mockResolvedValue({ ...delivered, status: "CANCELLED" });
+    await expect(addPaymentRecord(paymentInput)).rejects.toThrow(
+      "not editable",
+    );
+    expect(mocks.paymentCreate).not.toHaveBeenCalled();
   });
 });

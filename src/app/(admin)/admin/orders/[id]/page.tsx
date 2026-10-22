@@ -7,8 +7,10 @@ import {
 } from "@prisma/client";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { randomUUID } from "node:crypto";
 
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
+import { FinancialForm } from "@/components/admin/financial-form";
 import { OrderReviewSection } from "@/components/admin/order-review-section";
 import { TrackingCustomerControls } from "@/components/admin/tracking-customer-controls";
 import {
@@ -33,16 +35,12 @@ import {
 } from "@/lib/admin/labels";
 
 import {
-  recordPayment,
   recordOrderTrackingMilestone,
-  resetPayment,
   retryOrderNotification,
   rotateOrderTrackingLink,
-  updateAgreedPrice,
   updateOrderDetails,
   updateOrderItem,
   updateOrderStatus,
-  updatePayment,
 } from "../../actions";
 
 const trackingMilestoneLabels: Record<OrderTrackingMilestoneKind, string> = {
@@ -662,7 +660,7 @@ export default async function AdminOrderPage({
           </dl>
           <details className="admin-correction-details">
             <summary>Изменить согласованную цену</summary>
-            <form action={updateAgreedPrice} className="admin-stack-form">
+            <FinancialForm operation="PRICE">
               <input name="orderId" type="hidden" value={order.id} />
               <label>
                 <span>Согласованная сумма, {order.currency}</span>
@@ -695,7 +693,7 @@ export default async function AdminOrderPage({
               <ConfirmSubmitButton message="Сохранить новую согласованную цену и пересчитать финансовое состояние заказа?">
                 Сохранить цену
               </ConfirmSubmitButton>
-            </form>
+            </FinancialForm>
           </details>
         </section>
         <section className="admin-panel">
@@ -731,8 +729,9 @@ export default async function AdminOrderPage({
           <p className="admin-readiness-note">
             Сброс оплаты сохраняет запись и аудит, но исключает её из расчётов.
           </p>
-          <form action={recordPayment} className="admin-stack-form">
+          <FinancialForm operation="ADD">
             <input name="orderId" type="hidden" value={order.id} />
+            <input name="requestKey" type="hidden" value={randomUUID()} />
             <select name="kind">
               {Object.values(PaymentKind).map((kind) => (
                 <option key={kind} value={kind}>
@@ -763,7 +762,7 @@ export default async function AdminOrderPage({
             />
             <input name="reference" placeholder="Номер / комментарий" />
             <button type="submit">Записать оплату</button>
-          </form>
+          </FinancialForm>
           <div className="admin-payment-list">
             {order.payments.map((payment) => (
               <details className="admin-correction-details" key={payment.id}>
@@ -782,7 +781,7 @@ export default async function AdminOrderPage({
                 </p>
                 {payment.status === "ACTIVE" ? (
                   <>
-                    <form action={updatePayment} className="admin-stack-form">
+                    <FinancialForm operation="EDIT">
                       <input name="orderId" type="hidden" value={order.id} />
                       <input
                         name="paymentId"
@@ -830,8 +829,8 @@ export default async function AdminOrderPage({
                       <ConfirmSubmitButton message="Сохранить исправление оплаты и пересчитать финансовое состояние заказа?">
                         Сохранить оплату
                       </ConfirmSubmitButton>
-                    </form>
-                    <form action={resetPayment} className="admin-stack-form">
+                    </FinancialForm>
+                    <FinancialForm operation="VOID">
                       <input name="orderId" type="hidden" value={order.id} />
                       <input
                         name="paymentId"
@@ -845,7 +844,7 @@ export default async function AdminOrderPage({
                       <ConfirmSubmitButton message="Сбросить эту оплату? Запись останется в аудите, но будет исключена из суммы оплаты.">
                         Сбросить оплату
                       </ConfirmSubmitButton>
-                    </form>
+                    </FinancialForm>
                   </>
                 ) : (
                   <p className="admin-warning-note">

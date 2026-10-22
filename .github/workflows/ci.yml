@@ -30,6 +30,7 @@ on:
       - codex/tracking-upstream-evidence
       - codex/logistics-workflow
       - codex/verified-customer-reviews
+      - codex/delivered-payment-closeout
 
 permissions:
   contents: read

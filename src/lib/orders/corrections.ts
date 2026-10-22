@@ -62,6 +62,101 @@ function assertEditable(status: OrderStatus) {
   }
 }
 
+export class FinancialCorrectionError extends Error {}
+
+function assertFinanciallyEditable(status: OrderStatus) {
+  if (status !== "DELIVERED" && !editableStatuses.has(status)) {
+    throw new FinancialCorrectionError("This order state is not editable.");
+  }
+}
+
+// Ledger validation, idempotency and writes must see one consistent balance.
+// Retry a serialization conflict rather than allow two concurrent overpayments.
+async function financialTransaction<T>(
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await getPrisma().$transaction(callback, {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2034"
+      ) {
+        if (attempt < 2) continue;
+        throw new FinancialCorrectionError("Payment changed. Please retry.");
+      }
+      throw error;
+    }
+  }
+}
+
+async function validatePayment(
+  tx: Prisma.TransactionClient,
+  input: {
+    amountMinor: number;
+    currency: string;
+    kind: PaymentKind;
+    orderId: string;
+    paymentId?: string;
+    processorFeeMinor: number | null;
+  },
+) {
+  if (
+    !Number.isSafeInteger(input.amountMinor) ||
+    input.amountMinor <= 0 ||
+    input.amountMinor > 100_000_000 ||
+    (input.processorFeeMinor !== null &&
+      (!Number.isSafeInteger(input.processorFeeMinor) ||
+        input.processorFeeMinor < 0 ||
+        input.processorFeeMinor > input.amountMinor))
+  ) {
+    throw new FinancialCorrectionError("Invalid payment amount or fee.");
+  }
+  const order = await tx.order.findUniqueOrThrow({
+    where: { id: input.orderId },
+    select: {
+      status: true,
+      currency: true,
+      agreedTotalMinor: true,
+      confirmedTotalMinor: true,
+      items: { select: { quantity: true, unitPriceMinor: true } },
+      payments: {
+        where: {
+          status: "ACTIVE",
+          ...(input.paymentId ? { id: { not: input.paymentId } } : {}),
+        },
+        select: { amountMinor: true, kind: true, status: true, currency: true },
+      },
+    },
+  });
+  assertFinanciallyEditable(order.status);
+  if (
+    input.currency !== order.currency ||
+    order.payments.some((payment) => payment.currency !== order.currency)
+  ) {
+    throw new FinancialCorrectionError(
+      "Payment currency must match the order.",
+    );
+  }
+  const total = effectiveTotalMinor({
+    agreedTotalMinor: order.agreedTotalMinor,
+    confirmedTotalMinor: order.confirmedTotalMinor,
+    itemTotalMinor: itemSnapshotTotalMinor(order.items),
+  });
+  const { paidMinor } = calculateFinancials(total, [
+    ...order.payments,
+    { amountMinor: input.amountMinor, kind: input.kind },
+  ]);
+  if (paidMinor < 0 || (total !== null && paidMinor > total)) {
+    throw new FinancialCorrectionError(
+      "Payment exceeds the available balance.",
+    );
+  }
+}
+
 async function recalculateFinancialState(
   tx: Prisma.TransactionClient,
   orderId: string,
@@ -276,7 +371,7 @@ export async function correctAgreedPrice(input: {
   existingPaymentsAcknowledged: boolean;
   orderId: string;
 }) {
-  return getPrisma().$transaction(async (tx) => {
+  return financialTransaction(async (tx) => {
     const order = await tx.order.findUniqueOrThrow({
       select: {
         agreedTotalMinor: true,
@@ -290,7 +385,7 @@ export async function correctAgreedPrice(input: {
       },
       where: { id: input.orderId },
     });
-    assertEditable(order.status);
+    assertFinanciallyEditable(order.status);
     if (order.payments.length && !input.existingPaymentsAcknowledged) {
       throw new Error("Confirm the price correction with existing payments.");
     }
@@ -334,13 +429,37 @@ export async function addPaymentRecord(input: {
   orderId: string;
   processorFeeMinor: number | null;
   reference: string | null;
+  requestKey: string;
 }) {
-  return getPrisma().$transaction(async (tx) => {
-    const order = await tx.order.findUniqueOrThrow({
-      select: { status: true },
-      where: { id: input.orderId },
+  if (!/^[0-9a-f-]{36}$/i.test(input.requestKey)) {
+    throw new FinancialCorrectionError("Invalid payment request.");
+  }
+  return financialTransaction(async (tx) => {
+    const replay = await tx.orderCorrectionHistory.findFirst({
+      where: {
+        orderId: input.orderId,
+        changedField: `payment_request.${input.requestKey}`,
+      },
+      select: { newValue: true },
     });
-    assertEditable(order.status);
+    if (replay && typeof replay.newValue === "string") {
+      const existing = await tx.payment.findUniqueOrThrow({
+        where: { id: replay.newValue },
+      });
+      if (
+        existing.amountMinor !== input.amountMinor ||
+        existing.currency !== input.currency ||
+        existing.kind !== input.kind ||
+        existing.processorFeeMinor !== input.processorFeeMinor ||
+        existing.reference !== input.reference
+      ) {
+        throw new FinancialCorrectionError(
+          "Payment request already used. Reload the order.",
+        );
+      }
+      return existing;
+    }
+    await validatePayment(tx, input);
     const payment = await tx.payment.create({
       data: {
         amountMinor: input.amountMinor,
@@ -352,6 +471,13 @@ export async function addPaymentRecord(input: {
         recordedByAdminId: input.actorId,
         reference: input.reference,
       },
+    });
+    await audit(tx, {
+      actorId: input.actorId,
+      field: `payment_request.${input.requestKey}`,
+      next: payment.id,
+      orderId: input.orderId,
+      previous: null,
     });
     await audit(tx, {
       actorId: input.actorId,
@@ -375,7 +501,7 @@ export async function editPaymentRecord(input: {
   processorFeeMinor: number | null;
   reference: string | null;
 }) {
-  return getPrisma().$transaction(async (tx) => {
+  return financialTransaction(async (tx) => {
     const payment = await tx.payment.findFirstOrThrow({
       select: {
         amountMinor: true,
@@ -391,7 +517,8 @@ export async function editPaymentRecord(input: {
         status: "ACTIVE",
       },
     });
-    assertEditable(payment.order.status);
+    assertFinanciallyEditable(payment.order.status);
+    await validatePayment(tx, input);
     await tx.payment.update({
       data: {
         amountMinor: input.amountMinor,
@@ -428,7 +555,7 @@ export async function voidPaymentRecord(input: {
   paymentId: string;
   reason: string;
 }) {
-  return getPrisma().$transaction(async (tx) => {
+  return financialTransaction(async (tx) => {
     const payment = await tx.payment.findFirstOrThrow({
       select: {
         amountMinor: true,
@@ -441,7 +568,7 @@ export async function voidPaymentRecord(input: {
         status: "ACTIVE",
       },
     });
-    assertEditable(payment.order.status);
+    assertFinanciallyEditable(payment.order.status);
     await tx.payment.update({
       data: {
         status: "VOIDED",

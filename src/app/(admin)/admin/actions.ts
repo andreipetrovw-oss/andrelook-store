@@ -30,6 +30,7 @@ import { getPrisma } from "@/lib/db";
 import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
 import {
   addPaymentRecord,
+  FinancialCorrectionError,
   correctAgreedPrice,
   correctOrderDetails,
   correctOrderItem,
@@ -110,6 +111,8 @@ const agreedPriceSchema = z.object({
 const paymentEditSchema = paymentSchema.extend({
   paymentId: z.string().min(1),
 });
+
+const paymentCreateSchema = paymentSchema.extend({ requestKey: z.uuid() });
 
 const paymentResetSchema = z.object({
   orderId: z.string().min(1),
@@ -718,7 +721,7 @@ export async function updateOrderStatus(formData: FormData) {
 }
 
 export async function recordPayment(formData: FormData) {
-  const parsed = paymentSchema.safeParse(Object.fromEntries(formData));
+  const parsed = paymentCreateSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid payment.");
   const recordedByAdminId = await adminId();
   await addPaymentRecord({
@@ -732,6 +735,7 @@ export async function recordPayment(formData: FormData) {
         ? Math.round(parsed.data.processorFee * 100)
         : null,
     reference: parsed.data.reference || null,
+    requestKey: parsed.data.requestKey,
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
@@ -832,6 +836,54 @@ export async function resetPayment(formData: FormData) {
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
+}
+
+export async function saveFinancialCorrection(
+  _state: { error: string | null },
+  formData: FormData,
+): Promise<{ error: string | null }> {
+  await requireOwner();
+  try {
+    switch (formData.get("operation")) {
+      case "ADD":
+        await recordPayment(formData);
+        break;
+      case "EDIT":
+        await updatePayment(formData);
+        break;
+      case "VOID":
+        await resetPayment(formData);
+        break;
+      case "PRICE":
+        await updateAgreedPrice(formData);
+        break;
+      default:
+        return { error: "Неизвестная финансовая операция. Обновите страницу." };
+    }
+    return { error: null };
+  } catch (error) {
+    const messages: Record<string, string> = {
+      "Payment exceeds the available balance.":
+        "Сумма превышает остаток к оплате или доступную сумму возврата.",
+      "Payment currency must match the order.":
+        "Валюта оплаты должна совпадать с валютой заказа.",
+      "Invalid payment amount or fee.":
+        "Укажите положительную сумму. Комиссия не может превышать сумму оплаты.",
+      "This order state is not editable.":
+        "Финансовые изменения недоступны для отменённого заказа.",
+      "Payment request already used. Reload the order.":
+        "Эта операция уже обработана. Обновите страницу перед новой оплатой.",
+      "Payment changed. Please retry.":
+        "Оплата изменилась параллельно. Обновите страницу и повторите попытку.",
+    };
+    return {
+      error:
+        error instanceof FinancialCorrectionError
+          ? (messages[error.message] ??
+            "Не удалось сохранить оплату. Проверьте данные и обновите страницу.")
+          : "Не удалось сохранить. Проверьте сумму, подтверждение и актуальность данных заказа.",
+    };
+  }
 }
 
 export async function recordAdvertisingSpend(formData: FormData) {

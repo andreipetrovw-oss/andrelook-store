@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { reviewEligible } from "@/lib/reviews/model";
 
 import {
   calculateFinancials,
@@ -8,6 +9,25 @@ import {
 } from "./financials";
 
 describe("CRM payment summary", () => {
+  it.each([0, 7_000, 21_900])(
+    "preserves delivery and real review eligibility at paid amount %s",
+    (paidMinor) => {
+      const status = recalculatedCommercialStatus({
+        currentStatus: "DELIVERED",
+        effectiveTotalMinor: 21_900,
+        paidMinor,
+        paymentPreference: "FULL_ADVANCE",
+      });
+      expect(status).toBe("DELIVERED");
+      expect(
+        reviewEligible({
+          status,
+          displayNumber: "AL-20261015-32CC44",
+          customer: { name: "Marcel Sokolov" },
+        }),
+      ).toBe(true);
+    },
+  );
   it("calculates paid and balance values including refunds", () => {
     expect(
       calculateFinancials(30_000, [
