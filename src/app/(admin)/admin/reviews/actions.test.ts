@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   moderate: vi.fn(),
   transaction: vi.fn(),
   order: vi.fn(),
+  revalidate: vi.fn(),
 }));
 vi.mock("@/lib/auth/server", () => ({ requireOwner: mocks.owner }));
 vi.mock("@/lib/reviews/service", () => ({
@@ -18,7 +19,7 @@ vi.mock("@/lib/db", () => ({
     order: { findUniqueOrThrow: mocks.order },
   }),
 }));
-vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidate }));
 import {
   copyReviewRequest,
   moderateOrderReview,
@@ -52,4 +53,12 @@ it("passes authenticated identity to the audited moderator", async () => {
     reason: "",
     actorEmail: "owner@example.com",
   });
+  expect(mocks.revalidate).toHaveBeenCalledWith(
+    "/(localized)/[locale]",
+    "layout",
+  );
+  expect(mocks.revalidate).toHaveBeenCalledWith(
+    "/(localized)/[locale]/catalog/[categorySlug]/[productSlug]",
+    "page",
+  );
 });

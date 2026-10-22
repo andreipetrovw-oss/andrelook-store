@@ -9,14 +9,18 @@ import { reviewRequestMessage } from "@/lib/reviews/copy";
 import { ensureReviewInvitation, moderateReview } from "@/lib/reviews/service";
 import { invitationToken, newReviewCredentials } from "@/lib/reviews/security";
 
-function refreshReviews(orderId: string) {
+function refreshReviews(orderId: string, publicChanged = false) {
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
-  revalidatePath("/[locale]", "layout");
+  if (!publicChanged) return;
+  revalidatePath("/(localized)/[locale]", "layout");
+  revalidatePath(
+    "/(localized)/[locale]/catalog/[categorySlug]/[productSlug]",
+    "page",
+  );
   for (const locale of ["et", "ru", "en"]) {
     revalidatePath(`/${locale}`);
     revalidatePath(`/${locale}/reviews`);
-    revalidatePath(`/${locale}/catalog/[categorySlug]/[productSlug]`, "page");
   }
 }
 
@@ -114,7 +118,7 @@ export async function moderateOrderReview(form: FormData) {
     })
     .parse(Object.fromEntries(form));
   await moderateReview({ ...input, actorEmail: owner.email });
-  refreshReviews(input.orderId);
+  refreshReviews(input.orderId, true);
 }
 
 export async function moderateReviewWithFeedback(
