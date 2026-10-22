@@ -1,4 +1,5 @@
 import { OrderStatus } from "@prisma/client";
+import { reviewStatusLabels } from "@/components/admin/order-review-section";
 import Link from "next/link";
 
 import { getAdminOrders } from "@/lib/admin/query";
@@ -74,6 +75,7 @@ export default async function AdminOrdersPage({
               <th>Статус</th>
               <th>Источник</th>
               <th>Уведомление</th>
+              <th>Отзыв</th>
               <th>Дата</th>
               <th>Следующее действие</th>
               <th>Остаток</th>
@@ -102,6 +104,16 @@ export default async function AdminOrdersPage({
                   {order.notification
                     ? notificationStatusLabels[order.notification.status]
                     : "—"}
+                </td>
+                <td>
+                  {
+                    reviewStatusLabels[
+                      order.reviewInvitation?.review?.status ??
+                        (order.reviewInvitation?.requestedAt
+                          ? "REQUESTED"
+                          : "NOT_REQUESTED")
+                    ]
+                  }
                 </td>
                 <td>{russianDate.format(order.orderDate)}</td>
                 <td>

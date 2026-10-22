@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
+import { OrderReviewSection } from "@/components/admin/order-review-section";
 import { TrackingCustomerControls } from "@/components/admin/tracking-customer-controls";
 import {
   getAdminOrder,
@@ -105,6 +106,7 @@ export default async function AdminOrderPage({
         ) : null}
       </div>
       <div className="order-detail-grid">
+        <OrderReviewSection orderId={order.id} />
         <section className="admin-panel">
           <h2>Клиент и контакт</h2>
           <dl>

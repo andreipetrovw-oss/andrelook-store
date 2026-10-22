@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { ProductCard } from "@/components/product-card";
+import { HomeReviews } from "@/components/reviews";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getStorefrontContent } from "@/i18n/storefront-content";
@@ -338,6 +339,7 @@ export default async function LocalizedHome({
         </div>
       </section>
 
+      <HomeReviews locale={locale} />
       <section className="contact-band home-contact-band">
         <div className="container contact-band-inner">
           <div>

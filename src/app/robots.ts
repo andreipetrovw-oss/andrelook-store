@@ -4,7 +4,7 @@ import { getServerConfig } from "@/lib/env";
 
 export default function robots(): MetadataRoute.Robots {
   const config = getServerConfig();
-  const privatePaths = ["/admin", "/api/", "/sign-in", "/track"];
+  const privatePaths = ["/admin", "/api/", "/sign-in", "/track", "/review/"];
   return config.indexingEnabled
     ? {
         host: config.siteUrl.origin,

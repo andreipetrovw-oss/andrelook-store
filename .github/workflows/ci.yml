@@ -29,6 +29,7 @@ on:
       - codex/crm-order-corrections
       - codex/tracking-upstream-evidence
       - codex/logistics-workflow
+      - codex/verified-customer-reviews
 
 permissions:
   contents: read

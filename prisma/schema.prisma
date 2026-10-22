@@ -349,6 +349,7 @@ model Product {
   economicsVersions    ProductEconomicsVersion[]
   attributedAdSpend    AdSpend[]
   analyticsEvents      AnalyticsEvent[]
+  customerReviews      CustomerReview[]
   createdAt            DateTime                  @default(now())
   updatedAt            DateTime                  @updatedAt
 
@@ -612,12 +613,92 @@ model Order {
   trackingNotifications        TrackingMilestoneNotification[]
   trackingMilestones           OrderTrackingMilestone[]
   correctionHistory            OrderCorrectionHistory[]
+  reviewInvitation             ReviewInvitation?
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime                        @updatedAt
 
   @@index([status, nextActionAt])
   @@index([acquisitionChannel, orderDate])
   @@index([customerId, orderDate])
+}
+
+enum ReviewStatus {
+  SUBMITTED
+  PUBLISHED
+  REJECTED
+  UNPUBLISHED
+}
+
+enum ReviewKind {
+  SERVICE
+  PRODUCT
+}
+
+model ReviewInvitation {
+  id                String                    @id @default(cuid())
+  orderId           String                    @unique
+  order             Order                     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  tokenHash         String                    @unique
+  tokenEncrypted    String
+  revokedAt         DateTime?
+  requestedAt       DateTime?
+  createdAt         DateTime                  @default(now())
+  rotatedAt         DateTime?
+  review            CustomerReview?
+  moderationHistory ReviewModerationHistory[]
+}
+
+model CustomerReview {
+  id                   String                    @id @default(cuid())
+  publicId             String                    @unique @default(uuid())
+  invitationId         String                    @unique
+  invitation           ReviewInvitation          @relation(fields: [invitationId], references: [id], onDelete: Restrict)
+  kind                 ReviewKind                @default(SERVICE)
+  productId            String?
+  product              Product?                  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orderItemId          String?                   @unique
+  orderItem            OrderItem?                @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  productNameSnapshot  String?
+  locale               Locale
+  rating               Int
+  originalText         String
+  publicText           String
+  displayName          String
+  qualityRating        Int?
+  communicationRating  Int?
+  deliveryRating       Int?
+  status               ReviewStatus              @default(SUBMITTED)
+  publicationConsentAt DateTime
+  submittedAt          DateTime                  @default(now())
+  publishedAt          DateTime?
+  updatedAt            DateTime                  @updatedAt
+  moderationHistory    ReviewModerationHistory[]
+
+  @@index([status, submittedAt])
+  @@index([productId, status])
+}
+
+model ReviewModerationHistory {
+  id           String           @id @default(cuid())
+  reviewId     String?
+  review       CustomerReview?  @relation(fields: [reviewId], references: [id], onDelete: Restrict)
+  invitationId String
+  invitation   ReviewInvitation @relation(fields: [invitationId], references: [id], onDelete: Restrict)
+  actorEmail   String
+  action       String
+  reason       String?
+  previousText String?
+  createdAt    DateTime         @default(now())
+
+  @@index([invitationId, createdAt])
+}
+
+model ReviewRateLimit {
+  keyHash     String   @id
+  attempts    Int      @default(1)
+  windowStart DateTime
+
+  @@index([windowStart])
 }
 
 model Shipment {
@@ -1030,6 +1111,7 @@ model OrderItem {
   economicsVersionSnapshot       Int?
   economicsSourceTypeSnapshot    EconomicsSourceType?
   internalNotes                  String?
+  customerReview                 CustomerReview?
   createdAt                      DateTime             @default(now())
   updatedAt                      DateTime             @updatedAt
 

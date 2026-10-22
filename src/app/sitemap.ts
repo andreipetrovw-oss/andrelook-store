@@ -61,6 +61,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const staticEntries = [
         sitemapEntry({
           locale,
+          path: "reviews",
+          priority: 0.7,
+          siteUrl: config.siteUrl,
+        }),
+        sitemapEntry({
+          locale,
           path: "",
           priority: 1,
           siteUrl: config.siteUrl,

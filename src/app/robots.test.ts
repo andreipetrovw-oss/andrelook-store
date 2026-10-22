@@ -23,22 +23,22 @@ describe("robots policy", () => {
     expect(result.rules).toEqual([
       {
         allow: "/",
-        disallow: ["/admin", "/api/", "/sign-in", "/track"],
+        disallow: ["/admin", "/api/", "/sign-in", "/track", "/review/"],
         userAgent: "*",
       },
       {
         allow: "/",
-        disallow: ["/admin", "/api/", "/sign-in", "/track"],
+        disallow: ["/admin", "/api/", "/sign-in", "/track", "/review/"],
         userAgent: "Googlebot",
       },
       {
         allow: "/",
-        disallow: ["/admin", "/api/", "/sign-in", "/track"],
+        disallow: ["/admin", "/api/", "/sign-in", "/track", "/review/"],
         userAgent: "Bingbot",
       },
       {
         allow: "/",
-        disallow: ["/admin", "/api/", "/sign-in", "/track"],
+        disallow: ["/admin", "/api/", "/sign-in", "/track", "/review/"],
         userAgent: "OAI-SearchBot",
       },
     ]);

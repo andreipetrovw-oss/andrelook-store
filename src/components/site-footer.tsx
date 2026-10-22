@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
+import { reviewCopy } from "@/lib/reviews/copy";
 
 import { FooterPrivacySettingsButton } from "./privacy-settings-button";
 
@@ -42,6 +43,7 @@ export function SiteFooter({
             {dictionary.returnsExchanges}
           </Link>
           <Link href={`/${locale}/faq`}>{dictionary.faq}</Link>
+          <Link href={`/${locale}/reviews`}>{reviewCopy[locale].title}</Link>
         </div>
         <div>
           <h2>{dictionary.contact}</h2>

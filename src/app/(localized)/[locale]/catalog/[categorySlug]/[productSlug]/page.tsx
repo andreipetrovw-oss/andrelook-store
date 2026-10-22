@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { ProductCard } from "@/components/product-card";
+import { ProductReviews } from "@/components/reviews";
+import { getPublishedReviews } from "@/lib/reviews/service";
+import { productReviewSchema, type PublicReview } from "@/lib/reviews/model";
 import { ProductConfigurator } from "@/components/product-configurator";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductInteractionProvider } from "@/components/product-interaction-context";
@@ -112,9 +115,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function ProductStructuredData({
   product,
   url,
+  reviews,
 }: {
   product: NonNullable<Awaited<ReturnType<typeof resolveProduct>>>;
   url: string;
+  reviews: PublicReview[];
 }) {
   const data = productStructuredData({
     availability: product.availability,
@@ -129,7 +134,10 @@ function ProductStructuredData({
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify(data).replaceAll("<", "\\u003c"),
+        __html: JSON.stringify({
+          ...data,
+          ...productReviewSchema(reviews),
+        }).replaceAll("<", "\\u003c"),
       }}
       type="application/ld+json"
     />
@@ -147,6 +155,7 @@ export default async function ProductPage({ params }: Props) {
     getPublicCategoryProducts(locale, resolved.categorySlug, storefrontScope()),
   ]);
   if (!product) notFound();
+  const reviews = await getPublishedReviews(product.id);
   const related = categoryProducts
     .filter((item) => item.id !== product.id)
     .slice(0, 3);
@@ -189,7 +198,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
-      <ProductStructuredData product={product} url={url} />
+      <ProductStructuredData product={product} url={url} reviews={reviews} />
       <script
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
@@ -446,6 +455,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </article>
 
+        <ProductReviews reviews={reviews} locale={locale} />
         {related.length ? (
           <section className="container related-section">
             <header className="editorial-heading split-heading">

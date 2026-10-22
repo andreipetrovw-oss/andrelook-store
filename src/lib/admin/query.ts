@@ -111,6 +111,9 @@ export async function getAdminOrders(filters: {
       },
       nextActionAt: true,
       notification: { select: { status: true } },
+      reviewInvitation: {
+        select: { requestedAt: true, review: { select: { status: true } } },
+      },
       orderDate: true,
       paymentPreference: true,
       payments: {

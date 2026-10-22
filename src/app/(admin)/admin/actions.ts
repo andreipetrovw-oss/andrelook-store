@@ -21,6 +21,7 @@ import {
   TrackingEvidenceSource,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { ensureReviewInvitation } from "@/lib/reviews/service";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -709,6 +710,8 @@ export async function updateOrderStatus(formData: FormData) {
       });
     }
   });
+  if (parsed.data.status === "DELIVERED")
+    await ensureReviewInvitation(parsed.data.orderId);
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
