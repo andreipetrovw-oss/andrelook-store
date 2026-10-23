@@ -147,23 +147,22 @@ describe("transactional assisted-order service", () => {
       unitPurchaseCostMinorSnapshot: 8_000,
     });
     expect(data.statusHistory.create).toEqual({ toStatus: "NEW" });
-    expect(data.legalAcceptances.create).toMatchObject({
-      availabilitySnapshot: "PRE_ORDER",
-      colorSnapshot: "black",
-      currencySnapshot: "EUR",
-      deliveryEstimateSnapshot: "2–3 weeks",
-      kind: "REQUEST_SELECTION",
+    expect(data.legalRequestSnapshot).toMatchObject({
+      availability: "PRE_ORDER",
+      color: "black",
+      currency: "EUR",
+      deliveryEstimate: "2–3 weeks",
       policyVersion: "andrelook-legal-2026-10-v1",
-      productInternalCodeSnapshot: "AL-SRC-TEST",
-      productNameSnapshot: "Database product",
-      quantitySnapshot: 1,
+      productCode: "AL-SRC-TEST",
+      productName: "Database product",
+      quantity: 1,
       returnsVersion: "andrelook-returns-2026-10-v1",
       sizeGuideAvailable: true,
       sizeGuideVersion: expect.stringMatching(/^[a-f0-9]{64}$/),
-      sizeSnapshot: "M",
+      size: "M",
       source: "WEBSITE_CHECKBOX",
       termsVersion: "andrelook-terms-2026-10-v1",
-      unitPriceMinorSnapshot: 25_000,
+      unitPriceMinor: 25_000,
     });
     expect(data.attribution.create).toMatchObject({
       analyticsConsent: true,

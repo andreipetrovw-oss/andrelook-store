@@ -1060,36 +1060,6 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
-.admin-history-list {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.admin-history-list article {
-  border: 1px solid var(--color-border);
-  display: grid;
-  gap: 0.35rem;
-  padding: 1rem;
-}
-
-.admin-history-list small,
-.admin-history-list span {
-  color: var(--color-ink-muted);
-}
-
-.admin-checkbox {
-  align-items: start;
-  display: grid !important;
-  gap: 0.65rem !important;
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-.admin-checkbox input {
-  min-height: auto;
-  width: 1.1rem;
-}
-
 .withdrawal-body {
   padding-block: clamp(2rem, 6vw, 5rem);
 }

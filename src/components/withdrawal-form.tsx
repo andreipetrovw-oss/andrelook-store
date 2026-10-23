@@ -43,7 +43,7 @@ export function WithdrawalForm({ locale }: { locale: Locale }) {
         <p>
           {copy.reference}: <strong>{state.publicId}</strong>
         </p>
-        {state.confirmationStatus !== "SENT" ? (
+        {state.notificationIssue ? (
           <p className="form-error">{copy.confirmationDeliveryIssue}</p>
         ) : null}
       </section>
@@ -79,12 +79,7 @@ export function WithdrawalForm({ locale }: { locale: Locale }) {
           </label>
           <label>
             <span>{copy.orderReference}</span>
-            <input
-              autoCapitalize="characters"
-              autoComplete="off"
-              name="orderReference"
-              required
-            />
+            <input autoComplete="off" name="orderReference" required />
           </label>
           <label>
             <span>{copy.confirmationEmail}</span>

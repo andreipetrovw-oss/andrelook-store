@@ -9,7 +9,7 @@ export const legalPolicyCopy = {
     acceptance:
       "I confirm that I have checked the selected model, colour and size, reviewed the available size guide and understood the displayed price and estimated delivery time. I understand that after Andrelook sends the order to the supplier, changes and any voluntary size exchange are not guaranteed. This does not limit my statutory consumer rights, including the right of withdrawal where it applies.",
     acceptanceNoChart:
-      "I confirm that I have checked the selected model and colour and requested personal sizing help because no size guide is available. I understand the displayed price and estimated delivery time and that, after Andrelook sends the order to the supplier, changes and any voluntary exchange are not guaranteed. This does not limit my statutory consumer rights, including the right of withdrawal where it applies.",
+      "I confirm that I have checked the selected model, colour and size, where selected, and understand that no size guide is available. I understand the displayed price and estimated delivery time and that, after Andrelook sends the order to the supplier, changes and any voluntary exchange are not guaranteed. This does not limit my statutory consumer rights, including the right of withdrawal where it applies.",
     compactTitle: "Before you send the pre-order request",
     directReturnCost:
       "If you exercise the statutory right of withdrawal, you pay the direct cost of returning the item unless Andrelook agrees otherwise or the law requires Andrelook to bear it.",
@@ -25,7 +25,7 @@ export const legalPolicyCopy = {
     acceptance:
       "Kinnitan, et olen kontrollinud valitud mudelit, värvi ja suurust, tutvunud olemasoleva suurustabeliga ning saanud aru kuvatud hinnast ja eeldatavast tarneajast. Mõistan, et pärast tellimuse edastamist tarnijale ei ole muudatused ega vabatahtlik suurusevahetus garanteeritud. See ei piira minu seadusest tulenevaid tarbijaõigusi, sealhulgas taganemisõigust, kui see kohaldub.",
     acceptanceNoChart:
-      "Kinnitan, et olen kontrollinud valitud mudelit ja värvi ning palunud personaalset suuruseabi, sest suurustabel puudub. Olen saanud aru kuvatud hinnast ja eeldatavast tarneajast ning sellest, et pärast tellimuse edastamist tarnijale ei ole muudatused ega vabatahtlik vahetus garanteeritud. See ei piira minu seadusest tulenevaid tarbijaõigusi, sealhulgas taganemisõigust, kui see kohaldub.",
+      "Kinnitan, et olen kontrollinud valitud mudelit, värvi ja suurust, kui see on valitud, ning mõistan, et suurustabel puudub. Olen saanud aru kuvatud hinnast ja eeldatavast tarneajast ning sellest, et pärast tellimuse edastamist tarnijale ei ole muudatused ega vabatahtlik vahetus garanteeritud. See ei piira minu seadusest tulenevaid tarbijaõigusi, sealhulgas taganemisõigust, kui see kohaldub.",
     compactTitle: "Enne eeltellimuspäringu saatmist",
     directReturnCost:
       "Seadusliku taganemisõiguse kasutamisel kannad asja tagastamise otsesed kulud, kui Andrelook ei lepi kokku teisiti või seadus ei kohusta Andrelooki neid kandma.",
@@ -41,7 +41,7 @@ export const legalPolicyCopy = {
     acceptance:
       "Я подтверждаю, что проверил(а) выбранные модель, цвет и размер, ознакомился(-ась) с доступной таблицей размеров и понял(а) указанную цену и ориентировочный срок доставки. Я понимаю, что после передачи заказа поставщику изменения и добровольный обмен размера не гарантируются. Это не ограничивает мои предусмотренные законом права потребителя, включая право на отказ от договора, когда оно применяется.",
     acceptanceNoChart:
-      "Я подтверждаю, что проверил(а) выбранные модель и цвет и запросил(а) помощь с размером, поскольку таблица размеров отсутствует. Я понял(а) указанную цену, ориентировочный срок доставки и то, что после передачи заказа поставщику изменения и добровольный обмен не гарантируются. Это не ограничивает мои предусмотренные законом права потребителя, включая право на отказ от договора, когда оно применяется.",
+      "Я подтверждаю, что проверил(а) выбранные модель, цвет и размер, если он выбран, и понимаю, что таблица размеров отсутствует. Я понял(а) указанную цену, ориентировочный срок доставки и то, что после передачи заказа поставщику изменения и добровольный обмен не гарантируются. Это не ограничивает мои предусмотренные законом права потребителя, включая право на отказ от договора, когда оно применяется.",
     compactTitle: "Перед отправкой заявки на предзаказ",
     directReturnCost:
       "При использовании законного права на отказ вы оплачиваете прямые расходы на обратную отправку, если Andrelook не согласовал иное или закон не возлагает эти расходы на Andrelook.",
@@ -61,7 +61,7 @@ export const withdrawalCopy = {
     confirmationLead:
       "We have recorded your withdrawal statement. This confirms receipt, not the outcome of any inspection or refund calculation.",
     confirmationDeliveryIssue:
-      "Your statement was recorded, but its electronic confirmation could not be delivered. Keep the reference below and contact info.andrelook@gmail.com if you need a copy.",
+      "Your statement was recorded, but a notification could not be delivered. Keep the reference below and contact info.andrelook@gmail.com to confirm receipt.",
     confirm: "Confirm withdrawal",
     consumerName: "Consumer name",
     error:
@@ -70,7 +70,7 @@ export const withdrawalCopy = {
     formIntro:
       "Use this function to submit an unambiguous withdrawal statement for a distance purchase. You do not have to use this form and you do not have to give a reason.",
     initialAction: "Withdraw from contract",
-    orderReference: "Order number",
+    orderReference: "Order number or purchase details",
     privacy:
       "We use these details only to identify the contract and confirm receipt of your statement.",
     policyVersion: "Policy version",
@@ -86,7 +86,7 @@ export const withdrawalCopy = {
     confirmationLead:
       "Oleme sinu taganemisavalduse registreerinud. See kinnitab avalduse kättesaamist, mitte kontrolli või tagasimakse arvutuse tulemust.",
     confirmationDeliveryIssue:
-      "Sinu avaldus registreeriti, kuid elektroonilise kinnituse saatmine ebaõnnestus. Hoia allolev viide alles ja kirjuta koopia saamiseks aadressile info.andrelook@gmail.com.",
+      "Sinu avaldus registreeriti, kuid üht teadet ei õnnestunud edastada. Hoia allolev viide alles ja kinnita kättesaamist aadressil info.andrelook@gmail.com.",
     confirm: "Kinnitan taganemise",
     consumerName: "Tarbija nimi",
     error:
@@ -95,7 +95,7 @@ export const withdrawalCopy = {
     formIntro:
       "Selle funktsiooniga saad esitada sidevahendi abil sõlmitud ostu kohta ühemõttelise taganemisavalduse. Vormi kasutamine ega põhjuse esitamine ei ole kohustuslik.",
     initialAction: "Taganen lepingust",
-    orderReference: "Tellimuse number",
+    orderReference: "Tellimuse number või ostu andmed",
     privacy:
       "Kasutame neid andmeid ainult lepingu tuvastamiseks ja avalduse kättesaamise kinnitamiseks.",
     policyVersion: "Tingimuste versioon",
@@ -111,7 +111,7 @@ export const withdrawalCopy = {
     confirmationLead:
       "Мы зарегистрировали ваше заявление об отказе. Это подтверждает получение заявления, но не результат проверки товара или расчёта возврата.",
     confirmationDeliveryIssue:
-      "Ваше заявление зарегистрировано, но электронное подтверждение доставить не удалось. Сохраните указанный ниже номер и напишите на info.andrelook@gmail.com, если нужна копия.",
+      "Ваше заявление зарегистрировано, но одно из уведомлений не удалось доставить. Сохраните указанный ниже номер и уточните получение на info.andrelook@gmail.com.",
     confirm: "Подтверждаю отказ",
     consumerName: "Имя потребителя",
     error:
@@ -120,7 +120,7 @@ export const withdrawalCopy = {
     formIntro:
       "Эта функция позволяет направить однозначное заявление об отказе от дистанционной покупки. Использовать именно эту форму и указывать причину не обязательно.",
     initialAction: "Отказываюсь от договора",
-    orderReference: "Номер заказа",
+    orderReference: "Номер заказа или данные покупки",
     privacy:
       "Мы используем эти данные только для идентификации договора и подтверждения получения заявления.",
     policyVersion: "Версия условий",

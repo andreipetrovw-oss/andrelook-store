@@ -275,17 +275,6 @@ enum NotificationStatus {
   SKIPPED
 }
 
-enum LegalAcceptanceKind {
-  REQUEST_SELECTION
-  PREORDER_CONFIRMED
-}
-
-enum LegalAcceptanceSource {
-  WEBSITE_CHECKBOX
-  CUSTOMER_MESSAGE
-  OWNER_DOCUMENTED
-}
-
 enum ImageRole {
   PRIMARY
   GALLERY
@@ -625,8 +614,7 @@ model Order {
   trackingMilestones           OrderTrackingMilestone[]
   correctionHistory            OrderCorrectionHistory[]
   reviewInvitation             ReviewInvitation?
-  legalAcceptances             OrderLegalAcceptance[]
-  withdrawalRequests           WithdrawalRequest[]
+  legalRequestSnapshot         Json?
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime                        @updatedAt
 
@@ -635,74 +623,20 @@ model Order {
   @@index([customerId, orderDate])
 }
 
-model OrderLegalAcceptance {
-  id                          String                @id @default(cuid())
-  orderId                     String
-  order                       Order                 @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  kind                        LegalAcceptanceKind
-  source                      LegalAcceptanceSource
-  policyVersion               String
-  termsVersion                String
-  returnsVersion              String
-  acceptedAt                  DateTime
-  productInternalCodeSnapshot String
-  productNameSnapshot         String
-  colorSnapshot               String?
-  sizeSnapshot                String?
-  sizeHelpRequested           Boolean               @default(false)
-  quantitySnapshot            Int
-  unitPriceMinorSnapshot      Int?
-  currencySnapshot            String?               @db.Char(3)
-  availabilitySnapshot        AvailabilityType?
-  deliveryEstimateSnapshot    String?
-  sizeGuideAvailable          Boolean               @default(false)
-  sizeGuideVersion            String?
-  sizeGuideSnapshot           Json?
-  evidenceNote                String?
-  createdByAdminId            String?
-  createdByAdmin              AdminUser?            @relation("LegalAcceptanceRecorder", fields: [createdByAdminId], references: [id], onDelete: Restrict)
-  confirmationStatus          NotificationStatus    @default(SKIPPED)
-  confirmationRecipient       String?
-  confirmationProviderId      String?
-  confirmationSentAt          DateTime?
-  confirmationLastError       String?
-  createdAt                   DateTime              @default(now())
-
-  @@index([orderId, acceptedAt])
-  @@index([policyVersion, acceptedAt])
-}
-
 model WithdrawalRequest {
-  id                     String             @id @default(cuid())
-  publicId               String             @unique @default(uuid())
-  requestKey             String             @unique
-  orderId                String?
-  order                  Order?             @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  orderReference         String
-  consumerName           String
-  confirmationEmail      String
-  locale                 Locale
-  statementText          String
-  policyVersion          String
-  submittedAt            DateTime           @default(now())
-  confirmationStatus     NotificationStatus @default(PENDING)
-  confirmationProviderId String?
-  confirmationSentAt     DateTime?
-  confirmationLastError  String?
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  id                  String             @id @default(cuid())
+  publicId            String             @unique @default(uuid())
+  requestKey          String             @unique
+  orderReference      String
+  consumerName        String
+  confirmationEmail   String
+  locale              Locale
+  statementText       String
+  submittedAt         DateTime           @default(now())
+  customerEmailStatus NotificationStatus @default(PENDING)
+  ownerEmailStatus    NotificationStatus @default(PENDING)
 
   @@index([orderReference, submittedAt])
-  @@index([orderId, submittedAt])
-  @@index([confirmationStatus, submittedAt])
-}
-
-model WithdrawalRateLimit {
-  keyHash     String   @id
-  attempts    Int      @default(1)
-  windowStart DateTime
-
-  @@index([windowStart])
 }
 
 enum ReviewStatus {
@@ -1287,7 +1221,6 @@ model AdminUser {
   shipmentOverrides       ShipmentStatusOverride[]    @relation("ShipmentOverrideCreator")
   orderTrackingMilestones OrderTrackingMilestone[]    @relation("OrderTrackingMilestoneCreator")
   logisticsEvidence       ShipmentLogisticsEvidence[] @relation("LogisticsEvidenceCreator")
-  legalAcceptances        OrderLegalAcceptance[]      @relation("LegalAcceptanceRecorder")
   createdAt               DateTime                    @default(now())
   updatedAt               DateTime                    @updatedAt
 

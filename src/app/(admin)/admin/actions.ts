@@ -27,7 +27,6 @@ import { z } from "zod";
 
 import { requireOwner } from "@/lib/auth/server";
 import { getPrisma } from "@/lib/db";
-import { documentPreorderConfirmation } from "@/lib/legal/order-confirmation";
 import { sendNewOrderNotification } from "@/lib/notifications/order-notification";
 import {
   addPaymentRecord,
@@ -285,15 +284,6 @@ const orderTrackingMilestoneSchema = z.object({
   kind: z.enum(OrderTrackingMilestoneKind),
   occurredAt: z.string().trim().min(1),
   orderId: z.string().min(1),
-});
-
-const preorderConfirmationSchema = z.object({
-  acceptedAt: z.string().trim().min(1),
-  confirmationReceived: z.literal("accepted"),
-  currentSizeGuideMatches: z.literal("accepted"),
-  evidenceNote: z.string().trim().min(10).max(1000),
-  orderId: z.string().min(1),
-  source: z.enum(["CUSTOMER_MESSAGE", "OWNER_DOCUMENTED"]),
 });
 
 export async function createManualOrder(formData: FormData) {
@@ -561,25 +551,6 @@ export async function recordOrderTrackingMilestone(formData: FormData) {
         where: { id: parsed.data.orderId },
       });
     }
-  });
-  revalidatePath(`/admin/orders/${parsed.data.orderId}`);
-}
-
-export async function recordPreorderConfirmation(formData: FormData) {
-  const parsed = preorderConfirmationSchema.safeParse(
-    Object.fromEntries(formData),
-  );
-  if (!parsed.success) throw new Error("Invalid preorder confirmation record.");
-  const acceptedAt = parseTallinnLocalDateTime(parsed.data.acceptedAt);
-  if (!acceptedAt) throw new Error("Invalid confirmation timestamp.");
-  const changedByAdminId = await adminId();
-  await documentPreorderConfirmation({
-    acceptedAt,
-    adminId: changedByAdminId,
-    evidenceNote: parsed.data.evidenceNote,
-    orderId: parsed.data.orderId,
-    sendEmail: formData.get("sendEmail") === "true",
-    source: parsed.data.source,
   });
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
 }

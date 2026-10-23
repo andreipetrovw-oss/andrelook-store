@@ -2115,7 +2115,7 @@
             },
             {
               "name": "Clothes length",
-              "values": [65, 67, 79, 71, 73]
+              "values": [65, 67, 69, 71, 73]
             },
             {
               "name": "Sleeve",
@@ -2131,7 +2131,7 @@
         "evidence": {
           "chartScope": "PHASE 5B ADDITIONAL / VERIFIED IN PHASE 5C1",
           "notes": [
-            "L Clothes length is visibly printed as 79 between M=67 and XL=71; preserved exactly and flagged SOURCE INCONSISTENCY.",
+            "Source image prints 79 for L/3 Clothes length; owner-confirmed typo correction on 2026-10-23 sets this value to 69. All other source measurements remain unchanged.",
             "Unit is not printed clearly; no unit inferred."
           ],
           "sourceAlbumId": "190253977",

@@ -1,105 +1,59 @@
--- CreateEnum
-CREATE TYPE "LegalAcceptanceKind" AS ENUM ('REQUEST_SELECTION', 'PREORDER_CONFIRMED');
+-- Additive. Existing orders remain NULL and retain their original terms.
+ALTER TABLE "Order" ADD COLUMN "legalRequestSnapshot" JSONB;
 
--- CreateEnum
-CREATE TYPE "LegalAcceptanceSource" AS ENUM ('WEBSITE_CHECKBOX', 'CUSTOMER_MESSAGE', 'OWNER_DOCUMENTED');
-
--- CreateTable
-CREATE TABLE "OrderLegalAcceptance" (
-    "id" TEXT NOT NULL,
-    "orderId" TEXT NOT NULL,
-    "kind" "LegalAcceptanceKind" NOT NULL,
-    "source" "LegalAcceptanceSource" NOT NULL,
-    "policyVersion" TEXT NOT NULL,
-    "termsVersion" TEXT NOT NULL,
-    "returnsVersion" TEXT NOT NULL,
-    "acceptedAt" TIMESTAMP(3) NOT NULL,
-    "productInternalCodeSnapshot" TEXT NOT NULL,
-    "productNameSnapshot" TEXT NOT NULL,
-    "colorSnapshot" TEXT,
-    "sizeSnapshot" TEXT,
-    "sizeHelpRequested" BOOLEAN NOT NULL DEFAULT false,
-    "quantitySnapshot" INTEGER NOT NULL,
-    "unitPriceMinorSnapshot" INTEGER,
-    "currencySnapshot" CHAR(3),
-    "availabilitySnapshot" "AvailabilityType",
-    "deliveryEstimateSnapshot" TEXT,
-    "sizeGuideAvailable" BOOLEAN NOT NULL DEFAULT false,
-    "sizeGuideVersion" TEXT,
-    "sizeGuideSnapshot" JSONB,
-    "evidenceNote" TEXT,
-    "createdByAdminId" TEXT,
-    "confirmationStatus" "NotificationStatus" NOT NULL DEFAULT 'SKIPPED',
-    "confirmationRecipient" TEXT,
-    "confirmationProviderId" TEXT,
-    "confirmationSentAt" TIMESTAMP(3),
-    "confirmationLastError" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "OrderLegalAcceptance_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
+-- A declaration must be recorded even if the supplied order number does not match.
 CREATE TABLE "WithdrawalRequest" (
     "id" TEXT NOT NULL,
     "publicId" TEXT NOT NULL,
     "requestKey" TEXT NOT NULL,
-    "orderId" TEXT,
     "orderReference" TEXT NOT NULL,
     "consumerName" TEXT NOT NULL,
     "confirmationEmail" TEXT NOT NULL,
     "locale" "Locale" NOT NULL,
     "statementText" TEXT NOT NULL,
-    "policyVersion" TEXT NOT NULL,
     "submittedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "confirmationStatus" "NotificationStatus" NOT NULL DEFAULT 'PENDING',
-    "confirmationProviderId" TEXT,
-    "confirmationSentAt" TIMESTAMP(3),
-    "confirmationLastError" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
+    "customerEmailStatus" "NotificationStatus" NOT NULL DEFAULT 'PENDING',
+    "ownerEmailStatus" "NotificationStatus" NOT NULL DEFAULT 'PENDING',
     CONSTRAINT "WithdrawalRequest_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "WithdrawalRateLimit" (
-    "keyHash" TEXT NOT NULL,
-    "attempts" INTEGER NOT NULL DEFAULT 1,
-    "windowStart" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "WithdrawalRateLimit_pkey" PRIMARY KEY ("keyHash")
-);
-
--- CreateIndex
-CREATE INDEX "OrderLegalAcceptance_orderId_acceptedAt_idx" ON "OrderLegalAcceptance"("orderId", "acceptedAt");
-
--- CreateIndex
-CREATE INDEX "OrderLegalAcceptance_policyVersion_acceptedAt_idx" ON "OrderLegalAcceptance"("policyVersion", "acceptedAt");
-
--- CreateIndex
 CREATE UNIQUE INDEX "WithdrawalRequest_publicId_key" ON "WithdrawalRequest"("publicId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "WithdrawalRequest_requestKey_key" ON "WithdrawalRequest"("requestKey");
-
--- CreateIndex
 CREATE INDEX "WithdrawalRequest_orderReference_submittedAt_idx" ON "WithdrawalRequest"("orderReference", "submittedAt");
 
--- CreateIndex
-CREATE INDEX "WithdrawalRequest_orderId_submittedAt_idx" ON "WithdrawalRequest"("orderId", "submittedAt");
-
--- CreateIndex
-CREATE INDEX "WithdrawalRequest_confirmationStatus_submittedAt_idx" ON "WithdrawalRequest"("confirmationStatus", "submittedAt");
-
--- CreateIndex
-CREATE INDEX "WithdrawalRateLimit_windowStart_idx" ON "WithdrawalRateLimit"("windowStart");
-
--- AddForeignKey
-ALTER TABLE "OrderLegalAcceptance" ADD CONSTRAINT "OrderLegalAcceptance_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrderLegalAcceptance" ADD CONSTRAINT "OrderLegalAcceptance_createdByAdminId_fkey" FOREIGN KEY ("createdByAdminId") REFERENCES "AdminUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "WithdrawalRequest" ADD CONSTRAINT "WithdrawalRequest_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-- Owner-confirmed correction for one published chart only. Historical order
+-- snapshots and every other product/measurement remain untouched.
+DO $$
+DECLARE target_chart_id TEXT;
+DECLARE current_length TEXT;
+DECLARE target_label TEXT;
+DECLARE target_size TEXT;
+BEGIN
+  SELECT sc."id", sc."chartData" #>> '{measurements,1,values,2}',
+         sc."chartData" #>> '{measurements,1,name}',
+         sc."chartData" #>> '{sizes,2}'
+    INTO target_chart_id, current_length, target_label, target_size
+    FROM "SizeChart" sc
+    JOIN "Product" p ON p."id" = sc."productId"
+   WHERE p."internalCode" = 'AL-LEGACY-015';
+  IF target_chart_id IS NOT NULL AND (
+    target_label IS DISTINCT FROM 'Clothes length' OR
+    target_size IS DISTINCT FROM 'L/3' OR
+    current_length IS DISTINCT FROM '79' AND current_length IS DISTINCT FROM '69'
+  ) THEN
+    RAISE EXCEPTION 'Jayden size chart did not match the expected correction target';
+  END IF;
+  IF current_length = '79' THEN
+    UPDATE "SizeChart"
+       SET "chartData" = jsonb_set("chartData", '{measurements,1,values,2}', '69'::jsonb),
+           "updatedAt" = CURRENT_TIMESTAMP
+     WHERE "id" = target_chart_id;
+  END IF;
+  UPDATE "SizeChartEvidence"
+     SET "notes" = jsonb_set(
+       "notes", '{0}',
+       to_jsonb('Source image prints 79 for L/3 Clothes length; owner-confirmed typo correction on 2026-10-23 sets this value to 69. All other source measurements remain unchanged.'::text)
+     )
+   WHERE "sizeChartId" = target_chart_id
+     AND "notes" ->> 0 = 'L Clothes length is visibly printed as 79 between M=67 and XL=71; preserved exactly and flagged SOURCE INCONSISTENCY.';
+END $$;
