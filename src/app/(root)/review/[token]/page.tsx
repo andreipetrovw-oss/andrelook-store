@@ -4,7 +4,7 @@ import Link from "next/link";
 import { CustomerReviewForm } from "@/components/customer-review-form";
 import { isLocale } from "@/config/locales";
 import { reviewCopy } from "@/lib/reviews/copy";
-import { safeCustomerNames } from "@/lib/reviews/model";
+import { reviewProductName, safeCustomerNames } from "@/lib/reviews/model";
 import {
   consumeReviewAttempt,
   resolveReviewInvitation,
@@ -85,8 +85,8 @@ export default async function ReviewInvitationPage({
               token={token}
               locale={locale}
               names={safeCustomerNames(invitation.order.customer.name)}
-              products={invitation.order.items.map(
-                (i) => i.productNameSnapshot,
+              products={invitation.order.items.map((i) =>
+                reviewProductName(i.productNameSnapshot, locale, i.product),
               )}
             />
           </>

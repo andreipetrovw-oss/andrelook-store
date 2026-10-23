@@ -82,6 +82,37 @@ export type PublicReview = {
   kind: "PRODUCT" | "SERVICE";
 };
 
+type ReviewProduct = {
+  publicationStatus: string;
+  translations: Array<{ locale: string; name: string }>;
+};
+
+export function reviewProductName(
+  snapshot: string | null,
+  locale: string,
+  product?: ReviewProduct | null,
+) {
+  const safe = (value: string | null | undefined) =>
+    value?.trim() &&
+    !/\bAL-[A-Z0-9_-]+\b/i.test(value) &&
+    !containsContactData(value)
+      ? value.trim()
+      : null;
+  const translations =
+    product?.publicationStatus === "PUBLISHED" ? product.translations : [];
+  return (
+    safe(
+      translations.find((t) => t.locale.toLowerCase() === locale.toLowerCase())
+        ?.name,
+    ) ??
+    safe(snapshot) ??
+    { et: "Ostetud toode", ru: "Приобретённый товар", en: "Purchased item" }[
+      locale.toLowerCase() as "et" | "ru" | "en"
+    ] ??
+    "Purchased item"
+  );
+}
+
 export function publicReviewDTO(review: {
   publicId: string;
   rating: number;
@@ -92,6 +123,7 @@ export function publicReviewDTO(review: {
   productNameSnapshot: string | null;
   productId: string | null;
   kind: "PRODUCT" | "SERVICE";
+  product?: ReviewProduct | null;
 }): PublicReview {
   return {
     publicId: review.publicId,
@@ -100,7 +132,14 @@ export function publicReviewDTO(review: {
     displayName: review.displayName,
     locale: review.locale,
     submittedAt: review.submittedAt.toISOString(),
-    productName: review.productNameSnapshot,
+    productName:
+      review.kind === "PRODUCT"
+        ? reviewProductName(
+            review.productNameSnapshot,
+            review.locale,
+            review.product,
+          )
+        : null,
     productId: review.productId,
     kind: review.kind,
   };

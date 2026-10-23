@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { copyReviewRequest } from "@/app/(admin)/admin/reviews/actions";
+import { copyCurrentReviewRequest } from "@/lib/reviews/clipboard";
 
 export function ReviewRequestControl({
   orderId,
@@ -14,6 +15,14 @@ export function ReviewRequestControl({
   const [message, setMessage] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [manualCopy, setManualCopy] = useState(false);
+  const current = useRef(true);
+  useEffect(() => {
+    current.current = true;
+    return () => {
+      current.current = false;
+    };
+  }, []);
   return (
     <div className="admin-review-request">
       <button
@@ -21,17 +30,22 @@ export function ReviewRequestControl({
         onClick={() =>
           start(async () => {
             try {
-              const result = await copyReviewRequest(orderId);
+              setFeedback("");
+              const result = await copyCurrentReviewRequest(
+                orderId,
+                copyReviewRequest,
+                navigator.clipboard,
+                () => current.current,
+              );
+              if (!result) return;
               setUrl(result.url);
               setMessage(result.message);
-              try {
-                await navigator.clipboard.writeText(result.message);
-                setFeedback(
-                  "Сообщение скопировано. Отправьте его клиенту удобным способом.",
-                );
-              } catch {
-                setFeedback("Выделите и скопируйте готовое сообщение ниже.");
-              }
+              setManualCopy(!result.copied);
+              setFeedback(
+                result.copied
+                  ? "Сообщение скопировано. Отправьте его клиенту удобным способом."
+                  : "Не удалось подтвердить копирование. Выделите и скопируйте готовое сообщение ниже.",
+              );
             } catch {
               setFeedback(
                 "Не удалось подготовить приглашение. Проверьте, что заказ доставлен, и обновите страницу.",
@@ -54,13 +68,14 @@ export function ReviewRequestControl({
         </a>
       ) : null}
       {message ? (
-        <details>
+        <details open={manualCopy}>
           <summary>Готовое сообщение</summary>
           <textarea
             aria-label="Сообщение клиенту"
             readOnly
             value={message}
             rows={9}
+            onFocus={(event) => event.currentTarget.select()}
           />
         </details>
       ) : null}

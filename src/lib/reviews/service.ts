@@ -66,7 +66,22 @@ export async function resolveReviewInvitation(token: string) {
     where: { tokenHash: reviewHash(token) },
     include: {
       review: { select: { id: true } },
-      order: { include: { customer: true, items: { orderBy: { id: "asc" } } } },
+      order: {
+        include: {
+          customer: true,
+          items: {
+            orderBy: { id: "asc" },
+            include: {
+              product: {
+                select: {
+                  publicationStatus: true,
+                  translations: { select: { locale: true, name: true } },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
   return invitation && !invitation.revokedAt && reviewEligible(invitation.order)
@@ -224,6 +239,12 @@ export async function getPublishedReviews(productId?: string) {
       invitation: { order: { status: "DELIVERED" } },
     },
     include: {
+      product: {
+        select: {
+          publicationStatus: true,
+          translations: { select: { locale: true, name: true } },
+        },
+      },
       invitation: {
         include: {
           order: {

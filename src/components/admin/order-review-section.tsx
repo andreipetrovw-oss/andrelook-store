@@ -52,6 +52,7 @@ export async function OrderReviewSection({ orderId }: { orderId: string }) {
         <p>Приглашение станет доступно после доставки реального заказа.</p>
       ) : !invitation?.revokedAt && !review ? (
         <ReviewRequestControl
+          key={orderId}
           orderId={orderId}
           requested={!!invitation?.requestedAt}
         />
