@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 vi.mock("server-only", () => ({}));
+const notification = vi.hoisted(() => vi.fn().mockResolvedValue("sent"));
+vi.mock("./owner-notification", () => ({ notifyReviewOwner: notification }));
 vi.mock("@/lib/env", () => ({ isDatabaseConfigured: () => true }));
 const db = vi.hoisted(() => ({
   order: { findUnique: vi.fn() },
@@ -241,6 +243,17 @@ describe("customer review submission", () => {
     });
     expect(await submitCustomerReview(token, data)).toBe(true);
     expect(db.customerReview.create).not.toHaveBeenCalled();
+    expect(notification).not.toHaveBeenCalled();
+  });
+  it("notifies only after a successful original submission", async () => {
+    expect(await submitCustomerReview(token, data)).toBe(true);
+    expect(notification).toHaveBeenCalledTimes(1);
+    expect(notification.mock.calls[0]![0]).not.toHaveProperty("token");
+  });
+  it("email failure leaves submission successful", async () => {
+    notification.mockResolvedValueOnce("failed");
+    expect(await submitCustomerReview(token, data)).toBe(true);
+    expect(db.customerReview.create).toHaveBeenCalledTimes(1);
   });
   it("rejects changed eligibility and revoked tokens at write time", async () => {
     for (const state of [

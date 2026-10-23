@@ -32,6 +32,7 @@ on:
       - codex/verified-customer-reviews
       - codex/delivered-payment-closeout
       - codex/review-presend-fixes
+      - codex/review-owner-notifications
 
 permissions:
   contents: read

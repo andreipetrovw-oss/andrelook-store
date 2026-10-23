@@ -12,6 +12,7 @@ import {
   safeCustomerNames,
 } from "./model";
 import { newReviewCredentials, reviewHash, validReviewToken } from "./security";
+import { notifyReviewOwner, type ReviewNotice } from "./owner-notification";
 
 export async function ensureReviewInvitation(orderId: string) {
   const prisma = getPrisma();
@@ -93,8 +94,9 @@ export async function submitCustomerReview(token: string, input: unknown) {
   const parsed = reviewSubmissionSchema.safeParse(input);
   if (!validReviewToken(token) || !parsed.success) return false;
   const prisma = getPrisma();
+  let notice: ReviewNotice | undefined;
   try {
-    return await prisma.$transaction(
+    const submitted = await prisma.$transaction(
       async (tx) => {
         const invitation = await tx.reviewInvitation.findUnique({
           where: { tokenHash: reviewHash(token) },
@@ -126,7 +128,7 @@ export async function submitCustomerReview(token: string, input: unknown) {
             : data.nameStyle === "INITIAL"
               ? names.initial
               : null) ?? reviewCopy[locale].anonymous;
-        await tx.customerReview.create({
+        const created = await tx.customerReview.create({
           data: {
             invitationId: invitation.id,
             kind: item ? "PRODUCT" : "SERVICE",
@@ -145,10 +147,21 @@ export async function submitCustomerReview(token: string, input: unknown) {
             status: "SUBMITTED",
           },
         });
+        notice = {
+          id: created.id,
+          orderId: invitation.order.id,
+          orderNumber: invitation.order.displayNumber,
+          displayName,
+          rating: data.rating,
+          text: data.text,
+          locale,
+        };
         return true;
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
+    if (submitted && notice) await notifyReviewOwner(notice);
+    return submitted;
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&

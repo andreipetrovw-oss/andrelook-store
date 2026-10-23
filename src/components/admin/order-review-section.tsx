@@ -46,6 +46,9 @@ export async function OrderReviewSection({ orderId }: { orderId: string }) {
       <h2>Отзыв</h2>
       <p>
         <strong>{reviewStatusLabels[status]}</strong>
+        {eligible && status === "SUBMITTED" && !invitation?.revokedAt
+          ? " · Новый"
+          : null}
         {invitation?.revokedAt ? " · Ссылка отозвана" : null}
       </p>
       {!eligible ? (

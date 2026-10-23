@@ -10,6 +10,7 @@ import { ensureReviewInvitation, moderateReview } from "@/lib/reviews/service";
 import { invitationToken, newReviewCredentials } from "@/lib/reviews/security";
 
 function refreshReviews(orderId: string, publicChanged = false) {
+  revalidatePath("/admin", "layout");
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
   if (!publicChanged) return;

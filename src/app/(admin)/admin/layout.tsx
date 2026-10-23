@@ -8,6 +8,7 @@ import { getOwnerAccess } from "@/lib/auth/server";
 import { getServerConfig } from "@/lib/env";
 import { andrelookFontVariables } from "@/lib/fonts";
 import "@/styles/globals.css";
+import { getReviewAttention } from "@/lib/reviews/attention";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ export default async function AdminLayout({
     redirect(`/sign-in?reason=${access.status}`);
   }
   const publishableKey = getServerConfig().clerkPublishableKey;
+  const attention = await getReviewAttention();
 
   return (
     <ClerkProvider
@@ -38,6 +40,11 @@ export default async function AdminLayout({
               <nav aria-label="Навигация владельца">
                 <Link href="/admin">Обзор</Link>
                 <Link href="/admin/orders">Заказы</Link>
+                {attention[0] ? (
+                  <Link href={`/admin/orders/${attention[0].orderId}`}>
+                    Новые отзывы: {attention.length}
+                  </Link>
+                ) : null}
                 <Link href="/admin/logistics">Логистика</Link>
                 <Link href="/admin/catalog">Каталог</Link>
                 <Link href="/admin/advertising">Реклама</Link>
