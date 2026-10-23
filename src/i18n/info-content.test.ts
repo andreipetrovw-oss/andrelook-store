@@ -43,4 +43,21 @@ describe("localized information architecture", () => {
       }
     }
   });
+
+  it("keeps preorder, exchange and withdrawal rules aligned in every locale", () => {
+    for (const locale of locales) {
+      const legalCopy = JSON.stringify({
+        faq: getInfoPage(locale, "faq"),
+        preorder: getInfoPage(locale, "pre-order"),
+        returns: getInfoPage(locale, "returns-exchanges"),
+        terms: getInfoPage(locale, "terms"),
+      });
+      expect(legalCopy).toMatch(/14/);
+      expect(legalCopy).toMatch(/voluntary|vabatahtlik|добровольн/i);
+      expect(legalCopy).toMatch(/direct.*cost|otsesed.*kulu|прямые.*расход/i);
+      expect(legalCopy).not.toMatch(
+        /non-refundable|невозвратн|tagastamatu.*ettemaks/i,
+      );
+    }
+  });
 });

@@ -21,6 +21,7 @@ function validForm() {
   form.set("productVersion", "2026-09-26T12:00:00.000Z");
   form.set("quantity", "1");
   form.set("requestKey", "11111111-1111-4111-8111-111111111111");
+  form.set("selectionConfirmation", "accepted");
   form.set("size", "M");
   form.set("socialHandle", "@andrelook_customer");
   return form;
@@ -43,6 +44,18 @@ describe("assisted order request validation", () => {
         consent: expect.any(Array),
         locale: expect.any(Array),
         requestKey: expect.any(Array),
+      });
+    }
+  });
+
+  it("requires a separate, explicit selection and legal confirmation", () => {
+    const form = validForm();
+    form.delete("selectionConfirmation");
+    const result = requestOrderInput(form);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors).toMatchObject({
+        selectionConfirmation: expect.any(Array),
       });
     }
   });

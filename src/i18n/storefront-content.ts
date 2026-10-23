@@ -171,7 +171,7 @@ const content: Record<Locale, StorefrontContent> = {
       orderContext: "Оформление предзаказа",
       requestLabel: "Оформить предзаказ",
       returnsSummary:
-        "Общий порядок описан на странице «Возврат и обмен». Применимые к заказу условия подтвердим до оплаты.",
+        "14-дневное право на отказ для дистанционной покупки сохраняется. Добровольный обмен размера — только по соглашению и при наличии замены.",
       sizeGuideAvailable: "Есть таблица размеров",
       sizeGuideUnavailable: "Поможем выбрать размер",
       sizingLabel: "Размеры",
@@ -292,7 +292,7 @@ const content: Record<Locale, StorefrontContent> = {
       orderContext: "Eeltellimuse vormistamine",
       requestLabel: "Vormista eeltellimus",
       returnsSummary:
-        "Üldine kord on kirjas lehel „Tagastus ja vahetus“. Sinu tellimusele kehtivad tingimused kinnitame enne maksmist.",
+        "Sidevahendi abil sõlmitud ostu 14-päevane taganemisõigus säilib. Vabatahtlik suurusevahetus toimub ainult kokkuleppel ja asendustoote olemasolul.",
       sizeGuideAvailable: "Suurustabel olemas",
       sizeGuideUnavailable: "Aitame suurust valida",
       sizingLabel: "Suurused",
@@ -413,7 +413,7 @@ const content: Record<Locale, StorefrontContent> = {
       orderContext: "Complete your pre-order",
       requestLabel: "Pre-order",
       returnsSummary:
-        "The general process is explained on the Returns & exchanges page. We confirm the terms that apply to your order before payment.",
+        "The 14-day distance-withdrawal right remains available. A voluntary size exchange requires agreement and replacement availability.",
       sizeGuideAvailable: "Size chart available",
       sizeGuideUnavailable: "Personal sizing help",
       sizingLabel: "Sizing",

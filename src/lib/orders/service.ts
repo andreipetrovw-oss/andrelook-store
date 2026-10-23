@@ -13,6 +13,12 @@ import {
 import type { AttributionTouchData } from "@/lib/attribution/types";
 import { getPrisma } from "@/lib/db";
 import { getServerConfig } from "@/lib/env";
+import { sizeGuideEvidence } from "@/lib/legal/acceptance";
+import {
+  LEGAL_POLICY_VERSION,
+  RETURNS_VERSION,
+  TERMS_VERSION,
+} from "@/lib/legal/policy";
 import { createTrackingCredentials } from "@/lib/tracking/security";
 
 import { SIZE_HELP_VALUE } from "./request-constants";
@@ -103,10 +109,16 @@ export async function createOrderRequest(
       id: true,
       internalCode: true,
       privateData: { select: { landedCostMinor: true } },
+      preorderEstimateText: true,
       publicationStatus: true,
       retailPriceMinor: true,
       sizeChart: {
-        select: { chartData: true, isPublished: true, reviewStatus: true },
+        select: {
+          chartData: true,
+          isPublished: true,
+          reviewStatus: true,
+          units: true,
+        },
       },
       slug: true,
       translations: {
@@ -177,6 +189,15 @@ export async function createOrderRequest(
   const lastTouch = attribution.lastTouch ?? attribution.firstTouch;
   const economics = product.economicsVersions?.[0] ?? null;
   const trackingCredentials = createTrackingCredentials();
+  const approvedSizeChart =
+    product.sizeChart?.reviewStatus === "APPROVED" &&
+    product.sizeChart.isPublished
+      ? product.sizeChart
+      : null;
+  const selectedSizeGuide = sizeGuideEvidence(
+    approvedSizeChart?.chartData,
+    approvedSizeChart?.units,
+  );
 
   try {
     const order = await prisma.$transaction(async (tx) => {
@@ -257,6 +278,29 @@ export async function createOrderRequest(
               unitLogisticsCostMinorSnapshot: economics?.logisticsEstimateMinor,
               unitPriceMinor: product.retailPriceMinor,
               unitPurchaseCostMinorSnapshot: economics?.purchaseEstimateMinor,
+            },
+          },
+          legalAcceptances: {
+            create: {
+              acceptedAt: requestedAt,
+              availabilitySnapshot: product.availabilityType,
+              colorSnapshot: input.colour || null,
+              currencySnapshot: product.currency,
+              deliveryEstimateSnapshot: product.preorderEstimateText,
+              kind: "REQUEST_SELECTION",
+              policyVersion: LEGAL_POLICY_VERSION,
+              productInternalCodeSnapshot: product.internalCode,
+              productNameSnapshot: translation.name,
+              quantitySnapshot: input.quantity,
+              returnsVersion: RETURNS_VERSION,
+              sizeGuideAvailable: selectedSizeGuide.sizeGuideAvailable,
+              sizeGuideSnapshot: selectedSizeGuide.sizeGuideSnapshot,
+              sizeGuideVersion: selectedSizeGuide.sizeGuideVersion,
+              sizeHelpRequested: input.size === SIZE_HELP_VALUE,
+              sizeSnapshot: input.size === SIZE_HELP_VALUE ? null : input.size,
+              source: "WEBSITE_CHECKBOX",
+              termsVersion: TERMS_VERSION,
+              unitPriceMinorSnapshot: product.retailPriceMinor,
             },
           },
           attribution: {

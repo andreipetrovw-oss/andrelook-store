@@ -35,6 +35,7 @@ import {
 } from "@/lib/admin/labels";
 
 import {
+  recordPreorderConfirmation,
   recordOrderTrackingMilestone,
   retryOrderNotification,
   rotateOrderTrackingLink,
@@ -241,6 +242,129 @@ export default async function AdminOrderPage({
               </details>
             </div>
           ))}
+        </section>
+        <section className="admin-panel admin-panel-wide">
+          <h2>Юридическое подтверждение предзаказа</h2>
+          {order.legalAcceptances.length ? (
+            <div className="admin-history-list">
+              {order.legalAcceptances.map((acceptance) => (
+                <article key={acceptance.id}>
+                  <strong>
+                    {acceptance.kind === "REQUEST_SELECTION"
+                      ? "Выбор подтверждён на сайте"
+                      : "Предзаказ подтверждён клиентом"}
+                  </strong>
+                  <span>{russianDateTime.format(acceptance.acceptedAt)}</span>
+                  <small>
+                    {acceptance.productNameSnapshot} ·{" "}
+                    {acceptance.colorSnapshot ?? "без цвета"} ·{" "}
+                    {acceptance.sizeHelpRequested
+                      ? "помощь с размером"
+                      : (acceptance.sizeSnapshot ?? "без размера")}
+                  </small>
+                  <small>
+                    {acceptance.policyVersion} · {acceptance.source} · таблица:{" "}
+                    {acceptance.sizeGuideVersion ?? "не применялась"}
+                  </small>
+                  {acceptance.evidenceNote ? (
+                    <p>{acceptance.evidenceNote}</p>
+                  ) : null}
+                  <small>
+                    Подтверждение на сохраняемом носителе:{" "}
+                    {acceptance.confirmationStatus}
+                    {acceptance.confirmationSentAt
+                      ? " · " +
+                        russianDateTime.format(acceptance.confirmationSentAt)
+                      : ""}
+                  </small>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="admin-warning-note">
+              Новая редакция условий для этого заказа не зафиксирована. Не
+              применяйте её задним числом и не создавайте подтверждение без
+              фактически полученного согласия клиента.
+            </p>
+          )}
+          <details className="admin-correction-details">
+            <summary>Зафиксировать фактическое подтверждение клиента</summary>
+            <form
+              action={recordPreorderConfirmation}
+              className="admin-stack-form"
+            >
+              <input name="orderId" type="hidden" value={order.id} />
+              <label>
+                <span>Дата и время подтверждения (Europe/Tallinn)</span>
+                <input name="acceptedAt" required type="datetime-local" />
+              </label>
+              <label>
+                <span>Источник</span>
+                <select defaultValue="CUSTOMER_MESSAGE" name="source">
+                  <option value="CUSTOMER_MESSAGE">
+                    Сообщение клиента / переписка
+                  </option>
+                  <option value="OWNER_DOCUMENTED">
+                    Иное документированное подтверждение
+                  </option>
+                </select>
+              </label>
+              <label>
+                <span>Ссылка на доказательство / описание</span>
+                <textarea
+                  name="evidenceNote"
+                  placeholder="Укажите канал, дату и что именно подтвердил клиент. Не вставляйте лишние персональные данные."
+                  required
+                />
+              </label>
+              <label className="admin-checkbox">
+                <input
+                  name="confirmationReceived"
+                  required
+                  type="checkbox"
+                  value="accepted"
+                />
+                <span>
+                  Я действительно получил(а) подтверждение модели, цвета,
+                  размера, цены, срока и применимых условий от клиента.
+                </span>
+              </label>
+              <label className="admin-checkbox">
+                <input
+                  name="currentSizeGuideMatches"
+                  required
+                  type="checkbox"
+                  value="accepted"
+                />
+                <span>
+                  Текущая таблица размеров совпадает с показанной клиенту; если
+                  таблицы не было, клиент запросил помощь с размером.
+                </span>
+              </label>
+              <label className="admin-checkbox">
+                <input name="sendEmail" type="checkbox" value="true" />
+                <span>
+                  Отправить подтверждение на email клиента (только если email
+                  указан)
+                </span>
+              </label>
+              <button type="submit">Сохранить подтверждение</button>
+            </form>
+          </details>
+          {order.withdrawalRequests.length ? (
+            <div className="admin-history-list">
+              <h3>Заявления об отказе</h3>
+              {order.withdrawalRequests.map((request) => (
+                <article key={request.id}>
+                  <strong>{request.publicId}</strong>
+                  <span>{russianDateTime.format(request.submittedAt)}</span>
+                  <small>
+                    Электронное подтверждение: {request.confirmationStatus}
+                  </small>
+                </article>
+              ))}
+            </div>
+          ) : null}
         </section>
         <section className="admin-panel">
           <h2>Получение и оплата</h2>

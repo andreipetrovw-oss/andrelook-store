@@ -715,6 +715,63 @@ button:disabled {
   grid-template-columns: auto 1fr;
 }
 
+.request-legal-summary {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+  padding: 1rem;
+}
+
+.request-legal-summary > * {
+  margin: 0;
+}
+
+.request-legal-summary dl {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.request-legal-summary dl div {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.request-legal-summary dt {
+  color: var(--color-ink-muted);
+}
+
+.request-legal-summary dd {
+  font-weight: 600;
+  margin: 0;
+  text-align: right;
+}
+
+.request-legal-summary p {
+  color: var(--color-ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.request-legal-summary a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.legal-selection-confirmation {
+  border: 1px solid var(--color-border-strong);
+  padding: 1rem;
+}
+
+.legal-selection-confirmation span {
+  line-height: 1.55;
+  text-transform: none !important;
+}
+
 .consent-row input {
   min-height: auto;
   width: 1.1rem;
@@ -1001,6 +1058,93 @@ button:disabled {
 
 .admin-panel-wide {
   grid-column: 1 / -1;
+}
+
+.admin-history-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-history-list article {
+  border: 1px solid var(--color-border);
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+}
+
+.admin-history-list small,
+.admin-history-list span {
+  color: var(--color-ink-muted);
+}
+
+.admin-checkbox {
+  align-items: start;
+  display: grid !important;
+  gap: 0.65rem !important;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.admin-checkbox input {
+  min-height: auto;
+  width: 1.1rem;
+}
+
+.withdrawal-body {
+  padding-block: clamp(2rem, 6vw, 5rem);
+}
+
+.withdrawal-function,
+.withdrawal-confirmation {
+  background: var(--color-surface, #fffdf8);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1.25rem 3rem rgb(31 26 20 / 8%);
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.withdrawal-start-button,
+.withdrawal-form button {
+  background: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  color: var(--color-background);
+  cursor: pointer;
+  min-height: 3rem;
+  padding: 0.75rem 1.2rem;
+}
+
+.withdrawal-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.withdrawal-form label:not(.consent-row) {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.withdrawal-form input {
+  background: var(--color-background);
+  border: 1px solid var(--color-border-strong);
+  min-height: 3rem;
+  padding: 0.7rem;
+  width: 100%;
+}
+
+.withdrawal-statement {
+  align-items: start;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.withdrawal-statement input {
+  min-height: auto;
+  width: 1.1rem;
+}
+
+.withdrawal-privacy {
+  color: var(--color-ink-muted);
+  font-size: 0.82rem;
 }
 
 .timeline {

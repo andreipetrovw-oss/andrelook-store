@@ -38,6 +38,7 @@ const input = {
   productVersion: "2026-09-26T12:00:00.000Z",
   quantity: 1,
   requestKey: "11111111-1111-4111-8111-111111111111",
+  selectionConfirmation: "accepted" as const,
   size: "M",
   socialHandle: "@customer",
 };
@@ -59,12 +60,14 @@ const databaseProduct = {
   id: "product_1",
   internalCode: "AL-SRC-TEST",
   privateData: { landedCostMinor: 10_000 },
+  preorderEstimateText: "2–3 weeks",
   publicationStatus: "PUBLISHED" as const,
   retailPriceMinor: 25_000,
   sizeChart: {
     chartData: { measurements: [], sizes: ["S", "M"] },
     isPublished: true,
     reviewStatus: "APPROVED" as const,
+    units: "cm",
   },
   slug: "approved-product",
   translations: [{ locale: "EN" as const, name: "Database product" }],
@@ -144,6 +147,24 @@ describe("transactional assisted-order service", () => {
       unitPurchaseCostMinorSnapshot: 8_000,
     });
     expect(data.statusHistory.create).toEqual({ toStatus: "NEW" });
+    expect(data.legalAcceptances.create).toMatchObject({
+      availabilitySnapshot: "PRE_ORDER",
+      colorSnapshot: "black",
+      currencySnapshot: "EUR",
+      deliveryEstimateSnapshot: "2–3 weeks",
+      kind: "REQUEST_SELECTION",
+      policyVersion: "andrelook-legal-2026-10-v1",
+      productInternalCodeSnapshot: "AL-SRC-TEST",
+      productNameSnapshot: "Database product",
+      quantitySnapshot: 1,
+      returnsVersion: "andrelook-returns-2026-10-v1",
+      sizeGuideAvailable: true,
+      sizeGuideVersion: expect.stringMatching(/^[a-f0-9]{64}$/),
+      sizeSnapshot: "M",
+      source: "WEBSITE_CHECKBOX",
+      termsVersion: "andrelook-terms-2026-10-v1",
+      unitPriceMinorSnapshot: 25_000,
+    });
     expect(data.attribution.create).toMatchObject({
       analyticsConsent: true,
       marketingConsent: false,

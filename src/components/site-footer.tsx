@@ -68,6 +68,9 @@ export function SiteFooter({
           <Link href={`/${locale}/about`}>{dictionary.about}</Link>
           <Link href={`/${locale}/privacy`}>{dictionary.privacy}</Link>
           <Link href={`/${locale}/terms`}>{dictionary.terms}</Link>
+          <Link href={`/${locale}/withdrawal`}>
+            {dictionary.withdrawContract}
+          </Link>
           <FooterPrivacySettingsButton locale={locale} />
         </div>
       </div>

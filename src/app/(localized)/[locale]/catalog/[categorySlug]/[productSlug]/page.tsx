@@ -438,7 +438,9 @@ export default async function ProductPage({ params }: Props) {
                 availability={product.availability}
                 brandName={product.brand?.name ?? product.category.name}
                 colours={product.colors}
+                currency={product.currency}
                 dictionary={dictionary}
+                hasSizeGuide={Boolean(product.sizeChart)}
                 locale={locale}
                 productId={product.id}
                 productImage={
@@ -449,6 +451,7 @@ export default async function ProductPage({ params }: Props) {
                 productName={displayName}
                 productVersion={product.version}
                 preorderTime={preorderTime}
+                retailPriceMinor={product.retailPriceMinor}
                 sizes={sizes}
               />
             </aside>

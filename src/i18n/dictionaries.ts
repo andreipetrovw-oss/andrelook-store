@@ -107,6 +107,7 @@ export type Dictionary = {
   validationRequired: string;
   viewCatalog: string;
   viewProduct: string;
+  withdrawContract: string;
 };
 
 const dictionaries: Record<Locale, Dictionary> = {
@@ -221,6 +222,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     validationRequired: "Заполните это поле.",
     viewCatalog: "Смотреть каталог",
     viewProduct: "Смотреть модель",
+    withdrawContract: "Отказаться от договора",
   },
   et: {
     about: "Andrelookist",
@@ -335,6 +337,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     validationRequired: "Täida see väli.",
     viewCatalog: "Vaata kataloogi",
     viewProduct: "Vaata mudelit",
+    withdrawContract: "Taganen lepingust",
   },
   en: {
     about: "About",
@@ -448,6 +451,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     validationRequired: "Please complete this field.",
     viewCatalog: "View catalog",
     viewProduct: "View piece",
+    withdrawContract: "Withdraw from contract",
   },
 };
 

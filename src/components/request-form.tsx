@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import {
@@ -16,6 +17,7 @@ import {
   parseStoredAttribution,
 } from "@/lib/attribution/state";
 import { trackPublicEvent } from "@/lib/measurement/client";
+import { legalPolicyCopy } from "@/lib/legal/policy";
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
 import { selectionSummary } from "@/lib/orders/selection-summary";
 
@@ -282,28 +284,35 @@ export function RequestForm({
   availability,
   brandName,
   colours,
+  currency,
   dictionary,
+  hasSizeGuide,
   locale,
   productId,
   productImage,
   productName,
   productVersion,
   preorderTime,
+  retailPriceMinor,
   sizes,
 }: {
   availability: "IN_STOCK" | "PRE_ORDER" | "UNAVAILABLE" | null;
   brandName: string;
   colours: Array<{ code: string; name: string }>;
+  currency: string | null;
   dictionary: Dictionary;
+  hasSizeGuide: boolean;
   locale: Locale;
   productId: string;
   productImage: { alt: string; url: string } | null;
   productName: string;
   productVersion: string;
   preorderTime: string;
+  retailPriceMinor: number | null;
   sizes: string[];
 }) {
   const labels = copy[locale];
+  const legal = legalPolicyCopy[locale];
   const [state, action, pending] = useActionState(
     submitOrderRequest,
     initialRequestFormState,
@@ -333,6 +342,19 @@ export function RequestForm({
     size,
     sizingAssistance: labels.sizingAssistance,
   });
+  const formattedPrice =
+    retailPriceMinor === null || !currency
+      ? null
+      : new Intl.NumberFormat(locale, {
+          currency,
+          style: "currency",
+        }).format(retailPriceMinor / 100);
+  const availabilityLabel =
+    availability === "IN_STOCK"
+      ? dictionary.availabilityInStock
+      : availability === "UNAVAILABLE"
+        ? dictionary.availabilityUnavailable
+        : dictionary.availabilityPreOrder;
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -556,6 +578,34 @@ export function RequestForm({
         </div>
         <h2>{dictionary.requestTitle}</h2>
         <p>{dictionary.requestIntro}</p>
+        <aside className="request-legal-summary">
+          <strong>{legal.compactTitle}</strong>
+          <dl>
+            <div>
+              <dt>{dictionary.availability}</dt>
+              <dd>{availabilityLabel}</dd>
+            </div>
+            <div>
+              <dt>{dictionary.price}</dt>
+              <dd>{formattedPrice ?? dictionary.pricePending}</dd>
+            </div>
+            <div>
+              <dt>{dictionary.leadTime}</dt>
+              <dd>{preorderTime}</dd>
+            </div>
+          </dl>
+          <p>{legal.selectedDetails}</p>
+          <p>{legal.exchange}</p>
+          <p>{legal.withdrawal}</p>
+          <p>{legal.directReturnCost}</p>
+          <p>
+            <Link href={`/${locale}/terms`}>{dictionary.terms}</Link>
+            {" · "}
+            <Link href={`/${locale}/returns-exchanges`}>
+              {dictionary.returnsExchanges}
+            </Link>
+          </p>
+        </aside>
         <form
           action={action}
           className="request-form"
@@ -822,6 +872,21 @@ export function RequestForm({
           </label>
           <FieldError
             errors={state.errors?.consent}
+            message={dictionary.validationRequired}
+          />
+          <label className="consent-row legal-selection-confirmation">
+            <input
+              name="selectionConfirmation"
+              required
+              type="checkbox"
+              value="accepted"
+            />
+            <span>
+              {hasSizeGuide ? legal.acceptance : legal.acceptanceNoChart}
+            </span>
+          </label>
+          <FieldError
+            errors={state.errors?.selectionConfirmation}
             message={dictionary.validationRequired}
           />
           {state.status === "error" ? (

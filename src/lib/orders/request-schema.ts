@@ -48,6 +48,9 @@ export const requestOrderSchema = z
     productVersion: z.iso.datetime(),
     quantity: z.coerce.number().int().min(1).max(5),
     requestKey: z.uuid(),
+    selectionConfirmation: z.literal("accepted", {
+      error: "Selection confirmation is required.",
+    }),
     size: z.string().trim().min(1).max(40),
     socialHandle: optionalText(200),
     utmCampaign: optionalText(200),
@@ -147,6 +150,7 @@ export function requestOrderInput(formData: FormData) {
     productVersion: formData.get("productVersion"),
     quantity: formData.get("quantity"),
     requestKey: formData.get("requestKey"),
+    selectionConfirmation: formData.get("selectionConfirmation"),
     size: formData.get("size"),
     socialHandle: formData.get("socialHandle"),
     utmCampaign: formData.get("utmCampaign"),

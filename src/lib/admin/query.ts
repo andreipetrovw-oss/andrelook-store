@@ -171,6 +171,10 @@ export async function getAdminOrder(id: string) {
         orderBy: { createdAt: "desc" },
       },
       items: true,
+      legalAcceptances: {
+        include: { createdByAdmin: { select: { email: true } } },
+        orderBy: { acceptedAt: "desc" },
+      },
       notification: true,
       payments: { orderBy: { receivedAt: "desc" } },
       shipmentLinks: {
@@ -192,6 +196,7 @@ export async function getAdminOrder(id: string) {
         orderBy: { occurredAt: "desc" },
       },
       trackingNotifications: { orderBy: { createdAt: "desc" } },
+      withdrawalRequests: { orderBy: { submittedAt: "desc" } },
     },
     where: { id },
   });
@@ -241,6 +246,19 @@ export async function getOrderCorrectionProductOptions() {
         where: { locale: "RU" },
       },
     },
+  });
+}
+
+export async function getWithdrawalRequests() {
+  await requireOwner();
+  return getPrisma().withdrawalRequest.findMany({
+    include: {
+      order: {
+        select: { displayNumber: true, id: true, status: true },
+      },
+    },
+    orderBy: { submittedAt: "desc" },
+    take: 200,
   });
 }
 

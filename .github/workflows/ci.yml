@@ -31,6 +31,7 @@ on:
       - codex/logistics-workflow
       - codex/verified-customer-reviews
       - codex/delivered-payment-closeout
+      - codex/legal-seller-protection
 
 permissions:
   contents: read

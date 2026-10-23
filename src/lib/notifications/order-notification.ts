@@ -65,6 +65,16 @@ export async function sendNewOrderNotification(orderId: string) {
           unitPriceMinor: true,
         },
       },
+      legalAcceptances: {
+        orderBy: { acceptedAt: "desc" },
+        select: {
+          acceptedAt: true,
+          policyVersion: true,
+          sizeGuideVersion: true,
+          source: true,
+        },
+        take: 1,
+      },
       postalCode: true,
       requestedLocale: true,
       paymentPreference: true,
@@ -151,6 +161,16 @@ export async function sendNewOrderNotification(orderId: string) {
     ],
     ["Language", order.requestedLocale],
     ["Source / attribution", attribution],
+    [
+      "Legal acceptance",
+      order.legalAcceptances[0]
+        ? `${order.legalAcceptances[0].policyVersion} · ${order.legalAcceptances[0].source} · ${order.legalAcceptances[0].acceptedAt.toISOString()}`
+        : "Legacy / not recorded",
+    ],
+    [
+      "Size guide snapshot",
+      order.legalAcceptances[0]?.sizeGuideVersion ?? "Not recorded",
+    ],
   ];
   const text = [
     `New Andrelook order request ${order.displayNumber}`,

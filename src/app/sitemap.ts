@@ -77,6 +77,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.9,
           siteUrl: config.siteUrl,
         }),
+        sitemapEntry({
+          locale,
+          path: "withdrawal",
+          priority: 0.5,
+          siteUrl: config.siteUrl,
+        }),
         ...publicBrandSlugs.map((brandSlug) =>
           sitemapEntry({
             locale,
