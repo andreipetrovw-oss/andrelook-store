@@ -4,6 +4,23 @@ type Clipboard = {
   readText?: () => Promise<string>;
 };
 
+async function boundedClipboard<T>(operation: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Clipboard unavailable")),
+          2000,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // Each click fetches this order's current message. Nothing is cached across orders.
 export async function copyCurrentReviewRequest(
   orderId: string,
@@ -16,9 +33,9 @@ export async function copyCurrentReviewRequest(
   let copied = false;
   try {
     if (clipboard) {
-      await clipboard.writeText(request.message);
+      await boundedClipboard(clipboard.writeText(request.message));
       copied = clipboard.readText
-        ? (await clipboard.readText()) === request.message
+        ? (await boundedClipboard(clipboard.readText())) === request.message
         : true;
     }
   } catch {

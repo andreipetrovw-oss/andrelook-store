@@ -104,4 +104,17 @@ describe("current-order review clipboard", () => {
     expect(await result).toBeNull();
     expect(clipboard.writeText).not.toHaveBeenCalled();
   });
+  it("opens fallback instead of hanging on an unanswered clipboard permission request", async () => {
+    vi.useFakeTimers();
+    try {
+      const result = copyCurrentReviewRequest("en", async () => requests.en, {
+        writeText: async () => {},
+        readText: () => new Promise<string>(() => {}),
+      });
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(await result).toEqual({ ...requests.en, copied: false });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
