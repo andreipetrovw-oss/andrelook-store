@@ -59,6 +59,30 @@ export function CatalogExperience({
     q: searchParams.get("q") ?? undefined,
     sort: searchParams.get("sort") ?? undefined,
   } satisfies CatalogParams;
+  return (
+    <CatalogResults
+      basePath={basePath}
+      dictionary={dictionary}
+      locale={locale}
+      products={products}
+      params={params}
+    />
+  );
+}
+
+export function CatalogResults({
+  basePath,
+  dictionary,
+  locale,
+  products,
+  params = {},
+}: {
+  basePath: string;
+  dictionary: Dictionary;
+  locale: Locale;
+  products: PublicProductDto[];
+  params?: CatalogParams;
+}) {
   const content = getStorefrontContent(locale);
   const visibleProducts = filterAndSortProducts(products, params);
   const hasFilters = Boolean(params.q || params.sort);

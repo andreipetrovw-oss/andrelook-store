@@ -63,6 +63,7 @@ export type AttributionState = {
 };
 
 export type OrderAttributionInput = {
+  websiteSessionId?: string | null;
   analyticsConsent: boolean;
   consentVersion: string;
   firstTouch: AttributionTouchData | null;

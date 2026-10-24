@@ -30,7 +30,45 @@ let analyticsConsentGranted = false;
 let marketingConsentGranted = false;
 let firstPartyAnalyticsConsentGranted = false;
 const firstPartyViewKeys = new Set<string>();
+const externalViewKeys = new Set<string>();
+const submittedEventIds = new Set<string>();
+let currentRoute: string | null = null;
+let viewSequence = 0;
+let metaPageViewSequence = -1;
 const analyticsSessionKey = "andrelookAnalyticsSessionV1";
+
+export function beginMeasurementView() {
+  const route = `${window.location.pathname ?? "/"}${window.location.search ?? ""}`;
+  if (route !== currentRoute) {
+    currentRoute = route;
+    viewSequence += 1;
+    firstPartyViewKeys.clear();
+    externalViewKeys.clear();
+  }
+}
+
+function firstPartyAllowed() {
+  return (
+    productionMeasurementAllowed() ||
+    (process.env.NEXT_PUBLIC_STAGING_ANALYTICS_ENABLED === "true" &&
+      window.location.hostname.endsWith(
+        "-andreys-projects-a106cf89.vercel.app",
+      ) &&
+      window.location.hostname.startsWith("andrelook-v1-staging"))
+  );
+}
+
+function metaPageView() {
+  beginMeasurementView();
+  if (
+    marketingConsentGranted &&
+    window.fbq &&
+    metaPageViewSequence !== viewSequence
+  ) {
+    window.fbq("track", "PageView");
+    metaPageViewSequence = viewSequence;
+  }
+}
 
 export function measurementAllowedForHost(
   host: string,
@@ -133,7 +171,6 @@ function loadMetaPixel() {
   script.src = "https://connect.facebook.net/en_US/fbevents.js";
   document.head.append(script);
   window.fbq("init", pixelId);
-  window.fbq("track", "PageView");
 }
 
 function metaProductPayload(
@@ -160,8 +197,8 @@ function metaProductPayload(
 }
 
 export function applyMeasurementConsent(consent: ConsentPreferences) {
-  firstPartyAnalyticsConsentGranted =
-    consent.analytics && productionMeasurementAllowed();
+  beginMeasurementView();
+  firstPartyAnalyticsConsentGranted = consent.analytics && firstPartyAllowed();
   analyticsConsentGranted = analyticsMeasurementAllowedForHost(
     window.location.hostname,
     consent.analytics,
@@ -174,6 +211,7 @@ export function applyMeasurementConsent(consent: ConsentPreferences) {
   if (analyticsConsentGranted) loadGoogleAnalytics();
   updateGoogleAnalyticsConsent(analyticsConsentGranted);
   if (marketingConsentGranted) loadMetaPixel();
+  metaPageView();
 }
 
 type FirstPartyEventName =
@@ -192,6 +230,15 @@ function analyticsSessionId() {
   return created;
 }
 
+export function getAnalyticsSessionId() {
+  if (!firstPartyAnalyticsConsentGranted) return null;
+  try {
+    return analyticsSessionId();
+  } catch {
+    return null;
+  }
+}
+
 function firstPartyEvent(
   eventName: FirstPartyEventName,
   parameters: Record<
@@ -201,6 +248,7 @@ function firstPartyEvent(
   eventId?: string,
 ) {
   if (!firstPartyAnalyticsConsentGranted) return;
+  beginMeasurementView();
   const firstItem = Array.isArray(parameters.items)
     ? parameters.items[0]
     : undefined;
@@ -246,6 +294,8 @@ function firstPartyEvent(
 }
 
 export function trackFirstPartyPageView() {
+  beginMeasurementView();
+  metaPageView();
   firstPartyEvent("PAGE_VIEW", {});
 }
 
@@ -265,7 +315,29 @@ export function trackPublicEvent(
   > = {},
   options: { eventId?: string } = {},
 ) {
-  if (!productionMeasurementAllowed()) return;
+  beginMeasurementView();
+  if (!firstPartyAllowed()) return;
+  if (name === "preorder_submit" && options.eventId) {
+    const key = `andrelookSubmitted:${options.eventId}`;
+    if (submittedEventIds.has(key)) return;
+    try {
+      if (sessionStorage.getItem(key)) return;
+    } catch {
+      // In-memory deduplication still works if browser storage is unavailable.
+    }
+    if (
+      analyticsConsentGranted ||
+      marketingConsentGranted ||
+      firstPartyAnalyticsConsentGranted
+    ) {
+      submittedEventIds.add(key);
+      try {
+        sessionStorage.setItem(key, "1");
+      } catch {
+        /* Optional storage. */
+      }
+    }
+  }
   const firstPartyName: FirstPartyEventName | undefined = (
     {
       preorder_open: "PREORDER_OPEN",
@@ -282,7 +354,15 @@ export function trackPublicEvent(
     validGaMeasurementId(gaId) &&
     window.dataLayer
   ) {
-    gtag("event", name, parameters);
+    const key = `ga:${name}:${JSON.stringify(parameters.items ?? parameters.item_id ?? "")}`;
+    if (
+      !["view_item", "view_item_list"].includes(name) ||
+      !externalViewKeys.has(key)
+    ) {
+      gtag("event", name, parameters);
+      if (["view_item", "view_item_list"].includes(name))
+        externalViewKeys.add(key);
+    }
   }
   if (marketingConsentGranted && validMetaPixelId(metaPixelId) && window.fbq) {
     if (name === "preorder_submit") {
@@ -293,7 +373,11 @@ export function trackPublicEvent(
         window.fbq("track", "Lead", payload);
       }
     } else if (name === "view_item") {
-      window.fbq("track", "ViewContent", metaProductPayload(parameters));
+      const key = `meta:${name}:${JSON.stringify(parameters.items ?? parameters.item_id ?? "")}`;
+      if (!externalViewKeys.has(key)) {
+        window.fbq("track", "ViewContent", metaProductPayload(parameters));
+        externalViewKeys.add(key);
+      }
     }
   }
 }

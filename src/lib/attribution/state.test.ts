@@ -13,6 +13,33 @@ const base = {
 };
 
 describe("30-day attribution state", () => {
+  it("does not replace a campaign on consent reapply/locale navigation but captures a new SPA campaign", () => {
+    const first = updateAttributionState(null, {
+      ...base,
+      utmSource: "meta",
+      utmMedium: "paid_social",
+      utmCampaign: "first",
+    });
+    const repeat = updateAttributionState(first, {
+      ...base,
+      eventId: "again",
+      landingPage: "/ru",
+      now: new Date("2026-10-02"),
+      utmSource: "meta",
+      utmMedium: "paid_social",
+      utmCampaign: "first",
+    });
+    expect(repeat).toBe(first);
+    const next = updateAttributionState(repeat, {
+      ...base,
+      eventId: "new-campaign",
+      utmSource: "telegram",
+      utmCampaign: "second",
+    });
+    expect(next.firstTouch).toEqual(first.firstTouch);
+    expect(next.lastTouch.campaignName).toBe("second");
+    expect(first.lastTouch.campaignName).toBe("first");
+  });
   it("preserves the approved Meta campaign, ad set and creative labels", () => {
     const state = updateAttributionState(null, {
       ...base,

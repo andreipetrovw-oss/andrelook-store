@@ -11,11 +11,7 @@ import {
   itemSnapshotTotalMinor,
   requiredPrepaymentMinor,
 } from "@/lib/orders/financials";
-import {
-  buildAdvertisingRows,
-  buildLandingPerformance,
-  buildProductPerformance,
-} from "@/lib/measurement/reporting";
+import { buildAdvertisingRows } from "@/lib/measurement/reporting";
 import {
   applyRateBps,
   calculateActualProfitability,
@@ -23,6 +19,11 @@ import {
 } from "@/lib/economics/calculation";
 
 import { businessOrderWhere, isInternalTestOrder } from "./test-orders";
+import {
+  businessSummary,
+  websiteSummary,
+  websiteBreakdowns,
+} from "@/lib/measurement/correctness";
 
 export async function getAdminOverview() {
   await requireOwner();
@@ -244,7 +245,14 @@ export async function getOrderCorrectionProductOptions() {
   });
 }
 
-export async function getAdvertisingReport(input: { from: Date; to: Date }) {
+export async function getAdvertisingReport(input: {
+  from: Date;
+  to: Date;
+  spendFrom?: Date;
+  spendTo?: Date;
+  source?: string;
+  campaign?: string;
+}) {
   await requireOwner();
   const prisma = getPrisma();
   const [orders, spend, analyticsEvents, metaStatus] = await Promise.all([
@@ -252,6 +260,8 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
       select: {
         attribution: {
           select: {
+            analyticsConsent: true,
+            websiteSessionId: true,
             touches: {
               select: {
                 adName: true,
@@ -278,6 +288,11 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
           },
         },
         displayNumber: true,
+        createdAt: true,
+        currency: true,
+        agreedTotalMinor: true,
+        confirmedTotalMinor: true,
+        statusHistory: { select: { toStatus: true, createdAt: true } },
         items: {
           select: {
             paymentRateBpsSnapshot: true,
@@ -290,24 +305,20 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
         },
         orderDate: true,
         payments: {
-          select: { kind: true, processorFeeMinor: true },
+          select: {
+            kind: true,
+            processorFeeMinor: true,
+            amountMinor: true,
+            status: true,
+            currency: true,
+            receivedAt: true,
+          },
           where: { status: "ACTIVE" },
         },
         status: true,
       },
       where: {
         ...businessOrderWhere,
-        OR: [
-          { orderDate: { gte: input.from, lt: input.to } },
-          {
-            businessEvents: {
-              some: {
-                isActive: true,
-                occurredAt: { gte: input.from, lt: input.to },
-              },
-            },
-          },
-        ],
       },
     }),
     prisma.adSpend.findMany({
@@ -324,7 +335,12 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
         source: true,
         spendMinor: true,
       },
-      where: { date: { gte: input.from, lt: input.to } },
+      where: {
+        date: {
+          gte: input.spendFrom ?? input.from,
+          lt: input.spendTo ?? input.to,
+        },
+      },
     }),
     prisma.analyticsEvent.findMany({
       orderBy: { occurredAt: "asc" },
@@ -387,26 +403,74 @@ export async function getAdvertisingReport(input: { from: Date; to: Date }) {
     orders: reportingOrders,
     spend,
     to: input.to,
+    spendFrom: input.spendFrom,
+    spendTo: input.spendTo,
   });
+  for (const row of rows) {
+    const matches = (
+      touch: {
+        source: string;
+        campaignName: string | null;
+        adSetName?: string | null;
+        adName?: string | null;
+      } | null,
+    ) =>
+      (touch?.source ?? "UNKNOWN") === row.source &&
+      (touch?.campaignName ?? null) === row.campaign &&
+      (touch?.adSetName ?? null) === row.adSet &&
+      (touch?.adName ?? null) === row.ad;
+    const rowOrders = orders.filter((o) =>
+      matches(
+        o.attribution?.touches.find((t) => t.touchType === "LAST") ??
+          o.attribution?.touches.find((t) => t.touchType === "FIRST") ??
+          null,
+      ),
+    );
+    const business = businessSummary(rowOrders, input.from, input.to);
+    const web = websiteSummary(
+      rowOrders,
+      reportingEvents.filter((e) => matches(e)),
+      input.from,
+      input.to,
+    );
+    row.leads = business.leads;
+    row.confirmed = business.confirmed;
+    row.paid = business.fullyPaid;
+    row.revenueMinor = business.cashReceivedMinor;
+    row.siteVisits = web.sessions;
+    row.productViews = web.productViewSessions;
+    row.preorderOpens = web.preorderOpenSessions;
+    row.costPerLeadMinor = row.leads
+      ? Math.round(row.spendMinor / row.leads)
+      : null;
+    row.costPerCustomerMinor = row.paid
+      ? Math.round(row.spendMinor / row.paid)
+      : null;
+    row.roas = row.spendMinor > 0 ? row.revenueMinor / row.spendMinor : null;
+  }
+  const scope = (
+    touch: { source: string; campaignName: string | null } | null,
+  ) =>
+    (!input.source || (touch?.source ?? "UNKNOWN") === input.source) &&
+    (!input.campaign || touch?.campaignName === input.campaign);
+  const scopedOrders = orders.filter((o) =>
+    scope(
+      o.attribution?.touches.find((t) => t.touchType === "LAST") ??
+        o.attribution?.touches.find((t) => t.touchType === "FIRST") ??
+        null,
+    ),
+  );
+  const scopedEvents = reportingEvents.filter(scope);
   return {
+    business: businessSummary(scopedOrders, input.from, input.to),
+    website: websiteSummary(scopedOrders, scopedEvents, input.from, input.to),
+    ...websiteBreakdowns(scopedOrders, scopedEvents, input.from, input.to),
     diagnostics: {
       generatedAt: new Date(),
       metaLastImportedRows: metaStatus?.lastImportedRows ?? null,
       metaLastSuccessAt: metaStatus?.lastSuccessAt ?? null,
       metaStatus: metaStatus?.status ?? "UNAVAILABLE",
     },
-    landingRows: buildLandingPerformance({
-      events: reportingEvents,
-      from: input.from,
-      orders: reportingOrders,
-      to: input.to,
-    }),
-    productRows: buildProductPerformance({
-      events: reportingEvents,
-      from: input.from,
-      orders: reportingOrders,
-      to: input.to,
-    }),
     rows,
   };
 }

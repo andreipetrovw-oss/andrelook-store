@@ -118,6 +118,7 @@ describe("transactional assisted-order service", () => {
           ...input,
           orderAttribution: JSON.stringify({
             analyticsConsent: true,
+            websiteSessionId: "22222222-2222-4222-8222-222222222222",
             consentVersion: "g2-consent-v1",
             firstTouch: touch,
             lastTouch: touch,
@@ -146,6 +147,7 @@ describe("transactional assisted-order service", () => {
     expect(data.statusHistory.create).toEqual({ toStatus: "NEW" });
     expect(data.attribution.create).toMatchObject({
       analyticsConsent: true,
+      websiteSessionId: "22222222-2222-4222-8222-222222222222",
       marketingConsent: false,
       touches: {
         create: [

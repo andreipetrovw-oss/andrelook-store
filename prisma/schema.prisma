@@ -928,10 +928,13 @@ model OrderAttribution {
   consentVersion        String
   analyticsConsent      Boolean            @default(false)
   marketingConsent      Boolean            @default(false)
+  websiteSessionId      String?
   capturedAt            DateTime           @default(now())
   touches               AttributionTouch[]
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
+
+  @@index([websiteSessionId])
 }
 
 model AttributionTouch {

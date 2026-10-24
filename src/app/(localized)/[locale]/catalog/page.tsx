@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { CatalogExperience } from "@/components/catalog-experience";
+import {
+  CatalogExperience,
+  CatalogResults,
+} from "@/components/catalog-experience";
 import { CategoryNavigation } from "@/components/category-navigation";
 import { isLocale } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -85,7 +88,14 @@ export default async function CatalogPage({
         />
       </div>
       <Suspense
-        fallback={<div aria-busy="true" className="container loading-line" />}
+        fallback={
+          <CatalogResults
+            basePath={`/${locale}/catalog`}
+            dictionary={dictionary}
+            locale={locale}
+            products={products}
+          />
+        }
       >
         <CatalogExperience
           basePath={`/${locale}/catalog`}

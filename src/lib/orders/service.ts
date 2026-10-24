@@ -262,6 +262,9 @@ export async function createOrderRequest(
           attribution: {
             create: {
               analyticsConsent: attribution.analyticsConsent,
+              websiteSessionId: attribution.analyticsConsent
+                ? (attribution.websiteSessionId ?? null)
+                : null,
               attributionWindowDays: 30,
               consentVersion: attribution.consentVersion,
               marketingConsent: attribution.marketingConsent,

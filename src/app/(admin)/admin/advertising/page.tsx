@@ -12,11 +12,18 @@ import {
 } from "@/lib/admin/query";
 import type { AdvertisingRow } from "@/lib/measurement/reporting";
 import { conversionRate } from "@/lib/measurement/reporting";
+import {
+  reportingPeriod,
+  businessDay,
+  calendarDay,
+} from "@/lib/measurement/periods";
 
 function date(value: string | undefined, fallback: Date) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return fallback;
   const parsed = new Date(`${value}T00:00:00.000Z`);
-  return Number.isFinite(parsed.getTime()) ? parsed : fallback;
+  return Number.isFinite(parsed.getTime()) && isoDay(parsed) === value
+    ? parsed
+    : fallback;
 }
 
 function isoDay(value: Date) {
@@ -153,20 +160,24 @@ export default async function AdvertisingPage({
   }>;
 }) {
   const filters = await searchParams;
-  const today = new Date();
-  const tomorrow = new Date(
-    Date.UTC(
-      today.getUTCFullYear(),
-      today.getUTCMonth(),
-      today.getUTCDate() + 1,
-    ),
+  const todayDay = businessDay();
+  const defaultFrom = new Date(`${calendarDay(todayDay, -29)}T12:00:00Z`);
+  const requestedFrom = isoDay(date(filters.from, defaultFrom));
+  const throughDay = isoDay(
+    date(filters.to, new Date(`${todayDay}T12:00:00Z`)),
   );
-  const defaultFrom = new Date(tomorrow.getTime() - 30 * 86_400_000);
-  const from = date(filters.from, defaultFrom);
-  const toDay = date(filters.to, new Date(tomorrow.getTime() - 86_400_000));
-  const to = new Date(toDay.getTime() + 86_400_000);
+  const fromDay = requestedFrom <= throughDay ? requestedFrom : throughDay;
+  const { from, to, spendFrom, spendTo } = reportingPeriod(fromDay, throughDay);
+  const toDay = new Date(`${throughDay}T12:00:00Z`);
   const [report, operationLog, economicsProducts] = await Promise.all([
-    getAdvertisingReport({ from, to }),
+    getAdvertisingReport({
+      from,
+      to,
+      spendFrom,
+      spendTo,
+      source: filters.source,
+      campaign: filters.campaign,
+    }),
     getCampaignOperationLog(),
     getEconomicsProductOptions(),
   ]);
@@ -216,7 +227,6 @@ export default async function AdvertisingPage({
   const linkClicks = sumAvailable(metaRows, "linkClicks");
   const landingPageViews = sumAvailable(metaRows, "landingPageViews");
   const metaSpendMinor = metaRows.reduce((sum, row) => sum + row.spendMinor, 0);
-  const metaSiteVisits = metaRows.reduce((sum, row) => sum + row.siteVisits, 0);
   const clicks = outboundClicks ?? linkClicks;
   const ctr = conversionRate(clicks ?? 0, impressions);
   const cpc = clicks ? Math.round(metaSpendMinor / clicks) : null;
@@ -224,25 +234,7 @@ export default async function AdvertisingPage({
     ? Math.round((metaSpendMinor * 1_000) / impressions)
     : null;
   const frequency = impressions !== null && reach ? impressions / reach : null;
-  const contributionAfterAds =
-    totals.contributionBeforeAdsMinor === null
-      ? null
-      : totals.contributionBeforeAdsMinor - totals.spendMinor;
-  const costPerLead =
-    totals.leads && totals.spendMinor
-      ? Math.round(totals.spendMinor / totals.leads)
-      : null;
-  const costPerCustomer =
-    totals.paid && totals.spendMinor
-      ? Math.round(totals.spendMinor / totals.paid)
-      : null;
-  const roas = totals.spendMinor
-    ? (totals.revenueMinor / totals.spendMinor).toFixed(2)
-    : "—";
-  const conversion = totals.leads
-    ? `${((totals.paid / totals.leads) * 100).toFixed(1)}%`
-    : "—";
-  const calendarToday = new Date(tomorrow.getTime() - 86_400_000);
+  const calendarToday = new Date(`${todayDay}T12:00:00Z`);
   const thisMonth = new Date(
     Date.UTC(calendarToday.getUTCFullYear(), calendarToday.getUTCMonth(), 1),
   );
@@ -253,7 +245,9 @@ export default async function AdvertisingPage({
       1,
     ),
   );
-  const previousMonthEnd = new Date(thisMonth.getTime() - 86_400_000);
+  const previousMonthEnd = new Date(
+    `${calendarDay(isoDay(thisMonth), -1)}T12:00:00Z`,
+  );
   const rangeHref = (start: Date, end: Date) =>
     `/admin/advertising?from=${isoDay(start)}&to=${isoDay(end)}`;
 
@@ -262,16 +256,15 @@ export default async function AdvertisingPage({
       <span className="eyebrow">Бизнес-аналитика</span>
       <h1>Реклама</h1>
       <p className="admin-overview-note">
-        Период лида определяется датой обращения, выручка — датой оплаты, расход
-        — датой рекламной записи. Вклад до рекламы вычитает сохранённую landed
-        cost и фактическую комиссию оплаты; если комиссия не указана, для нового
-        заказа используется сохранённая расчётная ставка. Неполные исторические
-        данные отображаются как «—». Тестовые заказы исключены.
+        Когорта — реальные заказы, созданные за выбранный период; этапы —
+        достигнутые за всё время этой когорты. Поступления — действующие платежи
+        минус возвраты по дате платежа. Сутки: Europe/Tallinn. Расход использует
+        календарную дату рекламного провайдера. Тестовые заказы исключены.
       </p>
       <form className="admin-filters">
         <label>
           <span>С</span>
-          <input defaultValue={isoDay(from)} name="from" type="date" />
+          <input defaultValue={fromDay} name="from" type="date" />
         </label>
         <label>
           <span>По</span>
@@ -283,7 +276,7 @@ export default async function AdvertisingPage({
         <Link href={rangeHref(calendarToday, calendarToday)}>Сегодня</Link>
         <Link
           href={rangeHref(
-            new Date(tomorrow.getTime() - 7 * 86_400_000),
+            new Date(`${calendarDay(todayDay, -6)}T12:00:00Z`),
             calendarToday,
           )}
         >
@@ -291,7 +284,7 @@ export default async function AdvertisingPage({
         </Link>
         <Link
           href={rangeHref(
-            new Date(tomorrow.getTime() - 30 * 86_400_000),
+            new Date(`${calendarDay(todayDay, -29)}T12:00:00Z`),
             calendarToday,
           )}
         >
@@ -315,7 +308,6 @@ export default async function AdvertisingPage({
           ["Охват", number(reach)],
           ["Клики", number(clicks)],
           ["Meta LPV", number(landingPageViews)],
-          ["Визиты", totals.siteVisits],
           ["CTR", percent(ctr)],
           ["CPC", money(cpc)],
           ["CPM", money(cpm)],
@@ -327,40 +319,18 @@ export default async function AdvertisingPage({
           </div>
         ))}
       </div>
-      <h2>Воронка сайта</h2>
+      <h2>Сайт — сессии и заказы</h2>
       <div className="admin-cards">
         {[
-          ["Визиты", totals.siteVisits],
-          ["Просмотры товаров", totals.productViews],
-          ["Открытия предзаказа", totals.preorderOpens],
-          ["Лиды", totals.leads],
-          ["Подтверждено", totals.confirmed],
-          ["Оплачено", totals.paid],
-          ["Клик → визит", percent(conversionRate(metaSiteVisits, clicks))],
+          ["Сессии", report.website.sessions],
+          ["Сессии с просмотром товара", report.website.productViewSessions],
           [
-            "Визит → товар",
-            percent(conversionRate(totals.productViews, totals.siteVisits)),
+            "Сессии с открытием предзаказа",
+            report.website.preorderOpenSessions,
           ],
           [
-            "Товар → предзаказ",
-            percent(conversionRate(totals.preorderOpens, totals.productViews)),
-          ],
-          [
-            "Предзаказ → лид",
-            percent(conversionRate(totals.leads, totals.preorderOpens)),
-          ],
-          [
-            "Лид → подтверждено",
-            percent(conversionRate(totals.confirmed, totals.leads)),
-          ],
-          ["Лид → оплата", percent(conversionRate(totals.paid, totals.leads))],
-          [
-            "Визит → лид",
-            percent(conversionRate(totals.leads, totals.siteVisits)),
-          ],
-          [
-            "Визит → оплата",
-            percent(conversionRate(totals.paid, totals.siteVisits)),
+            "Заказы сайта с подтверждённой связью",
+            report.website.websiteOrders,
           ],
         ].map(([label, value]) => (
           <div className="admin-card" key={label}>
@@ -369,16 +339,30 @@ export default async function AdvertisingPage({
           </div>
         ))}
       </div>
-      <h2>Бизнес-результат</h2>
+      <p className="admin-overview-note">
+        Охват товара (сессии с товаром / все сессии):{" "}
+        {percent(report.website.productReach)}. Намерение (открытия / сессии с
+        товаром): {percent(report.website.preorderIntent)}. Заказы сайта /
+        сессии: {percent(report.website.orderConversion)}. Ручные и исторические
+        заказы без связи сюда не входят.
+      </p>
+      <h2>Бизнес — когорта заказов</h2>
       <div className="admin-cards">
         {[
-          ["Выручка", money(totals.revenueMinor)],
-          ["Вклад до рекламы", money(totals.contributionBeforeAdsMinor)],
-          ["Вклад после рекламы", money(contributionAfterAds)],
-          ["Цена лида", money(costPerLead)],
-          ["Цена клиента", money(costPerCustomer)],
-          ["ROAS", roas],
-          ["Конверсия лид → оплата", conversion],
+          ["Обращения", report.business.leads],
+          ["Нужен контакт", report.business.needsContact],
+          ["Подтверждено", report.business.confirmed],
+          ["Полностью оплачено", report.business.fullyPaid],
+          ["Доставлено", report.business.delivered],
+          ["Отменено", report.business.cancelled],
+          [
+            "Получено денег за период",
+            money(report.business.cashReceivedMinor),
+          ],
+          [
+            "Остаток по неотменённой когорте",
+            money(report.business.outstandingMinor),
+          ],
         ].map(([label, value]) => (
           <div className="admin-card" key={label}>
             <strong>{label}</strong>
@@ -386,6 +370,31 @@ export default async function AdvertisingPage({
           </div>
         ))}
       </div>
+      <p className="admin-overview-note">
+        Обращение → контакт: {percent(report.business.leadToContacted)}; контакт
+        → подтверждение: {percent(report.business.contactedToConfirmed)};
+        подтверждение → полная оплата:{" "}
+        {percent(report.business.confirmedToPaid)}; полная оплата → доставка:{" "}
+        {percent(report.business.paidToDelivered)}. Обращение → подтверждение:{" "}
+        {percent(report.business.leadToConfirmed)}; обращение → полная оплата:{" "}
+        {percent(report.business.leadToPaid)}. Доля отмен:{" "}
+        {percent(report.business.cancellationRate)}. Стоимость неотменённых
+        заказов: {money(report.business.orderValueMinor)}; стоимость
+        доставленных: {money(report.business.deliveredValueMinor)}.
+        {report.business.unknownValueOrders
+          ? ` Заказов без известной стоимости: ${report.business.unknownValueOrders}; денежные итоги неполные.`
+          : ""}
+        {report.business.otherCurrencyOrders
+          ? ` Заказов вне EUR: ${report.business.otherCurrencyOrders}; они не включены в денежные итоги EUR.`
+          : ""}
+      </p>
+      {report.business.cancelledPayments.map((order) => (
+        <p className="admin-overview-note" role="status" key={order.reference}>
+          Отменённый заказ {order.reference}: записано{" "}
+          {money(order.amountMinor)} оплаты — требуется сверка. Автоматических
+          изменений нет.
+        </p>
+      ))}
       <section className="admin-panel admin-panel-wide">
         <h2>
           {filters.campaign
@@ -416,12 +425,10 @@ export default async function AdvertisingPage({
                 <th>Лиды</th>
                 <th>Подтверждено</th>
                 <th>Оплачено</th>
-                <th>Выручка</th>
-                <th>Вклад до рекламы</th>
-                <th>Вклад после рекламы</th>
+                <th>Получено денег за период</th>
                 <th>Цена лида</th>
                 <th>Цена клиента</th>
-                <th>ROAS</th>
+                <th>Поступления / расход</th>
               </tr>
             </thead>
             <tbody>
@@ -431,7 +438,7 @@ export default async function AdvertisingPage({
                 >
                   <td>
                     <Link
-                      href={`/admin/advertising?from=${isoDay(from)}&to=${isoDay(toDay)}&source=${row.source}`}
+                      href={`/admin/advertising?from=${fromDay}&to=${throughDay}&source=${row.source}`}
                     >
                       {trafficSourceLabels[row.source]}
                     </Link>
@@ -439,7 +446,7 @@ export default async function AdvertisingPage({
                   <td>
                     {row.campaign ? (
                       <Link
-                        href={`/admin/advertising?from=${isoDay(from)}&to=${isoDay(toDay)}&source=${row.source}&campaign=${encodeURIComponent(row.campaign)}`}
+                        href={`/admin/advertising?from=${fromDay}&to=${throughDay}&source=${row.source}&campaign=${encodeURIComponent(row.campaign)}`}
                       >
                         {row.campaign}
                       </Link>
@@ -464,8 +471,6 @@ export default async function AdvertisingPage({
                   <td>{row.confirmed}</td>
                   <td>{row.paid}</td>
                   <td>{money(row.revenueMinor)}</td>
-                  <td>{money(row.contributionBeforeAdsMinor)}</td>
-                  <td>{money(row.contributionAfterAdsMinor)}</td>
                   <td>{money(row.costPerLeadMinor)}</td>
                   <td>{money(row.costPerCustomerMinor)}</td>
                   <td>{row.roas ?? "—"}</td>
@@ -478,9 +483,9 @@ export default async function AdvertisingPage({
       <section className="admin-panel admin-panel-wide">
         <h2>Посадочные страницы</h2>
         <p className="admin-overview-note">
-          Визит относится к первой странице сессии. Лиды и оплаты используют
-          сохранённый снимок атрибуции заказа; неизвестные исторические данные
-          не восстанавливаются оценками.
+          Первая известная посадочная страница сессии. Только заказы сайта с
+          подтверждённой связью с этой сессией; ручные и исторические заказы
+          сюда не входят.
         </p>
         <div className="admin-table-wrap" tabIndex={0}>
           <table className="admin-table">
@@ -488,11 +493,8 @@ export default async function AdvertisingPage({
               <tr>
                 <th>Страница</th>
                 <th>Визиты</th>
-                <th>Лиды</th>
-                <th>Оплачено</th>
-                <th>Выручка</th>
-                <th>Визит → лид</th>
-                <th>Визит → оплата</th>
+                <th>Заказы сайта</th>
+                <th>Заказы сайта / сессии</th>
               </tr>
             </thead>
             <tbody>
@@ -500,16 +502,13 @@ export default async function AdvertisingPage({
                 <tr key={item.landingPage}>
                   <td>{item.landingPage}</td>
                   <td>{item.visits}</td>
-                  <td>{item.leads}</td>
-                  <td>{item.paid}</td>
-                  <td>{money(item.revenueMinor)}</td>
-                  <td>{percent(item.leadConversionRate)}</td>
-                  <td>{percent(item.paidConversionRate)}</td>
+                  <td>{item.websiteOrders}</td>
+                  <td>{percent(item.orderConversion)}</td>
                 </tr>
               ))}
               {report.landingRows.length === 0 ? (
                 <tr>
-                  <td colSpan={7}>Надёжных данных за период пока нет.</td>
+                  <td colSpan={4}>Надёжных данных за период пока нет.</td>
                 </tr>
               ) : null}
             </tbody>
@@ -523,11 +522,9 @@ export default async function AdvertisingPage({
             <thead>
               <tr>
                 <th>Товар</th>
-                <th>Просмотры</th>
-                <th>Открытия предзаказа</th>
-                <th>Лиды</th>
-                <th>Оплачено</th>
-                <th>Выручка</th>
+                <th>Сессии с просмотром</th>
+                <th>Сессии с открытием предзаказа</th>
+                <th>Заказы сайта</th>
               </tr>
             </thead>
             <tbody>
@@ -536,14 +533,12 @@ export default async function AdvertisingPage({
                   <td>{item.productName}</td>
                   <td>{item.productViews}</td>
                   <td>{item.preorderOpens}</td>
-                  <td>{item.leads}</td>
-                  <td>{item.paid}</td>
-                  <td>{money(item.revenueMinor)}</td>
+                  <td>{item.websiteOrders}</td>
                 </tr>
               ))}
               {report.productRows.length === 0 ? (
                 <tr>
-                  <td colSpan={6}>Надёжных данных за период пока нет.</td>
+                  <td colSpan={4}>Надёжных данных за период пока нет.</td>
                 </tr>
               ) : null}
             </tbody>

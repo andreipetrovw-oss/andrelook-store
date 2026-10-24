@@ -113,6 +113,22 @@ export function updateAttributionState(
     };
   }
   if (!hasMeaningfulAttribution(input)) return previous;
+  const campaignFields = [
+    "source",
+    "utmSource",
+    "utmMedium",
+    "utmCampaign",
+    "utmContent",
+    "utmTerm",
+    "adName",
+    "adSetName",
+    "gclid",
+    "fbclid",
+  ] as const;
+  if (
+    campaignFields.every((field) => previous.lastTouch[field] === touch[field])
+  )
+    return previous;
   return { ...previous, lastTouch: touch };
 }
 

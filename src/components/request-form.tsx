@@ -15,7 +15,10 @@ import {
   parseConsentPreferences,
   parseStoredAttribution,
 } from "@/lib/attribution/state";
-import { trackPublicEvent } from "@/lib/measurement/client";
+import {
+  trackPublicEvent,
+  getAnalyticsSessionId,
+} from "@/lib/measurement/client";
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
 import { selectionSummary } from "@/lib/orders/selection-summary";
 
@@ -402,6 +405,9 @@ export function RequestForm({
         orderAttribution.value = consent
           ? JSON.stringify({
               analyticsConsent: consent.analytics,
+              websiteSessionId: consent.analytics
+                ? getAnalyticsSessionId()
+                : null,
               consentVersion: consent.version,
               firstTouch: state?.firstTouch ?? null,
               lastTouch: state?.lastTouch ?? null,

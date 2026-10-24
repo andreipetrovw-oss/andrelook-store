@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -86,7 +87,9 @@ export default async function LocalizedLayout({
       lang={locale}
     >
       <body>
-        <CampaignCapture locale={locale} />
+        <Suspense fallback={null}>
+          <CampaignCapture locale={locale} />
+        </Suspense>
         <a className="skip-link" href="#main-content">
           {dictionary.skipToContent}
         </a>

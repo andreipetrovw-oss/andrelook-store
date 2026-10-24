@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { isLocale, type Locale } from "@/config/locales";
 import {
@@ -90,6 +90,7 @@ function landingState(marketingConsent: boolean, reset = false) {
 
 export function CampaignCapture({ locale }: { locale: Locale }) {
   const pathname = usePathname();
+  const search = useSearchParams().toString();
   const [open, setOpen] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
@@ -147,11 +148,26 @@ export function CampaignCapture({ locale }: { locale: Locale }) {
   }, []);
 
   useEffect(() => {
-    const send = () => trackFirstPartyPageView();
+    const send = () => {
+      try {
+        const consent = parseConsentPreferences(
+          localStorage.getItem(consentStorageKey),
+        );
+        if (consent?.analytics || consent?.marketing) {
+          localStorage.setItem(
+            attributionStorageKey,
+            JSON.stringify(landingState(consent.marketing)),
+          );
+        }
+      } catch {
+        /* Storage restrictions must not block navigation. */
+      }
+      trackFirstPartyPageView();
+    };
     send();
     window.addEventListener("andrelook:consent", send);
     return () => window.removeEventListener("andrelook:consent", send);
-  }, [pathname]);
+  }, [pathname, search]);
 
   useEffect(() => {
     const showSettings = () => setOpen(true);

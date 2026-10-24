@@ -44,6 +44,7 @@ const touchSchema = z.object({
 });
 
 const attributionSchema = z.object({
+  websiteSessionId: z.string().uuid().nullable().optional(),
   analyticsConsent: z.boolean(),
   consentVersion: z.string().trim().min(1).max(100),
   firstTouch: touchSchema.nullable(),
@@ -127,6 +128,9 @@ export function orderAttributionForStorage(
   });
   return {
     ...submitted,
+    websiteSessionId: submitted.analyticsConsent
+      ? (submitted.websiteSessionId ?? null)
+      : null,
     firstTouch: sanitize(submitted.firstTouch),
     lastTouch: submitted.lastTouch ? sanitize(submitted.lastTouch) : null,
   };

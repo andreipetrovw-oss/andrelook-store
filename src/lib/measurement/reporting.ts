@@ -155,6 +155,8 @@ export function buildAdvertisingRows(input: {
   orders: ReportingOrder[];
   spend: ReportingSpend[];
   to: Date;
+  spendFrom?: Date;
+  spendTo?: Date;
 }) {
   const rows = new Map<string, AdvertisingRow>();
   const topFunnel = new Map<
@@ -317,7 +319,11 @@ export function buildAdvertisingRows(input: {
   }
 
   for (const spend of input.spend) {
-    if (spend.date < input.from || spend.date >= input.to) continue;
+    if (
+      spend.date < (input.spendFrom ?? input.from) ||
+      spend.date >= (input.spendTo ?? input.to)
+    )
+      continue;
     const rowKey = key(
       spend.source,
       spend.campaignName,

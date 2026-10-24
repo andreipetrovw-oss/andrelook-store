@@ -77,10 +77,17 @@ export function firstPartyAnalyticsAllowedForRuntime(
 ) {
   const host = normalizedHost(request);
   const origin = request.headers.get("origin");
+  const stagingAllowed =
+    runtime.projectId === "prj_M6hDxQzBiShNOpWkWwSj3FOZmf1m" &&
+    runtime.vercelEnvironment === "preview" &&
+    process.env.NEXT_PUBLIC_STAGING_ANALYTICS_ENABLED === "true" &&
+    host.startsWith("andrelook-v1-staging") &&
+    host.endsWith("-andreys-projects-a106cf89.vercel.app");
   return Boolean(
-    runtime.projectId === approvedProductionProjectId &&
-    runtime.vercelEnvironment === "production" &&
-    approvedHosts.has(host) &&
+    ((runtime.projectId === approvedProductionProjectId &&
+      runtime.vercelEnvironment === "production" &&
+      approvedHosts.has(host)) ||
+      stagingAllowed) &&
     (!origin || origin === `https://${host}`),
   );
 }

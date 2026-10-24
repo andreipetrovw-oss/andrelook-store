@@ -11,6 +11,27 @@ import {
 } from "./first-party";
 
 describe("first-party analytics isolation", () => {
+  it("allows explicit staging first-party UAT only, never another preview project", () => {
+    vi.stubEnv("NEXT_PUBLIC_STAGING_ANALYTICS_ENABLED", "true");
+    const host =
+      "andrelook-v1-staging-uat-andreys-projects-a106cf89.vercel.app";
+    const req = new Request(`https://${host}/api/analytics/events`, {
+      headers: { host, origin: `https://${host}` },
+    });
+    expect(
+      firstPartyAnalyticsAllowedForRuntime(req, {
+        projectId: "prj_M6hDxQzBiShNOpWkWwSj3FOZmf1m",
+        vercelEnvironment: "preview",
+      }),
+    ).toBe(true);
+    expect(
+      firstPartyAnalyticsAllowedForRuntime(req, {
+        projectId: "prj_UQULSqjeAyfvSEsY9bxTQ7ZsT1DH",
+        vercelEnvironment: "preview",
+      }),
+    ).toBe(false);
+    vi.unstubAllEnvs();
+  });
   const production = {
     projectId: "prj_UQULSqjeAyfvSEsY9bxTQ7ZsT1DH",
     vercelEnvironment: "production",
