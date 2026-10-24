@@ -48,7 +48,11 @@ describe("owner CRM data boundary", () => {
       expect.objectContaining({
         where: {
           displayNumber: {
-            notIn: ["AL-20261007-3C7477", "AL-20261011-302FDC"],
+            notIn: [
+              "AL-20261007-3C7477",
+              "AL-20261011-302FDC",
+              "AL-20261023-424699",
+            ],
           },
         },
       }),
@@ -57,7 +61,11 @@ describe("owner CRM data boundary", () => {
       expect.objectContaining({
         where: expect.objectContaining({
           displayNumber: {
-            notIn: ["AL-20261007-3C7477", "AL-20261011-302FDC"],
+            notIn: [
+              "AL-20261007-3C7477",
+              "AL-20261011-302FDC",
+              "AL-20261023-424699",
+            ],
           },
         }),
       }),
