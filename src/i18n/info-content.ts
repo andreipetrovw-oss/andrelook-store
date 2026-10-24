@@ -186,6 +186,10 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         "Напишите нам о модели, размере или заказе удобным способом.",
       sections: [
         {
+          title: "Andrelook",
+          body: "ANDRELOOK | STORE · Таллинн, Эстония.",
+        },
+        {
           title: "Telegram",
           body: "Быстрый способ обсудить модель и детали предзаказа: @andrelookstore.",
         },
@@ -196,6 +200,10 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         {
           title: "Email",
           body: "Для подробных вопросов: info.andrelook@gmail.com.",
+        },
+        {
+          title: "Телефон",
+          body: "+372 5883 6633.",
         },
       ],
     },
@@ -428,6 +436,10 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         "Kirjuta meile mudeli, suuruse või tellimuse kohta sobivas kanalis.",
       sections: [
         {
+          title: "Andrelook",
+          body: "ANDRELOOK | STORE · Tallinn, Eesti.",
+        },
+        {
           title: "Telegram",
           body: "Kiire viis mudelit ja eeltellimust arutada: @andrelookstore.",
         },
@@ -438,6 +450,10 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         {
           title: "E-post",
           body: "Pikemate küsimuste jaoks: info.andrelook@gmail.com.",
+        },
+        {
+          title: "Telefon",
+          body: "+372 5883 6633.",
         },
       ],
     },
@@ -670,6 +686,10 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         "Talk to us about a piece, sizing or an order through your preferred channel.",
       sections: [
         {
+          title: "Andrelook",
+          body: "ANDRELOOK | STORE · Tallinn, Estonia.",
+        },
+        {
           title: "Telegram",
           body: "A quick way to discuss a piece and pre-order details: @andrelookstore.",
         },
@@ -680,6 +700,10 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
         {
           title: "Email",
           body: "For detailed questions: info.andrelook@gmail.com.",
+        },
+        {
+          title: "Phone",
+          body: "+372 5883 6633.",
         },
       ],
     },

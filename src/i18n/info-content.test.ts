@@ -25,6 +25,19 @@ describe("localized information architecture", () => {
     }
   });
 
+  it("publishes only confirmed Andrelook contact details in every locale", () => {
+    for (const locale of locales) {
+      const contact = JSON.stringify(getInfoPage(locale, "contact"));
+      expect(contact).toContain("ANDRELOOK | STORE");
+      expect(contact).toContain("info.andrelook@gmail.com");
+      expect(contact).toContain("+372 5883 6633");
+      expect(contact).toMatch(/Tallinn|Таллинн/);
+      expect(contact).not.toMatch(
+        /Andreluk OÜ|registry number|registrikood|регистрационный номер/i,
+      );
+    }
+  });
+
   it("answers eight customer purchase questions in every locale", () => {
     for (const locale of locales) {
       const faq = getInfoPage(locale, "faq");
