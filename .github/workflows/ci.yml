@@ -37,6 +37,7 @@ on:
       - codex/live-meta-crm-sync
       - codex/trust-transparency
       - codex/customer-trust-consumer-protection
+      - codex/simplified-consumer-protection
 
 permissions:
   contents: read

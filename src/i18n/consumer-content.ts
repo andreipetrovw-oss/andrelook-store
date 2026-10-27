@@ -24,7 +24,7 @@ export const consumerContent: Record<Locale, ConsumerContent> = {
       body: "2–3 nädalat on eeldatav aeg, mitte garanteeritud tarnekuupäev. Kinnitatud etappe näed isikliku jälgimislingi kaudu; iga päev ei pruugi uut infot lisanduda. Kui kokkulepitud aeg möödub või info puudub, kirjuta meile tellimuse numbriga. Kui kokkulepitud toodet ei saa tarnida, ei asendata seda ilma sinu nõusolekuta. Viivituse korral saad seaduses ette nähtud tingimustel nõuda täitmist lisatähtaja jooksul või lepingust taganeda; õiguspärasel taganemisel tagastatakse tasutud summad.",
     },
     returnsIntroduction:
-      "Seadusest tulenev taganemine, vabatahtlik suurusevahetus ja puudusega kauba pretensioon on eri olukorrad. Suuruse kinnitamine ei piira kohustuslikke tarbijaõigusi.",
+      "Seadusest tulenev taganemine, vabatahtlik suurusevahetus ja puudusega kauba pretensioon on eri olukorrad. Suuruse kinnitamine ei piira kohustuslikke tarbijaõigusi. Täiendavat vabatahtlikku tagastusperioodi ei pakuta. Varem sõlmitud lepingute tingimusi see leht ei muuda.",
     returns: [
       {
         title: "Päring, kaugleping ja kohapealne ost",
@@ -36,11 +36,11 @@ export const consumerContent: Record<Locale, ConsumerContent> = {
       },
       {
         title: "Tagastuskulu ja tagasimakse",
-        body: "Otsese tagastuskulu kandmisest tuleb teatada enne lepingu sõlmimist; ilma selle teabeta ei saa kulu tarbijale panna. Taganemisel tagastatakse tasutud summad, sh tavapärase tarne kulu, põhjendamatu viivituseta, hiljemalt 14 päeva jooksul avalduse saamisest. Tagasimakse võib oodata kauba või tagasisaatmise tõendi saamiseni, kui müüja ei ole lubanud kaubale ise järele tulla. Kasutatakse sama makseviisi, kui pole sõnaselgelt ja lisakuluta kokku lepitud teisiti. Ettemaks ei ole automaatselt tagastamatu.",
+        body: "Seaduslikul taganemisel kannab otsese tagastuskulu ostja, kui sellest on enne lepingu sõlmimist teatatud ning pole kokku lepitud teisiti ja seadus ei nõua müüjalt kulude kandmist. Ilma eelneva teabeta ei saa kulu tarbijale panna. Tasutud summad, sh tavapärase tarne kulu, tagastatakse põhjendamatu viivituseta, hiljemalt 14 päeva jooksul avalduse saamisest. Tagasimakse võib oodata kauba või tagasisaatmise tõendi saamiseni, kui müüja ei ole lubanud kaubale ise järele tulla. Kasutatakse sama makseviisi, kui pole sõnaselgelt ja lisakuluta kokku lepitud teisiti. Ettemaks ei ole automaatselt tagastamatu.",
       },
       {
         title: "Proovimine ja vabatahtlik vahetus",
-        body: "Toodet võib üle vaadata ja proovida nagu poes. Pakendi avamine üksi ei kaota taganemisõigust. Vajalikust proovimisest ulatuslikum kasutamine võib kaasa tuua põhjendatud väärtuse vähenemise nõude seaduses lubatud ulatuses, mitte automaatse tagastamisest keeldumise. Vabatahtlik suurusevahetus ei ole garanteeritud: küsi võimalust enne tellimist. See ei asenda seaduslikku taganemisõigust ega puudusega kauba õigusi.",
+        body: "Toodet võib üle vaadata ja proovida nagu poes. Pakendi avamine üksi ei kaota taganemisõigust. Vajalikust proovimisest ulatuslikum kandmine või kahjustamine võib kaasa tuua tõendatud väärtuse vähenemise nõude seaduses lubatud ulatuses. Tegelik seisukord dokumenteeritakse; fikseeritud mahaarvamisi ega tagastusmenetlustasu ei rakendata. Vabatahtlik suurusevahetus toimub ainult eraldi kokkuleppel ja võimaluse korral, mitte automaatselt. See ei asenda seaduslikku taganemisõigust ega puudusega kauba õigusi.",
       },
       {
         title: "Vale või puudusega toode",
@@ -60,7 +60,7 @@ export const consumerContent: Record<Locale, ConsumerContent> = {
       body: "2–3 недели — ориентир, а не гарантированная дата доставки. Подтверждённые этапы доступны по личной ссылке; новая информация может появляться не каждый день. Если согласованный срок прошёл или обновлений нет, напишите нам с номером заказа. Если согласованный товар нельзя поставить, его не заменяют без вашего согласия. При задержке на предусмотренных законом условиях можно потребовать исполнения в дополнительный срок или отказаться от договора; при правомерном отказе уплаченные суммы возвращаются.",
     },
     returnsIntroduction:
-      "Законный отказ от договора, добровольный обмен размера и претензия по недостатку — разные ситуации. Подтверждение размера не ограничивает обязательные права потребителя.",
+      "Законный отказ от договора, добровольный обмен размера и претензия по недостатку — разные ситуации. Подтверждение размера не ограничивает обязательные права потребителя. Дополнительный добровольный срок возврата не предоставляется. Условия ранее заключённых договоров эта страница не меняет.",
     returns: [
       {
         title: "Заявка, дистанционный договор и покупка на месте",
@@ -72,11 +72,11 @@ export const consumerContent: Record<Locale, ConsumerContent> = {
       },
       {
         title: "Расходы и возврат денег",
-        body: "Об обязанности оплатить прямые расходы обратной отправки должны сообщить до заключения договора; без этого возложить их на покупателя нельзя. Уплаченные суммы, включая обычную доставку, возвращаются без необоснованной задержки, не позднее 14 дней с получения заявления. Возврат может быть приостановлен до получения товара или доказательства отправки, если продавец не обязался забрать товар сам. Используется прежний способ оплаты, если иной прямо не согласован без дополнительных расходов. Предоплата не становится автоматически невозвратной.",
+        body: "При законном отказе прямые расходы обратной отправки несёт покупатель, если об этом сообщили до заключения договора, не согласовали иное и закон не возлагает расходы на продавца. Без предварительного уведомления возложить их на покупателя нельзя. Уплаченные суммы, включая обычную доставку, возвращаются без необоснованной задержки, не позднее 14 дней с получения заявления. Возврат может быть приостановлен до получения товара или доказательства отправки, если продавец не обязался забрать товар сам. Используется прежний способ оплаты, если иной прямо не согласован без дополнительных расходов. Предоплата не становится автоматически невозвратной.",
       },
       {
         title: "Примерка и добровольный обмен",
-        body: "Товар можно осмотреть и примерить, как в магазине. Само вскрытие упаковки не лишает права отказа. Использование сверх необходимой проверки может повлечь обоснованное требование возместить снижение стоимости в допустимых законом пределах, но не автоматический запрет возврата. Добровольный обмен размера не гарантирован — уточните возможность до заказа. Он не заменяет законный отказ и права при недостатках.",
+        body: "Товар можно осмотреть и примерить, как в магазине. Само вскрытие упаковки не лишает права отказа. Носка сверх необходимой проверки или повреждения могут повлечь доказанное снижение стоимости в допустимых законом пределах. Фактическое состояние фиксируется; фиксированных удержаний и сборов за возврат нет. Добровольный обмен размера возможен только по отдельному согласованию и при наличии возможности, не автоматически. Он не заменяет законный отказ и права при недостатках.",
       },
       {
         title: "Неверный товар или недостаток",
@@ -96,7 +96,7 @@ export const consumerContent: Record<Locale, ConsumerContent> = {
       body: "2–3 weeks is an estimate, not a guaranteed delivery date. Your private link shows confirmed stages; new information may not appear every day. If the agreed time passes or updates are missing, contact us with your order number. An unavailable agreed item is not replaced without your consent. For delivery delays, the law allows you, subject to its conditions, to require delivery within an additional period or withdraw from the contract; payments must be refunded following valid withdrawal.",
     },
     returnsIntroduction:
-      "Statutory withdrawal, a voluntary size exchange and a claim about faulty goods are different situations. Confirming a size does not restrict mandatory consumer rights.",
+      "Statutory withdrawal, a voluntary size exchange and a claim about faulty goods are different situations. Confirming a size does not restrict mandatory consumer rights. No additional voluntary return period is offered. This page does not change previously concluded contracts.",
     returns: [
       {
         title: "Enquiry, distance contract or in-person purchase",
@@ -108,11 +108,11 @@ export const consumerContent: Record<Locale, ConsumerContent> = {
       },
       {
         title: "Return costs and reimbursement",
-        body: "Responsibility for direct return costs must be disclosed before the contract; without that information they cannot be charged to the consumer. Payments, including standard delivery, must be reimbursed without undue delay and within 14 days of receiving notice. Reimbursement may be withheld until the goods or proof of dispatch are received, unless the seller has offered to collect. The original payment method is used unless another is expressly agreed at no extra cost. An advance is not automatically non-refundable.",
+        body: "For statutory withdrawal, the buyer pays direct return costs where disclosed before the contract, unless otherwise agreed or the law requires the seller to pay. Without prior disclosure they cannot be charged to the consumer. Payments, including standard delivery, must be reimbursed without undue delay and within 14 days of receiving notice. Reimbursement may be withheld until the goods or proof of dispatch are received, unless the seller has offered to collect. The original payment method is used unless another is expressly agreed at no extra cost. An advance is not automatically non-refundable.",
       },
       {
         title: "Trying on and voluntary exchanges",
-        body: "You may inspect and try on an item as you would in a shop. Opening packaging alone does not remove withdrawal rights. Handling beyond necessary inspection may justify a substantiated deduction for diminished value where the law permits, not an automatic refusal of a return. A voluntary size exchange is not guaranteed; ask before ordering. It does not replace statutory withdrawal or rights concerning faulty goods.",
+        body: "You may inspect and try on an item as you would in a shop. Opening packaging alone does not remove withdrawal rights. Excessive wear or damage may justify an evidence-based diminished-value claim where the law permits. Actual condition is documented; there are no automatic fixed deductions or restocking fees. A voluntary size exchange requires separate agreement and an available solution; it is not automatic. It does not replace statutory withdrawal or rights concerning faulty goods.",
       },
       {
         title: "Incorrect or faulty goods",

@@ -40,7 +40,13 @@ describe("factual consumer information without fictional merchant terms", () => 
     expect(returns).toContain("not automatically non-refundable");
     expect(returns).toContain("two years");
     expect(returns).toContain("two months");
-    expect(returns).toContain("voluntary size exchange is not guaranteed");
+    expect(returns).toContain(
+      "voluntary size exchange requires separate agreement",
+    );
+    expect(returns).toContain(
+      "no automatic fixed deductions or restocking fees",
+    );
+    expect(returns).toContain("where disclosed before the contract");
     expect(content.beforePayment.body).toContain("seller’s name");
     expect(content.beforePayment.body).toContain("quantity");
     expect(content.beforePayment.body).toContain(

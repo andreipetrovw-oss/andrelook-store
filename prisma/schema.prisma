@@ -1124,6 +1124,24 @@ model OrderItem {
   @@index([productId])
 }
 
+// Independent legal declarations, including unmatched purchase references.
+// No relation or cascade to orders: receipt never changes an order or payment.
+model WithdrawalRequest {
+  id                  String             @id @default(cuid())
+  publicId            String             @unique @default(uuid())
+  requestKey          String             @unique
+  orderReference      String
+  consumerName        String
+  confirmationEmail   String
+  locale              Locale
+  statementText       String
+  submittedAt         DateTime           @default(now())
+  customerEmailStatus NotificationStatus @default(PENDING)
+  ownerEmailStatus    NotificationStatus @default(PENDING)
+
+  @@index([orderReference, submittedAt])
+}
+
 model OrderNotification {
   id                String             @id @default(cuid())
   orderId           String             @unique

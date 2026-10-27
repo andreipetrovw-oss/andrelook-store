@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getInfoPage, infoPageSlugs } from "@/i18n/info-content";
+import { withdrawalCopy } from "@/lib/legal/policy";
 import {
   brandedTitle,
   faqPageStructuredData,
@@ -92,6 +93,16 @@ export default async function InformationPage({ params }: Props) {
           </nav>
         </aside>
         <div className="information-content-column">
+          {infoSlug === "returns-exchanges" || infoSlug === "terms" ? (
+            <p>
+              <Link
+                className="primary-action-inline"
+                href={`/${locale}/withdrawal`}
+              >
+                {withdrawalCopy[locale].initialAction}
+              </Link>
+            </p>
+          ) : null}
           <div className="information-sections">
             {page.sections.map((section, index) => (
               <section key={section.title}>

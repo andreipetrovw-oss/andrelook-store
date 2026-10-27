@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { reviewCopy } from "@/lib/reviews/copy";
+import { withdrawalCopy } from "@/lib/legal/policy";
 
 import { FooterPrivacySettingsButton } from "./privacy-settings-button";
 
@@ -68,6 +69,9 @@ export function SiteFooter({
           <Link href={`/${locale}/about`}>{dictionary.about}</Link>
           <Link href={`/${locale}/privacy`}>{dictionary.privacy}</Link>
           <Link href={`/${locale}/terms`}>{dictionary.terms}</Link>
+          <Link href={`/${locale}/withdrawal`}>
+            {withdrawalCopy[locale].initialAction}
+          </Link>
           <FooterPrivacySettingsButton locale={locale} />
         </div>
       </div>
