@@ -18,7 +18,12 @@ const runtime = {
   projectId: "prj_UQULSqjeAyfvSEsY9bxTQ7ZsT1DH",
   vercelEnvironment: "production",
 };
-function fixture({ fail = false, empty = false, paginate = false } = {}) {
+function fixture({
+  fail = false,
+  empty = false,
+  paginate = false,
+  adSetBudget = false,
+} = {}) {
   const stored = new Map<string, unknown>();
   const campaign = {
     findFirst: vi.fn().mockResolvedValue({ id: "existing-campaign" }),
@@ -69,7 +74,7 @@ function fixture({ fail = false, empty = false, paginate = false } = {}) {
           id: liveCampaignId,
           name: "winter_vezere_30d_test01",
           effective_status: "ACTIVE",
-          lifetime_budget: "10000",
+          ...(adSetBudget ? {} : { lifetime_budget: "10000" }),
           start_time: "2026-10-27T02:00:00+0200",
           stop_time: "2026-11-26T02:00:00+0200",
         };
@@ -79,6 +84,7 @@ function fixture({ fail = false, empty = false, paginate = false } = {}) {
             {
               id: "set-real-id",
               name: "EE | Broad | Website Conversion | Vezere",
+              lifetime_budget: "10000",
             },
           ],
         };
@@ -149,6 +155,13 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 describe("live Meta import", () => {
+  it("uses verified ad-set lifetime budget when campaign budget is absent", async () => {
+    const f = fixture({ adSetBudget: true });
+    await syncMetaSpend({ runtime, fetchImpl: f.fetchImpl });
+    expect(
+      f.campaign.update.mock.calls[0]![0].data.metaSnapshot.lifetimeBudgetMinor,
+    ).toBe(10000);
+  });
   it("discovers the stable campaign/adset/ad before spend and imports today; retry upserts rather than adds", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-10-27T16:00:00Z"));

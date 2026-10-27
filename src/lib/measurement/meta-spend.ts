@@ -235,9 +235,12 @@ export async function syncMetaSpend(
       list<{
         id: string;
         name: string;
+        lifetime_budget?: string;
         start_time?: string;
         end_time?: string;
-      }>(`${liveCampaignId}/adsets`, { fields: "id,name,start_time,end_time" }),
+      }>(`${liveCampaignId}/adsets`, {
+        fields: "id,name,lifetime_budget,start_time,end_time",
+      }),
       list<{
         id: string;
         name: string;
@@ -309,7 +312,15 @@ export async function syncMetaSpend(
       campaignName: campaignData.name,
       utmCampaign: liveCampaignKey,
       status: campaignData.effective_status,
-      lifetimeBudgetMinor: metricNumber(campaignData.lifetime_budget),
+      lifetimeBudgetMinor:
+        metricNumber(campaignData.lifetime_budget) ??
+        (sets.length &&
+        sets.every((set) => metricNumber(set.lifetime_budget) !== null)
+          ? sets.reduce(
+              (total, set) => total + metricNumber(set.lifetime_budget)!,
+              0,
+            )
+          : null),
       startTime,
       endTime,
       from,
