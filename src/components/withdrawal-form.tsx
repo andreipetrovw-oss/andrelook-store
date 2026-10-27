@@ -32,7 +32,10 @@ export function WithdrawalForm({
   });
   const formId = "withdrawal-" + requestKey;
   useEffect(() => {
-    if (state.status === "success") result.current?.focus();
+    if (state.status === "success") {
+      result.current?.focus({ preventScroll: true });
+      result.current?.scrollIntoView({ block: "start" });
+    }
   }, [state]);
   return (
     <section className="withdrawal-function">

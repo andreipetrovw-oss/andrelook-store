@@ -1038,6 +1038,9 @@ button:disabled {
   display: grid;
   gap: 1rem;
 }
+.withdrawal-confirmation h2 {
+  scroll-margin-top: calc(var(--header-height) + 1.5rem);
+}
 .withdrawal-form label {
   display: grid;
   gap: 0.4rem;
