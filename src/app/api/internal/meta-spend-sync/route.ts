@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server";
+import { syncAuthorized } from "@/lib/measurement/meta-sync-auth";
 
 import { syncMetaSpend } from "@/lib/measurement/meta-spend";
 
 export const dynamic = "force-dynamic";
-
-function yesterdayUtc() {
-  const value = new Date();
-  value.setUTCDate(value.getUTCDate() - 1);
-  return value.toISOString().slice(0, 10);
-}
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET?.trim();
-  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!syncAuthorized(request.headers.get("authorization"))) {
     return new NextResponse(null, { status: 401 });
   }
   try {
-    const result = await syncMetaSpend({ date: yesterdayUtc() });
+    const result = await syncMetaSpend();
     return NextResponse.json(result);
   } catch {
     return NextResponse.json({ status: "failed" }, { status: 502 });

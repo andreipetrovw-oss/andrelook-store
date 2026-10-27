@@ -996,6 +996,8 @@ model Campaign {
   status             CampaignStatus      @default(UNKNOWN)
   startDate          DateTime?
   endDate            DateTime?
+  metaSnapshot       Json?
+  metaSyncedAt       DateTime?
   currency           String              @default("EUR") @db.Char(3)
   spendEntries       AdSpend[]
   changeLogs         CampaignChangeLog[]

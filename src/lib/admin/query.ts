@@ -401,7 +401,9 @@ export async function getAdvertisingReport(input: {
     events: reportingEvents,
     from: input.from,
     orders: reportingOrders,
-    spend,
+    // Daily/ad reach is not additive across a multi-day audience. The live
+    // campaign panel uses Meta's exact period aggregate instead.
+    spend: spend.map((entry) => ({ ...entry, reach: null })),
     to: input.to,
     spendFrom: input.spendFrom,
     spendTo: input.spendTo,

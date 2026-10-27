@@ -1,0 +1,33 @@
+name: Live Meta CRM sync
+on:
+  schedule:
+    - cron: "37 * * * *"
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: production-meta-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Refresh existing production Meta importer
+        env:
+          META_SYNC_TRIGGER_SECRET: ${{ secrets.META_SYNC_TRIGGER_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$META_SYNC_TRIGGER_SECRET"
+          # No checkout, Meta token, request tracing or output containing credentials.
+          response=$(mktemp)
+          trap 'rm -f "$response"' EXIT
+          printf 'header = "Authorization: Bearer %s"\n' "$META_SYNC_TRIGGER_SECRET" |
+            curl --config - --fail --silent --show-error --max-time 90 \
+              --output "$response" https://www.andrelook.store/api/internal/meta-spend-sync
+          node - "$response" <<'JS'
+          const fs = require('node:fs');
+          const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (!['ok', 'throttled'].includes(result.status)) process.exit(1);
+          console.log(JSON.stringify({ status: result.status, imported: result.imported }));
+          JS

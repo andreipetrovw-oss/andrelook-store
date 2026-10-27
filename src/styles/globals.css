@@ -1003,6 +1003,28 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.admin-live-meta {
+  overflow-wrap: anywhere;
+}
+
+.admin-live-meta .admin-meta-metrics {
+  display: grid;
+  gap: 0 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  margin-block: 0.75rem 1.25rem;
+}
+
+.admin-live-meta .admin-meta-metrics > div {
+  border-top: 1px solid var(--color-border);
+  gap: 0.75rem;
+  padding-block: 0.45rem;
+}
+
+.admin-live-meta summary {
+  cursor: pointer;
+  padding-block: 0.75rem;
+}
+
 .timeline {
   display: grid;
   gap: 0.75rem;

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import LiveMetaCampaign from "./live-meta-campaign";
+export const maxDuration = 60;
 
 import {
   recordAdvertisingSpend,
@@ -157,6 +159,7 @@ export default async function AdvertisingPage({
     from?: string;
     source?: string;
     to?: string;
+    metaSync?: string;
   }>;
 }) {
   const filters = await searchParams;
@@ -255,6 +258,7 @@ export default async function AdvertisingPage({
     <>
       <span className="eyebrow">Бизнес-аналитика</span>
       <h1>Реклама</h1>
+      <LiveMetaCampaign syncResult={filters.metaSync} />
       <p className="admin-overview-note">
         Когорта — реальные заказы, созданные за выбранный период; этапы —
         достигнутые за всё время этой когорты. Поступления — действующие платежи
