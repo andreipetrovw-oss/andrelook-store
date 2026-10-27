@@ -1,5 +1,6 @@
 import type { Locale } from "@/config/locales";
 import { trustContent } from "./trust-content";
+import { consumerContent } from "./consumer-content";
 
 export const infoPageSlugs = [
   "about",
@@ -659,13 +660,33 @@ export function getInfoPage(locale: Locale, slug: string) {
   if (!infoPageSlugs.includes(slug as InfoPageSlug)) return null;
   const page = pages[locale][slug as InfoPageSlug];
   const trust = trustContent[locale];
+  const consumer = consumerContent[locale];
+  if (slug === "returns-exchanges")
+    return {
+      ...page,
+      introduction: consumer.returnsIntroduction,
+      sections: consumer.returns,
+    };
+  if (slug === "delivery-payment")
+    return {
+      ...page,
+      sections: [
+        ...page.sections.slice(0, 2),
+        consumer.beforePayment,
+        consumer.delay,
+      ],
+    };
   if (slug === "how-to-order") return { ...page, sections: trust.steps };
   if (slug === "faq")
     return {
       ...page,
       sections: [
         ...page.sections.map((section, index) =>
-          index === 5 ? { ...section, body: trust.afterSubmit } : section,
+          index === 5
+            ? { ...section, body: trust.afterSubmit }
+            : index === 6
+              ? { ...section, body: consumer.returnsAnswer }
+              : section,
         ),
         { title: trust.trackingTitle, body: trust.tracking },
         { title: trust.reviewTitle, body: trust.review },

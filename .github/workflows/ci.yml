@@ -36,6 +36,7 @@ on:
       - codex/launch-readiness-audit
       - codex/live-meta-crm-sync
       - codex/trust-transparency
+      - codex/customer-trust-consumer-protection
 
 permissions:
   contents: read

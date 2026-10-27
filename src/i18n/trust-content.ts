@@ -46,10 +46,10 @@ export const trustContent: Record<Locale, TrustContent> = {
       "Vormi saatmisel raha ei võeta. Võtame sinuga isiklikult ühendust ning lepime enne maksmist kokku suuruse, hinna, kättesaamise ja muud detailid. Vajadusel aitame suurust valida. Pärast kinnitamist saad tellimuse numbri ja isikliku jälgimislingi; kinnitatud uuendused ja meie abi on sinuga kuni kättesaamiseni.",
     trackingTitle: "Kuidas saan tellimuse käiku jälgida?",
     tracking:
-      "Pärast kinnitamist saad Andrelooki tellimuse numbri ja turvalise isikliku jälgimislingi. Lehel näed oma tellimuse kinnitatud edenemist, mitte avalikku saadetiste loendit. Sama info avaneb tellimuse numbri ja isikliku juurdepääsukoodiga.",
+      "Päringu numbri näed pärast vormi edukat saatmist; see ei ole veel ostu kinnitus. Pärast tellimuse kinnitamist saad isikliku jälgimislingi. Hoia see alles või ava menüüst „Jälgi tellimust“ ning sisesta tellimuse number ja isiklik juurdepääsukood. Leht näitab kinnitatud etappe, mitte reaalajas asukohta. Uuendusi ei pruugi lisanduda iga päev. Kui link puudub või kokkulepitud aeg möödub, kirjuta meile tellimuse numbriga.",
     reviewTitle: "Mida tähendab „Kinnitatud ost“?",
     review:
-      "Sellise märgisega arvustuse saab esitada ainult isikliku arvustuslingi kaudu, mis on seotud lõpetatud Andrelooki tellimusega. Märgis kinnitab seost tegeliku tellimusega, mitte hinnangu positiivsust.",
+      "Sellise märgisega arvustuse saab esitada ainult isikliku arvustuslingi kaudu, mis on seotud lõpetatud Andrelooki tellimusega. Arvustused vaadatakse enne avaldamist üle. Märgis kinnitab seost tegeliku tellimusega, mitte hinnangu positiivsust.",
     contact:
       "Küsimused enne tellimist on teretulnud. Kirjuta mudeli, suuruse või tellimuse kohta Telegramis, Instagramis või e-posti teel; aitame kuni kättesaamiseni.",
   },
@@ -86,10 +86,10 @@ export const trustContent: Record<Locale, TrustContent> = {
       "Отправка формы не списывает деньги. Свяжемся с вами лично и до оплаты согласуем размер, цену, получение и остальные детали. Если нужно, поможем с размером. После подтверждения вы получите номер заказа и личную ссылку для отслеживания: подтверждённые обновления и наша поддержка доступны до получения.",
     trackingTitle: "Как узнать, на каком этапе мой заказ?",
     tracking:
-      "После подтверждения вы получите номер заказа Andrelook и личную защищённую ссылку. На странице видны подтверждённые этапы именно вашего заказа, а не публичный список отправлений. Доступ к той же информации возможен по номеру заказа и индивидуальному коду.",
+      "Номер заявки появится после успешной отправки формы; сам по себе он ещё не подтверждает покупку. После подтверждения заказа вы получите личную ссылку. Сохраните её или откройте в меню «Отследить заказ» и введите номер заказа и индивидуальный код. Страница показывает подтверждённые этапы, а не местоположение в реальном времени. Обновления могут появляться не каждый день. Если ссылки нет или согласованный срок прошёл, напишите нам с номером заказа.",
     reviewTitle: "Что означает «Подтверждённая покупка»?",
     review:
-      "Отзыв с этой отметкой можно отправить только по личной ссылке, связанной с завершённым заказом Andrelook. Отметка подтверждает связь с реальным заказом, а не положительную оценку.",
+      "Отзыв с этой отметкой можно отправить только по личной ссылке, связанной с завершённым заказом Andrelook. Перед публикацией отзывы проходят модерацию. Отметка подтверждает связь с реальным заказом, а не положительную оценку.",
     contact:
       "Вопросы до заказа приветствуются. Напишите о модели, размере или заказе в Telegram, Instagram или по электронной почте — остаёмся на связи до получения.",
   },
@@ -126,10 +126,10 @@ export const trustContent: Record<Locale, TrustContent> = {
       "Submitting the form does not charge you. We contact you personally to agree the size, price, fulfilment and other details before payment, with sizing help if needed. After confirmation, you receive an order number and private tracking link with confirmed updates. We remain available through to receipt.",
     trackingTitle: "How can I follow my order?",
     tracking:
-      "After confirmation, you receive an Andrelook order number and secure personal tracking link. The page shows confirmed progress for your own order, not a public shipment list. You can also access the same information with your order number and individual access code.",
+      "Your request reference appears after successful form submission; it is not yet purchase confirmation. After your order is confirmed, you receive a private tracking link. Save it, or select “Track order” in the menu and enter your order number and individual access code. The page shows confirmed stages, not a live location. Updates may not appear every day. If the link is missing or the agreed time has passed, contact us with your order number.",
     reviewTitle: "What does “Verified purchase” mean?",
     review:
-      "A review with this badge can only be submitted through a personal review link associated with a completed Andrelook order. The badge confirms a connection to a real order, not a positive rating.",
+      "A review with this badge can only be submitted through a personal review link associated with a completed Andrelook order. Reviews are moderated before publication. The badge confirms a connection to a real order, not a positive rating.",
     contact:
       "Questions before ordering are welcome. Ask about a piece, sizing or your order on Telegram, Instagram or email; we remain available through to receipt.",
   },
