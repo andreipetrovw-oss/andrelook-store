@@ -1,4 +1,5 @@
 import type { Locale } from "@/config/locales";
+import { trustContent } from "./trust-content";
 
 export type StorefrontContent = {
   catalog: { discoveryNote: string; filterHint: string; resultsLabel: string };
@@ -112,24 +113,7 @@ const content: Record<Locale, StorefrontContent> = {
       locationLabel: "Таллинн · Европа",
       orderIntro:
         "Без автоматической оплаты и обязательного аккаунта. Все детали согласуем с вами до оплаты.",
-      orderSteps: [
-        {
-          title: "Выберите модель",
-          body: "Выберите цвет и размер. Если сомневаетесь, поможем подобрать.",
-        },
-        {
-          title: "Оформите заявку",
-          body: "Оставьте контакт и выберите удобный способ получения.",
-        },
-        {
-          title: "Мы подтвердим заказ",
-          body: "Свяжемся с вами и согласуем детали и оплату.",
-        },
-        {
-          title: "Получите заказ",
-          body: "Обычно предзаказ занимает около 2–3 недель.",
-        },
-      ],
+      orderSteps: trustContent.ru.steps,
       orderTitle: "Как проходит заказ",
       serviceIntro:
         "От выбора размера до получения заказа — вы общаетесь с Andrelook напрямую.",
@@ -156,7 +140,7 @@ const content: Record<Locale, StorefrontContent> = {
       ],
       stateIntro:
         "Отправка формы не списывает оплату: сначала мы согласуем выбор, получение и итоговые детали.",
-      stateTitle: "Четыре понятных шага",
+      stateTitle: trustContent.ru.flowTitle,
     },
     product: {
       assistanceBody:
@@ -233,24 +217,7 @@ const content: Record<Locale, StorefrontContent> = {
       locationLabel: "Tallinn · Euroopa",
       orderIntro:
         "Automaatset makset ega kontot pole vaja. Kinnitame kõik detailid enne maksmist.",
-      orderSteps: [
-        {
-          title: "Vali toode",
-          body: "Vali värv ja suurus. Kui kahtled, aitame sobiva leida.",
-        },
-        {
-          title: "Esita tellimus",
-          body: "Jäta kontakt ja vali sobiv kättesaamisviis.",
-        },
-        {
-          title: "Kinnitame tellimuse",
-          body: "Võtame ühendust ning lepime kokku detailid ja makse.",
-        },
-        {
-          title: "Saa tellimus kätte",
-          body: "Eeltellimus võtab tavaliselt umbes 2–3 nädalat.",
-        },
-      ],
+      orderSteps: trustContent.et.steps,
       orderTitle: "Kuidas tellimine käib",
       serviceIntro:
         "Suuruse valikust tellimuse kättesaamiseni suhtled otse Andrelookiga.",
@@ -277,7 +244,7 @@ const content: Record<Locale, StorefrontContent> = {
       ],
       stateIntro:
         "Vormi saatmisel makset ei tehta. Esmalt lepime kokku valiku, kättesaamise ja tellimuse üksikasjad.",
-      stateTitle: "Neli selget sammu",
+      stateTitle: trustContent.et.flowTitle,
     },
     product: {
       assistanceBody:
@@ -354,24 +321,7 @@ const content: Record<Locale, StorefrontContent> = {
       locationLabel: "Tallinn · Europe",
       orderIntro:
         "No automatic payment and no account required. We confirm every detail before payment.",
-      orderSteps: [
-        {
-          title: "Choose the piece",
-          body: "Select a colour and size. If you are unsure, we will help.",
-        },
-        {
-          title: "Submit your order",
-          body: "Leave your contact details and choose how to receive it.",
-        },
-        {
-          title: "We confirm the order",
-          body: "We contact you to agree the details and payment.",
-        },
-        {
-          title: "Receive it",
-          body: "A pre-order usually takes approximately 2–3 weeks.",
-        },
-      ],
+      orderSteps: trustContent.en.steps,
       orderTitle: "How it works",
       serviceIntro:
         "From choosing a size to receiving your order, you speak directly with Andrelook.",
@@ -398,7 +348,7 @@ const content: Record<Locale, StorefrontContent> = {
       ],
       stateIntro:
         "Submitting the form never takes payment. We first confirm your selection, fulfilment and final order details.",
-      stateTitle: "Four clear steps",
+      stateTitle: trustContent.en.flowTitle,
     },
     product: {
       assistanceBody:
@@ -422,5 +372,20 @@ const content: Record<Locale, StorefrontContent> = {
 };
 
 export function getStorefrontContent(locale: Locale) {
-  return content[locale];
+  const copy = content[locale];
+  const trust = trustContent[locale];
+  return {
+    ...copy,
+    home: {
+      ...copy.home,
+      contactBody: trust.contact,
+      serviceItems: [
+        ...copy.home.serviceItems,
+        {
+          title: trust.steps[4]!.title,
+          body: trust.steps[4]!.body,
+        },
+      ],
+    },
+  };
 }

@@ -35,6 +35,7 @@ on:
       - codex/review-owner-notifications
       - codex/launch-readiness-audit
       - codex/live-meta-crm-sync
+      - codex/trust-transparency
 
 permissions:
   contents: read

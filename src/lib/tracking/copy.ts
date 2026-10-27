@@ -12,7 +12,7 @@ export const trackingCopy = {
     items: "Your order",
     last: "Last confirmed update",
     lookupBody:
-      "Enter your order number and individual Tracking Access Code. Your order number alone is never enough to open tracking.",
+      "After confirmation, Andrelook provides your order number and private tracking link with confirmed updates. Open that link or enter your order number and individual Tracking Access Code below. Your order number alone is never enough to open tracking.",
     lookupTitle: "Track your order",
     method: "Delivery method",
     network:
@@ -34,7 +34,7 @@ export const trackingCopy = {
     items: "Sinu tellimus",
     last: "Viimane kinnitatud uuendus",
     lookupBody:
-      "Sisesta tellimuse number ja personaalne jälgimise juurdepääsukood. Ainult tellimuse numbriga jälgimist avada ei saa.",
+      "Pärast kinnitamist saad Andrelookilt tellimuse numbri ja isikliku jälgimislingi kinnitatud uuendustega. Ava link või sisesta allpool tellimuse number ja isiklik juurdepääsukood. Ainult tellimuse numbriga jälgimist avada ei saa.",
     lookupTitle: "Jälgi tellimust",
     method: "Kättesaamisviis",
     network:
@@ -56,7 +56,7 @@ export const trackingCopy = {
     items: "Ваш заказ",
     last: "Последнее подтверждённое обновление",
     lookupBody:
-      "Введите номер заказа и индивидуальный код доступа к отслеживанию. Одного номера заказа недостаточно.",
+      "После подтверждения Andrelook предоставит номер заказа и личную ссылку с подтверждёнными обновлениями. Откройте ссылку или введите ниже номер заказа и индивидуальный код доступа. Одного номера заказа недостаточно.",
     lookupTitle: "Отследить заказ",
     method: "Способ получения",
     network:

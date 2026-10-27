@@ -25,10 +25,10 @@ describe("localized information architecture", () => {
     }
   });
 
-  it("answers eight customer purchase questions in every locale", () => {
+  it("preserves eight purchase questions and adds tracking and review provenance in every locale", () => {
     for (const locale of locales) {
       const faq = getInfoPage(locale, "faq");
-      expect(faq?.sections).toHaveLength(8);
+      expect(faq?.sections).toHaveLength(10);
       expect(JSON.stringify(faq)).not.toMatch(
         /price missing|not yet published|catalog version|six pieces|kuue tabelita|шести модел|chart is not yet available|таблица пока недоступна|tabel ei ole veel saadaval/i,
       );

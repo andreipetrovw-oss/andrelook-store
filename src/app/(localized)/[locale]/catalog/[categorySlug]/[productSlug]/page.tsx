@@ -17,6 +17,7 @@ import { SizeGuide } from "@/components/size-guide";
 import { isLocale, locales } from "@/config/locales";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getStorefrontContent } from "@/i18n/storefront-content";
+import { trustContent } from "@/i18n/trust-content";
 import {
   getPublicCatalog,
   getPublicCategoryProducts,
@@ -325,6 +326,13 @@ export default async function ProductPage({ params }: Props) {
                   {dictionary.howToOrder} ↗
                 </Link>
               </div>
+              <details className="product-trust-note" open>
+                <summary>{trustContent[locale].pdpTitle}</summary>
+                <p>{trustContent[locale].afterSubmit}</p>
+                <Link href={`/track?lang=${locale}`}>
+                  {trustContent[locale].steps[4]!.title} ↗
+                </Link>
+              </details>
 
               <dl className="product-facts product-commercial-facts">
                 <div>

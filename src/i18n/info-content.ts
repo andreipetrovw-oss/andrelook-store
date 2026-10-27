@@ -1,4 +1,5 @@
 import type { Locale } from "@/config/locales";
+import { trustContent } from "./trust-content";
 
 export const infoPageSlugs = [
   "about",
@@ -655,7 +656,29 @@ const pages: Record<Locale, Record<InfoPageSlug, InfoPage>> = {
 };
 
 export function getInfoPage(locale: Locale, slug: string) {
-  return infoPageSlugs.includes(slug as InfoPageSlug)
-    ? pages[locale][slug as InfoPageSlug]
-    : null;
+  if (!infoPageSlugs.includes(slug as InfoPageSlug)) return null;
+  const page = pages[locale][slug as InfoPageSlug];
+  const trust = trustContent[locale];
+  if (slug === "how-to-order") return { ...page, sections: trust.steps };
+  if (slug === "faq")
+    return {
+      ...page,
+      sections: [
+        ...page.sections.map((section, index) =>
+          index === 5 ? { ...section, body: trust.afterSubmit } : section,
+        ),
+        { title: trust.trackingTitle, body: trust.tracking },
+        { title: trust.reviewTitle, body: trust.review },
+      ],
+    };
+  if (slug === "about")
+    return {
+      ...page,
+      sections: [
+        ...page.sections,
+        { title: trust.steps[4]!.title, body: trust.steps[4]!.body },
+      ],
+    };
+  if (slug === "contact") return { ...page, introduction: trust.contact };
+  return page;
 }
