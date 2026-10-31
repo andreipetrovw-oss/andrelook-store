@@ -18,6 +18,8 @@ const eventSchema = z.object({
     "VIEW_ITEM_LIST",
     "SELECT_ITEM",
     "VIEW_ITEM",
+    "PREORDER_CTA_ATTEMPT",
+    "PREORDER_SELECTION_REQUIRED",
     "PREORDER_OPEN",
     "PREORDER_SUBMIT",
   ]),

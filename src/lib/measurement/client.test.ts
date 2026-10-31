@@ -261,9 +261,44 @@ describe("measurement environment isolation", () => {
       source: "DIRECT",
     });
 
+    measurement.trackPublicEvent("preorder_cta_attempt", {
+      item_id: "product-one",
+    });
+    measurement.trackPublicEvent("preorder_selection_required", {
+      item_id: "product-one",
+    });
+    expect(request).toHaveBeenCalledTimes(3);
+    expect(
+      request.mock.calls.slice(1).map((call) => {
+        const event = JSON.parse(call[1].body as string);
+        return [event.eventName, event.productId];
+      }),
+    ).toEqual([
+      ["PREORDER_CTA_ATTEMPT", "product-one"],
+      ["PREORDER_SELECTION_REQUIRED", "product-one"],
+    ]);
+    expect(
+      request.mock.calls.slice(1).every((call) => {
+        const event = JSON.parse(call[1].body as string);
+        return !JSON.stringify(event).includes("email");
+      }),
+    ).toBe(true);
+    expect(
+      (window as Window).dataLayer?.filter(
+        (entry) =>
+          Array.isArray(entry) &&
+          ["preorder_cta_attempt", "preorder_selection_required"].includes(
+            entry[1],
+          ),
+      ),
+    ).toHaveLength(0);
+
     measurement.applyMeasurementConsent(consent);
     measurement.trackPublicEvent("preorder_open", { item_id: "product-one" });
-    expect(request).toHaveBeenCalledOnce();
+    measurement.trackPublicEvent("preorder_cta_attempt", {
+      item_id: "product-one",
+    });
+    expect(request).toHaveBeenCalledTimes(3);
   });
 
   it("loads Meta once after marketing consent, allowlists payloads and stops after revocation", async () => {
@@ -370,6 +405,14 @@ describe("measurement environment isolation", () => {
       },
       { eventID: "11111111-1111-4111-8111-111111111111" },
     ]);
+    const pixelQueueLength = browserWindow.fbq?.queue.length ?? 0;
+    measurement.trackPublicEvent("preorder_cta_attempt", {
+      item_id: "AL-LEGACY-001",
+    });
+    measurement.trackPublicEvent("preorder_selection_required", {
+      item_id: "AL-LEGACY-001",
+    });
+    expect(browserWindow.fbq?.queue).toHaveLength(pixelQueueLength);
     expect(JSON.stringify(browserWindow.fbq?.queue)).not.toContain(
       "Private brand field",
     );

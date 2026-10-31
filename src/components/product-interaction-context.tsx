@@ -68,11 +68,21 @@ export function ProductInteractionProvider({
   }, []);
   const openOrder = useCallback(
     (trigger?: HTMLElement | null) => {
+      if (drawerOpen) return true;
+      trackPublicEvent("preorder_cta_attempt", {
+        item_id: measurementItem.item_id,
+      });
       if (sizes.length > 0 && !size) {
+        trackPublicEvent("preorder_selection_required", {
+          item_id: measurementItem.item_id,
+        });
         setSelectionError("size");
         return false;
       }
       if (colourCodes.length > 0 && !colour) {
+        trackPublicEvent("preorder_selection_required", {
+          item_id: measurementItem.item_id,
+        });
         setSelectionError("colour");
         return false;
       }
@@ -90,7 +100,14 @@ export function ProductInteractionProvider({
       });
       return true;
     },
-    [colour, colourCodes.length, measurementItem, size, sizes.length],
+    [
+      colour,
+      colourCodes.length,
+      drawerOpen,
+      measurementItem,
+      size,
+      sizes.length,
+    ],
   );
   const closeOrder = useCallback(() => setDrawerOpen(false), []);
   const restoreFocus = useCallback(

@@ -165,6 +165,16 @@ export function websiteSummary(
       .filter((e) => e.eventName === "PREORDER_OPEN")
       .map((e) => e.sessionId),
   );
+  const attempted = new Set(
+    scoped
+      .filter((e) => e.eventName === "PREORDER_CTA_ATTEMPT")
+      .map((e) => e.sessionId),
+  );
+  const selectionRequired = new Set(
+    scoped
+      .filter((e) => e.eventName === "PREORDER_SELECTION_REQUIRED")
+      .map((e) => e.sessionId),
+  );
   const linked = orders.filter(
     (o) =>
       !isInternalTestOrder(o.displayNumber) &&
@@ -182,6 +192,8 @@ export function websiteSummary(
   return {
     sessions: sessions.size,
     productViewSessions: product.size,
+    preorderAttemptSessions: attempted.size,
+    preorderSelectionRequiredSessions: selectionRequired.size,
     preorderOpenSessions: opened.size,
     websiteOrders: linked.length,
     convertingSessions: converted.size,

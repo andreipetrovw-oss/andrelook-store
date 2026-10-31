@@ -329,6 +329,14 @@ export default async function AdvertisingPage({
           ["Сессии", report.website.sessions],
           ["Сессии с просмотром товара", report.website.productViewSessions],
           [
+            "Сессии с нажатием предзаказа",
+            report.website.preorderAttemptSessions,
+          ],
+          [
+            "Сессии, где нужен выбор параметров",
+            report.website.preorderSelectionRequiredSessions,
+          ],
+          [
             "Сессии с открытием предзаказа",
             report.website.preorderOpenSessions,
           ],

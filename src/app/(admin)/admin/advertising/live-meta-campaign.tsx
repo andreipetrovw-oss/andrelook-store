@@ -191,6 +191,11 @@ export default async function LiveMetaCampaign({
           {rows([
             ["Сессии кампании", n(web.sessions)],
             ["Сессии с товаром", n(web.productViewSessions)],
+            ["Нажали предзаказ", n(web.preorderAttemptSessions)],
+            [
+              "Нужен выбор параметров",
+              n(web.preorderSelectionRequiredSessions),
+            ],
             ["Сессии с открытием предзаказа", n(web.preorderOpenSessions)],
             ["Заказы сайта с подтверждённой связью", n(web.websiteOrders)],
           ])}

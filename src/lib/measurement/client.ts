@@ -219,6 +219,8 @@ type FirstPartyEventName =
   | "VIEW_ITEM_LIST"
   | "SELECT_ITEM"
   | "VIEW_ITEM"
+  | "PREORDER_CTA_ATTEMPT"
+  | "PREORDER_SELECTION_REQUIRED"
   | "PREORDER_OPEN"
   | "PREORDER_SUBMIT";
 
@@ -302,7 +304,9 @@ export function trackFirstPartyPageView() {
 export function trackPublicEvent(
   name:
     | "contact_click"
+    | "preorder_cta_attempt"
     | "preorder_open"
+    | "preorder_selection_required"
     | "preorder_submit"
     | "select_item"
     | "size_help"
@@ -340,7 +344,9 @@ export function trackPublicEvent(
   }
   const firstPartyName: FirstPartyEventName | undefined = (
     {
+      preorder_cta_attempt: "PREORDER_CTA_ATTEMPT",
       preorder_open: "PREORDER_OPEN",
+      preorder_selection_required: "PREORDER_SELECTION_REQUIRED",
       preorder_submit: "PREORDER_SUBMIT",
       select_item: "SELECT_ITEM",
       view_item: "VIEW_ITEM",
@@ -349,6 +355,10 @@ export function trackPublicEvent(
   )[name];
   if (firstPartyName)
     firstPartyEvent(firstPartyName, parameters, options.eventId);
+  // These diagnostics are first-party only: they must not create GA4 or Meta
+  // conversions, nor add external events for each attempted CTA click.
+  if (name === "preorder_cta_attempt" || name === "preorder_selection_required")
+    return;
   if (
     analyticsConsentGranted &&
     validGaMeasurementId(gaId) &&
