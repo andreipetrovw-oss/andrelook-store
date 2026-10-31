@@ -39,6 +39,8 @@ on:
       - codex/customer-trust-consumer-protection
       - codex/simplified-consumer-protection
       - codex/manual-packed-milestone
+      - codex/conversion-recovery-p0
+      - codex/conversion-recovery-p0-p1
 
 permissions:
   contents: read
