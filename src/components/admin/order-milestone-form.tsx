@@ -24,7 +24,12 @@ export function OrderMilestoneForm({
     evidenceNote: "",
   });
   return (
-    <form action={action} aria-busy={pending} className="admin-stack-form">
+    <form
+      action={action}
+      aria-busy={pending}
+      className="admin-stack-form"
+      onReset={(event) => event.preventDefault()}
+    >
       <input name="orderId" type="hidden" value={orderId} />
       <fieldset
         className="admin-stack-form admin-form-grid"
