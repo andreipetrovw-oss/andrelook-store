@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { requestOrderInput } from "./request-schema";
+import { SIZE_HELP_VALUE } from "./request-constants";
 
 function validForm() {
   const form = new FormData();
@@ -30,6 +31,28 @@ describe("assisted order request validation", () => {
   it("accepts the minimal approved form shape", () => {
     expect(requestOrderInput(validForm()).success).toBe(true);
   });
+
+  it.each(["et", "ru", "en"])(
+    "requires size or explicit sizing help for %s requests",
+    (locale) => {
+      const form = validForm();
+      form.set("locale", locale);
+      form.set("preferredLocale", locale);
+      form.set("size", "");
+      const missing = requestOrderInput(form);
+      expect(missing.success).toBe(false);
+      if (!missing.success) {
+        expect(missing.error.flatten().fieldErrors.size).toEqual(
+          expect.any(Array),
+        );
+      }
+
+      form.set("size", SIZE_HELP_VALUE);
+      const assisted = requestOrderInput(form);
+      expect(assisted.success).toBe(true);
+      if (assisted.success) expect(assisted.data.size).toBe(SIZE_HELP_VALUE);
+    },
+  );
 
   it("rejects missing consent, invalid locales and invalid idempotency keys", () => {
     const form = validForm();

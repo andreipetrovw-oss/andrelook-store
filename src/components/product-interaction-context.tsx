@@ -15,15 +15,12 @@ import { trackPublicEvent } from "@/lib/measurement/client";
 
 import type { MeasurementItem } from "./measurement-events";
 
-type SelectionError = "colour" | "size" | null;
-
 type ProductInteractionValue = {
   closeOrder: () => void;
   colour: string;
   drawerOpen: boolean;
   openOrder: (trigger?: HTMLElement | null) => boolean;
   restoreFocus: () => void;
-  selectionError: SelectionError;
   setColour: (value: string) => void;
   setSize: (value: string) => void;
   size: string;
@@ -55,16 +52,13 @@ export function ProductInteractionProvider({
         : "",
   );
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectionError, setSelectionError] = useState<SelectionError>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const setColour = useCallback((value: string) => {
     setColourState(value);
-    setSelectionError((current) => (current === "colour" ? null : current));
   }, []);
   const setSize = useCallback((value: string) => {
     setSizeState(value);
-    setSelectionError((current) => (current === "size" ? null : current));
   }, []);
   const openOrder = useCallback(
     (trigger?: HTMLElement | null) => {
@@ -72,22 +66,12 @@ export function ProductInteractionProvider({
       trackPublicEvent("preorder_cta_attempt", {
         item_id: measurementItem.item_id,
       });
-      if (sizes.length > 0 && !size) {
+      if ((sizes.length > 0 && !size) || (colourCodes.length > 0 && !colour)) {
         trackPublicEvent("preorder_selection_required", {
           item_id: measurementItem.item_id,
         });
-        setSelectionError("size");
-        return false;
-      }
-      if (colourCodes.length > 0 && !colour) {
-        trackPublicEvent("preorder_selection_required", {
-          item_id: measurementItem.item_id,
-        });
-        setSelectionError("colour");
-        return false;
       }
       triggerRef.current = trigger ?? null;
-      setSelectionError(null);
       setDrawerOpen(true);
       trackPublicEvent("preorder_open", {
         ...(measurementItem.currency
@@ -122,7 +106,6 @@ export function ProductInteractionProvider({
       drawerOpen,
       openOrder,
       restoreFocus,
-      selectionError,
       setColour,
       setSize,
       size,
@@ -133,7 +116,6 @@ export function ProductInteractionProvider({
       drawerOpen,
       openOrder,
       restoreFocus,
-      selectionError,
       setColour,
       setSize,
       size,

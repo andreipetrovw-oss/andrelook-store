@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 import type { Locale } from "@/config/locales";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { SIZE_HELP_VALUE } from "@/lib/orders/request-constants";
@@ -11,19 +9,13 @@ import { useProductInteraction } from "./product-interaction-context";
 
 const copy = {
   en: {
-    colourPrompt: "Choose a colour before continuing.",
     help: "Help me choose a size",
-    sizePrompt: "Choose a size or ask for sizing help before continuing.",
   },
   et: {
-    colourPrompt: "Enne jätkamist vali värv.",
     help: "Aita mul suurust valida",
-    sizePrompt: "Enne jätkamist vali suurus või küsi suuruseabi.",
   },
   ru: {
-    colourPrompt: "Перед продолжением выберите цвет.",
     help: "Помогите выбрать размер",
-    sizePrompt: "Выберите размер или запросите помощь перед продолжением.",
   },
 } satisfies Record<Locale, Record<string, string>>;
 
@@ -41,15 +33,8 @@ export function ProductConfigurator({
   sizes: string[];
 }) {
   const labels = copy[locale];
-  const { colour, openOrder, selectionError, setColour, setSize, size } =
+  const { colour, openOrder, setColour, setSize, size } =
     useProductInteraction();
-  const colourRef = useRef<HTMLDivElement>(null);
-  const sizeRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (selectionError === "size") sizeRef.current?.focus();
-    if (selectionError === "colour") colourRef.current?.focus();
-  }, [selectionError]);
 
   return (
     <>
@@ -59,15 +44,7 @@ export function ProductConfigurator({
           className="product-option-preview"
         >
           <h2>{dictionary.colour}</h2>
-          <div
-            aria-describedby={
-              selectionError === "colour" ? "colour-selection-error" : undefined
-            }
-            className="option-chip-row colour-chip-row"
-            ref={colourRef}
-            role="group"
-            tabIndex={-1}
-          >
+          <div className="option-chip-row colour-chip-row" role="group">
             {colours.map((item) => (
               <button
                 aria-label={`${dictionary.colour}: ${item.name}`}
@@ -85,11 +62,6 @@ export function ProductConfigurator({
               </button>
             ))}
           </div>
-          {selectionError === "colour" ? (
-            <p className="selection-prompt" id="colour-selection-error">
-              {labels.colourPrompt}
-            </p>
-          ) : null}
         </section>
       ) : null}
 
@@ -100,15 +72,7 @@ export function ProductConfigurator({
             <a href="#size-guide">{dictionary.sizeGuide}</a>
           ) : null}
         </div>
-        <div
-          aria-describedby={
-            selectionError === "size" ? "size-selection-error" : undefined
-          }
-          className="option-chip-row size-chip-row"
-          ref={sizeRef}
-          role="group"
-          tabIndex={-1}
-        >
+        <div className="option-chip-row size-chip-row" role="group">
           {sizes.map((item) => (
             <button
               aria-label={`${dictionary.size}: ${item}`}
@@ -133,11 +97,6 @@ export function ProductConfigurator({
             {labels.help}
           </button>
         </div>
-        {selectionError === "size" ? (
-          <p className="selection-prompt" id="size-selection-error">
-            {labels.sizePrompt}
-          </p>
-        ) : null}
       </section>
 
       <button

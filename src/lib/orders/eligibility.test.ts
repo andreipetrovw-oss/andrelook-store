@@ -4,6 +4,7 @@ import {
   assessRequestEligibility,
   type RequestEligibilityProduct,
 } from "./eligibility";
+import { SIZE_HELP_VALUE } from "./request-constants";
 
 const product: RequestEligibilityProduct = {
   availability: "PRE_ORDER",
@@ -62,6 +63,28 @@ describe("server-side request eligibility", () => {
     ).toBe("selection");
     expect(
       assessRequestEligibility(product, { ...request, colour: "white" }, false),
+    ).toBe("selection");
+  });
+
+  it("accepts explicit size help while still requiring a valid colour", () => {
+    expect(
+      assessRequestEligibility(
+        product,
+        { ...request, size: SIZE_HELP_VALUE, sizeHelpRequested: true },
+        false,
+      ),
+    ).toBeNull();
+    expect(
+      assessRequestEligibility(
+        product,
+        {
+          ...request,
+          colour: "",
+          size: SIZE_HELP_VALUE,
+          sizeHelpRequested: true,
+        },
+        false,
+      ),
     ).toBe("selection");
   });
 
