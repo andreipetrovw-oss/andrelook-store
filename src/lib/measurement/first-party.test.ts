@@ -96,4 +96,37 @@ describe("first-party analytics isolation", () => {
       }),
     );
   });
+
+  it.each(["PREORDER_CTA_ATTEMPT", "PREORDER_SELECTION_REQUIRED"])(
+    "accepts the consent-gated %s diagnostic with a bounded anonymous payload",
+    async (eventName) => {
+      const upsert = vi.fn().mockResolvedValue({});
+      vi.mocked(getPrisma).mockReturnValue({
+        analyticsEvent: { upsert },
+        product: {
+          findUnique: vi.fn().mockResolvedValue({ id: "product-one" }),
+        },
+      } as never);
+      await recordFirstPartyAnalyticsEvent({
+        adName: null,
+        adSetName: null,
+        campaignName: "winter_vezere_30d_test01",
+        contentLabel: null,
+        eventId: "11111111-1111-4111-8111-111111111111",
+        eventName,
+        landingPage: "/et/catalog/test",
+        locale: "ET",
+        pagePath: "/et/catalog/test",
+        productId: "product-one",
+        sessionId: "22222222-2222-4222-8222-222222222222",
+        source: "META_ADS",
+        sourceGroup: "PAID",
+      });
+      expect(upsert).toHaveBeenCalledOnce();
+      expect(upsert.mock.calls[0]![0]).toMatchObject({
+        create: { eventName, productId: "product-one" },
+        update: {},
+      });
+    },
+  );
 });

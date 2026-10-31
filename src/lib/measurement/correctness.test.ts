@@ -173,6 +173,9 @@ describe("website session populations", () => {
       "PAGE_VIEW",
       "VIEW_ITEM",
       "VIEW_ITEM",
+      "PREORDER_CTA_ATTEMPT",
+      "PREORDER_CTA_ATTEMPT",
+      "PREORDER_SELECTION_REQUIRED",
       "PREORDER_OPEN",
       "PREORDER_OPEN",
     ].map((eventName) => ({
@@ -205,6 +208,8 @@ describe("website session populations", () => {
     expect(r).toMatchObject({
       sessions: 1,
       productViewSessions: 1,
+      preorderAttemptSessions: 1,
+      preorderSelectionRequiredSessions: 1,
       preorderOpenSessions: 1,
       websiteOrders: 1,
       productReach: 100,
