@@ -57,6 +57,7 @@ export type PublicTrackingCurrentStatus =
   | "TRACKING_ADDED"
   | "ORDER_CONFIRMED"
   | "PREPARING"
+  | "PACKED_AWAITING_DISPATCH"
   | "LOGISTICS_REGISTERED"
   | "IN_TRANSIT"
   | "ARRIVED_IN_ESTONIA"

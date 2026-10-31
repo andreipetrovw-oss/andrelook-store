@@ -10,7 +10,6 @@ import {
   LogisticsEvidenceSourceType,
   LogisticsEvidenceVerificationStatus,
   Locale,
-  OrderTrackingMilestoneKind,
   OrderStatus,
   PaymentKind,
   PublicationStatus,
@@ -44,6 +43,10 @@ import {
 import { createManualOrder as createManualOrderRecord } from "@/lib/orders/manual";
 import { notifyLinkedOrders } from "@/lib/tracking/notifications";
 import {
+  parseOrderMilestone,
+  saveOrderMilestone,
+} from "@/lib/tracking/order-milestone";
+import {
   createOwnerLogisticsEvidence,
   reviseOwnerLogisticsEvidence,
   voidOwnerLogisticsEvidence,
@@ -60,7 +63,6 @@ import {
 import {
   parseEvidenceLocalDateTime,
   parseTallinnDate,
-  parseTallinnLocalDateTime,
 } from "@/lib/tracking/time";
 
 const statusSchema = z.object({
@@ -273,18 +275,6 @@ function parsedLogisticsEvidence(formData: FormData) {
     verificationStatus: parsed.data.verificationStatus,
   };
 }
-
-const orderTrackingMilestoneSchema = z.object({
-  evidenceNote: z.string().trim().min(3).max(500),
-  evidenceSource: z.enum([
-    "OWNER_CONFIRMED",
-    "WAREHOUSE_CONFIRMED",
-    "MANUAL_OVERRIDE",
-  ]),
-  kind: z.enum(OrderTrackingMilestoneKind),
-  occurredAt: z.string().trim().min(1),
-  orderId: z.string().min(1),
-});
 
 export async function createManualOrder(formData: FormData) {
   await requireOwner();
@@ -524,35 +514,29 @@ export async function rotateOrderTrackingLink(formData: FormData) {
   revalidatePath(`/admin/orders/${orderId}`);
 }
 
-export async function recordOrderTrackingMilestone(formData: FormData) {
-  const parsed = orderTrackingMilestoneSchema.safeParse(
-    Object.fromEntries(formData),
-  );
-  if (!parsed.success) throw new Error("Invalid order milestone.");
-  const occurredAt = parseTallinnLocalDateTime(parsed.data.occurredAt);
-  if (!occurredAt) throw new Error("Invalid Tallinn milestone timestamp.");
-  const changedByAdminId = await adminId();
-  const customerVisible = parsed.data.kind !== "PAYMENT_RECEIVED";
-  await getPrisma().$transaction(async (tx) => {
-    await tx.orderTrackingMilestone.create({
-      data: {
-        createdByAdminId: changedByAdminId,
-        customerVisible,
-        evidenceNote: parsed.data.evidenceNote,
-        evidenceSource: parsed.data.evidenceSource,
-        kind: parsed.data.kind,
-        occurredAt,
-        orderId: parsed.data.orderId,
-      },
-    });
-    if (parsed.data.kind === "ORDER_CONFIRMED") {
-      await tx.order.update({
-        data: { confirmedAt: occurredAt },
-        where: { id: parsed.data.orderId },
-      });
-    }
-  });
+export async function recordOrderTrackingMilestone(
+  _previous: { error: string | null; message?: string },
+  formData: FormData,
+): Promise<{ error: string | null; message?: string }> {
+  await requireOwner();
+  const parsed = parseOrderMilestone(formData);
+  if (!parsed.data) return { error: parsed.error };
+  let created;
+  try {
+    created = await saveOrderMilestone(parsed.data, await adminId());
+  } catch {
+    return {
+      error:
+        "Не удалось сохранить событие. Проверьте данные и повторите попытку.",
+    };
+  }
   revalidatePath(`/admin/orders/${parsed.data.orderId}`);
+  return {
+    error: null,
+    message: created
+      ? "Подтверждённое событие добавлено."
+      : "Это событие уже сохранено. Дубликат не создан.",
+  };
 }
 
 export async function updateShipmentPublicTracking(formData: FormData) {

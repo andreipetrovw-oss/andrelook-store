@@ -128,6 +128,75 @@ describe("public tracking presentation", () => {
     ]);
   });
 
+  it.each([
+    ["RU", "Упакован — ожидает отправки"],
+    ["ET", "Pakitud — ootab väljasaatmist"],
+    ["EN", "Packed — awaiting dispatch"],
+  ] as const)(
+    "publishes a packed, non-shipped order with no shipment in %s",
+    async (locale, label) => {
+      findUnique.mockResolvedValue(
+        trackedOrder({
+          trackingMilestones: [
+            {
+              kind: "ORDER_CONFIRMED",
+              occurredAt: new Date("2026-10-29T09:00:00Z"),
+            },
+            {
+              kind: "PACKING_CONFIRMED",
+              occurredAt: new Date("2026-10-30T13:00:00Z"),
+            },
+            {
+              kind: "PACKING_CONFIRMED",
+              occurredAt: new Date("2026-10-30T13:00:00Z"),
+            },
+          ],
+        }),
+      );
+      const result = await getPublicTrackingOrder("p".repeat(43), locale);
+      expect(result).toMatchObject({
+        status: "PACKED_AWAITING_DISPATCH",
+        statusLabel: label,
+        lastUpdatedAt: "2026-10-30T13:00:00.000Z",
+        estimatedDeliveryFrom: null,
+        estimatedDeliveryTo: null,
+        carrierName: null,
+        trackingNumber: null,
+      });
+      expect(result?.timeline.map((e) => e.status)).toEqual([
+        "ORDER_CONFIRMED",
+        "PACKED_AWAITING_DISPATCH",
+      ]);
+      const output = JSON.stringify(result);
+      expect(output).not.toMatch(
+        /OWNER_CONFIRMED|WAREHOUSE|supplier|DHL|17TRACK|IN_TRANSIT|source|evidenceNote/,
+      );
+    },
+  );
+
+  it("does not move a dispatched order backwards when packing is backfilled", async () => {
+    findUnique.mockResolvedValue(
+      trackedOrder({
+        trackingMilestones: [
+          {
+            kind: "INTERNATIONAL_DISPATCH_CONFIRMED",
+            occurredAt: new Date("2026-10-30T14:00:00Z"),
+          },
+          {
+            kind: "PACKING_CONFIRMED",
+            occurredAt: new Date("2026-10-29T13:00:00Z"),
+          },
+        ],
+      }),
+    );
+    const result = await getPublicTrackingOrder("p".repeat(43), "EN");
+    expect(result?.status).toBe("IN_TRANSIT");
+    expect(result?.timeline.map((e) => e.status)).toEqual([
+      "PACKED_AWAITING_DISPATCH",
+      "IN_TRANSIT",
+    ]);
+  });
+
   it("surfaces one evidence-timestamped InfoReceived milestone without advancing the main status", async () => {
     findUnique.mockResolvedValue(
       trackedOrder({

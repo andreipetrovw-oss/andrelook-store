@@ -12,6 +12,7 @@ import { randomUUID } from "node:crypto";
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 import { FinancialForm } from "@/components/admin/financial-form";
 import { OrderReviewSection } from "@/components/admin/order-review-section";
+import { OrderMilestoneForm } from "@/components/admin/order-milestone-form";
 import { TrackingCustomerControls } from "@/components/admin/tracking-customer-controls";
 import {
   getAdminOrder,
@@ -35,7 +36,6 @@ import {
 } from "@/lib/admin/labels";
 
 import {
-  recordOrderTrackingMilestone,
   retryOrderNotification,
   rotateOrderTrackingLink,
   updateOrderDetails,
@@ -546,39 +546,14 @@ export default async function AdminOrderPage({
             </p>
           ) : null}
           <h3>Подтверждённая история заказа</h3>
-          <form
-            action={recordOrderTrackingMilestone}
-            className="admin-stack-form admin-form-grid"
-          >
-            <input name="orderId" type="hidden" value={order.id} />
-            <label>
-              <span>Событие</span>
-              <select name="kind">
-                {Object.values(OrderTrackingMilestoneKind).map((kind) => (
-                  <option key={kind} value={kind}>
-                    {trackingMilestoneLabels[kind]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Источник доказательства</span>
-              <select defaultValue="OWNER_CONFIRMED" name="evidenceSource">
-                <option value="OWNER_CONFIRMED">OWNER_CONFIRMED</option>
-                <option value="WAREHOUSE_CONFIRMED">WAREHOUSE_CONFIRMED</option>
-                <option value="MANUAL_OVERRIDE">MANUAL_OVERRIDE</option>
-              </select>
-            </label>
-            <label>
-              <span>Реальная дата и время (Таллинн)</span>
-              <input name="occurredAt" required type="datetime-local" />
-            </label>
-            <label>
-              <span>Основание / доказательство</span>
-              <input name="evidenceNote" required />
-            </label>
-            <button type="submit">Добавить подтверждённое событие</button>
-          </form>
+          <OrderMilestoneForm
+            key={order.id}
+            orderId={order.id}
+            kinds={Object.values(OrderTrackingMilestoneKind).map((kind) => ({
+              value: kind,
+              label: trackingMilestoneLabels[kind],
+            }))}
+          />
           {order.trackingMilestones.length ? (
             <ul className="timeline">
               {order.trackingMilestones.map((milestone) => (

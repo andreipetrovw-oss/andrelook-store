@@ -8,11 +8,16 @@ const mocks = vi.hoisted(() => ({
   createOwnerLogisticsEvidence: vi.fn(),
   requireOwner: vi.fn(),
   upsertAdmin: vi.fn(),
+  saveOrderMilestone: vi.fn(),
 }));
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
 vi.mock("@/lib/auth/server", () => ({ requireOwner: mocks.requireOwner }));
+vi.mock("@/lib/tracking/order-milestone", async (original) => ({
+  ...(await original<typeof import("@/lib/tracking/order-milestone")>()),
+  saveOrderMilestone: mocks.saveOrderMilestone,
+}));
 vi.mock("@/lib/db", () => ({
   getPrisma: () => ({ adminUser: { upsert: mocks.upsertAdmin } }),
 }));
@@ -35,6 +40,7 @@ import {
   addShipmentLogisticsEvidence,
   saveFinancialCorrection,
   updateAgreedPrice,
+  recordOrderTrackingMilestone,
 } from "./actions";
 import { FinancialCorrectionError } from "@/lib/orders/corrections";
 
@@ -124,5 +130,58 @@ describe("owner-only order correction actions", () => {
       (await saveFinancialCorrection({ error: null }, form)).error,
     ).not.toBeNull();
     expect(mocks.addPaymentRecord).not.toHaveBeenCalled();
+  });
+
+  it("denies milestone writes before any mutation for a non-owner", async () => {
+    mocks.requireOwner.mockRejectedValue(new Error("forbidden"));
+    await expect(
+      recordOrderTrackingMilestone({ error: null }, new FormData()),
+    ).rejects.toThrow("forbidden");
+    expect(mocks.upsertAdmin).not.toHaveBeenCalled();
+    expect(mocks.saveOrderMilestone).not.toHaveBeenCalled();
+  });
+
+  it("returns localized inline milestone errors instead of crashing or writing", async () => {
+    mocks.requireOwner.mockResolvedValue({ email: "owner@example.invalid" });
+    expect(
+      (await recordOrderTrackingMilestone({ error: null }, new FormData()))
+        .error,
+    ).toBeTruthy();
+    expect(mocks.upsertAdmin).not.toHaveBeenCalled();
+    expect(mocks.saveOrderMilestone).not.toHaveBeenCalled();
+  });
+
+  it("handles a valid packed event, retry and private database failure safely", async () => {
+    mocks.requireOwner.mockResolvedValue({
+      email: "owner@example.invalid",
+      provider: "clerk",
+      providerSubject: "owner",
+    });
+    mocks.upsertAdmin.mockResolvedValue({ id: "owner" });
+    const form = new FormData();
+    for (const [key, value] of Object.entries({
+      orderId: "synthetic-order",
+      kind: "PACKING_CONFIRMED",
+      evidenceSource: "OWNER_CONFIRMED",
+      occurredAt: "2026-10-30T15:00",
+      evidenceNote: "Verified staging packing evidence",
+    }))
+      form.set(key, value);
+    mocks.saveOrderMilestone
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false)
+      .mockRejectedValueOnce(new Error("PRIVATE_DATABASE_SECRET"));
+    expect(
+      await recordOrderTrackingMilestone({ error: null }, form),
+    ).toMatchObject({
+      error: null,
+      message: "Подтверждённое событие добавлено.",
+    });
+    expect(
+      (await recordOrderTrackingMilestone({ error: null }, form)).message,
+    ).toContain("Дубликат не создан");
+    const failed = await recordOrderTrackingMilestone({ error: null }, form);
+    expect(failed.error).toBeTruthy();
+    expect(failed.error).not.toContain("PRIVATE");
   });
 });

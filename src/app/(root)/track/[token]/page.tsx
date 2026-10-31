@@ -71,6 +71,9 @@ export default async function TrackingPage({
         <h1 className="tracking-order-number">{order.reference}</h1>
         <p className="tracking-current-status">{order.statusLabel}</p>
         <p>{labels.network}</p>
+        {order.status === "PACKED_AWAITING_DISPATCH" ? (
+          <p>{labels.packedNote}</p>
+        ) : null}
         {order.status === "IN_TRANSIT" ? <p>{labels.note}</p> : null}
         <dl className="tracking-facts">
           <div>

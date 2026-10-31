@@ -19,6 +19,8 @@ export const trackingCopy = {
       "This page reflects verified updates stored by Andrelook. It is not GPS tracking.",
     note: "Your shipment is in the international logistics network. The next update will appear after a confirmed carrier or Andrelook milestone.",
     order: "Order number",
+    packedNote:
+      "Tracking will be updated when new confirmed transport information becomes available.",
     refresh: "Refresh status",
     support: "Need help? Contact Andrelook ↗",
     timeline: "Order journey",
@@ -41,6 +43,8 @@ export const trackingCopy = {
       "Leht näitab Andrelooki salvestatud kinnitatud uuendusi. Tegemist ei ole GPS-jälgimisega.",
     note: "Saadetis on rahvusvahelises logistikavõrgus. Järgmine uuendus ilmub pärast vedaja või Andrelooki kinnitatud sündmust.",
     order: "Tellimuse number",
+    packedNote:
+      "Jälgimist uuendatakse, kui saabub uus kinnitatud transpordiinfo.",
     refresh: "Värskenda olekut",
     support: "Vajad abi? Võta Andrelookiga ühendust ↗",
     timeline: "Tellimuse teekond",
@@ -63,6 +67,8 @@ export const trackingCopy = {
       "Страница показывает подтверждённые обновления, сохранённые Andrelook. Это не GPS-отслеживание.",
     note: "Отправление находится в международной логистической сети. Следующее обновление появится после подтверждённого события перевозчика или Andrelook.",
     order: "Номер заказа",
+    packedNote:
+      "Отслеживание обновится, когда появится новая подтверждённая информация о перевозке.",
     refresh: "Обновить статус",
     support: "Нужна помощь? Связаться с Andrelook ↗",
     timeline: "Путь заказа",
